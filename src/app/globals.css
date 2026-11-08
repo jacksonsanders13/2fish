@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Colors come straight from the prototype. Light first, dark below. */
+:root {
+  --page: #eef1f5;
+  --surface: #ffffff;
+  --ink: #14212b;
+  --muted: #65717c;
+  --line: #dde3ea;
+  --brand: #1b5fd1;
+  --brand-ink: #ffffff;
+  --brand-soft: #e8f1ff;
+  --go: #12a05c;
+  --go-ink: #ffffff;
+  --go-soft: #e2f5ea;
+  --warn: #f2a630;
+  --warn-soft: #fdf1dc;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0f141a;
+    --surface: #1b2229;
+    --ink: #e7ecf1;
+    --muted: #9aa6b2;
+    --line: #2b343d;
+    --brand: #4d8cf0;
+    --brand-soft: #1d2c44;
+    --go: #2fbf76;
+    --go-ink: #05210f;
+    --go-soft: #173426;
+    --warn: #f2b04a;
+    --warn-soft: #3a2c14;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --page: #0f141a;
+  --surface: #1b2229;
+  --ink: #e7ecf1;
+  --muted: #9aa6b2;
+  --line: #2b343d;
+  --brand: #4d8cf0;
+  --brand-soft: #1d2c44;
+  --go: #2fbf76;
+  --go-ink: #05210f;
+  --go-soft: #173426;
+  --warn: #f2b04a;
+  --warn-soft: #3a2c14;
+  color-scheme: dark;
+}
+
+/* lets us write bg-surface, text-muted, border-line, etc. */
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-go: var(--go);
+  --color-go-ink: var(--go-ink);
+  --color-go-soft: var(--go-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+:focus-visible {
+  outline: 3px solid var(--warn);
+  outline-offset: 2px;
+}
+
+/* a few shared pieces so the JSX doesn't get buried in class names */
+@layer components {
+  .box {
+    @apply rounded-[14px] border border-line bg-surface;
+  }
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-[10px] border border-line bg-surface px-3.5 py-2.5 font-extrabold text-ink no-underline disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-go {
+    @apply min-w-[140px] flex-1 border-go bg-go text-base text-go-ink;
+  }
+  .btn-soft {
+    @apply border-page bg-page;
+  }
+  .chip {
+    @apply cursor-pointer whitespace-nowrap rounded-full border border-line bg-surface px-3 py-1 text-sm font-bold text-muted;
+  }
+  .chip[aria-pressed="true"] {
+    @apply border-brand bg-brand-soft text-brand;
+  }
+  .input {
+    @apply w-full rounded-[10px] border border-line bg-page px-3 py-2.5;
+  }
+  .label {
+    @apply text-sm font-extrabold;
+  }
+}
+
+dialog::backdrop {
+  background: rgba(10, 20, 30, 0.5);
+}
