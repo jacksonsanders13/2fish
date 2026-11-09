@@ -5,8 +5,8 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 
 // Light/dark switch. The choice is saved per browser; with no choice saved
-// the app follows the phone/computer setting. The <head> script in
-// layout.tsx applies the saved choice before first paint (no flash).
+// the app follows the device setting. The <head> script in layout.tsx
+// applies the saved choice before first paint (no flash).
 
 type Theme = "light" | "dark";
 const KEY = "2fish-theme";
@@ -28,26 +28,29 @@ function subscribe(cb: () => void) {
   };
 }
 
-export default function ThemeToggle() {
+function toggle(next: Theme) {
+  document.documentElement.dataset.theme = next;
+  try {
+    localStorage.setItem(KEY, next);
+  } catch {}
+  window.dispatchEvent(new Event(EVENT));
+}
+
+// withLabel: shows "Dark mode" / "Light mode" next to the icon (desktop rail)
+export default function ThemeToggle({ withLabel = false }: { withLabel?: boolean }) {
   const theme = useSyncExternalStore<Theme | null>(subscribe, current, () => null);
   const next: Theme = theme === "dark" ? "light" : "dark";
+  // nothing until we know the theme, so the icon never flips after load
+  const icon = theme === "dark" ? <Sun aria-hidden="true" /> : theme === "light" ? <Moon aria-hidden="true" /> : null;
 
-  return (
-    <Button
-      variant="ghostOnPrimary"
-      size="icon"
-      aria-label={`Switch to ${next} mode`}
-      title={`Switch to ${next} mode`}
-      onClick={() => {
-        document.documentElement.dataset.theme = next;
-        try {
-          localStorage.setItem(KEY, next);
-        } catch {}
-        window.dispatchEvent(new Event(EVENT));
-      }}
-    >
-      {/* nothing until we know the theme, so the icon never flips after load */}
-      {theme === "dark" ? <Sun aria-hidden="true" /> : theme === "light" ? <Moon aria-hidden="true" /> : null}
+  return withLabel ? (
+    <Button variant="ghost" className="justify-start" onClick={() => toggle(next)}>
+      {icon}
+      {theme ? `${next === "dark" ? "Dark" : "Light"} mode` : "Theme"}
+    </Button>
+  ) : (
+    <Button variant="ghost" size="icon" aria-label={`Switch to ${next} mode`} title={`Switch to ${next} mode`} onClick={() => toggle(next)}>
+      {icon}
     </Button>
   );
 }

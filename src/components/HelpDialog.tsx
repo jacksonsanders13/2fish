@@ -25,7 +25,7 @@ export default function HelpDialog() {
       ref={ref}
       onClose={closeHelp}
       aria-labelledby="help-title"
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border-0 bg-surface p-6 text-foreground shadow-pop open:animate-scale-in"
+      className="mx-0 mb-0 mt-auto w-full max-w-none rounded-t-xl border-0 bg-surface p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-foreground shadow-pop open:animate-sheet-in sm:m-auto sm:w-[calc(100%-2rem)] sm:max-w-md sm:rounded-xl sm:pb-6 sm:open:animate-scale-in"
     >
       {helpTarget && <HelpForm key={helpTarget.id} need={helpTarget} />}
     </dialog>
@@ -55,6 +55,8 @@ function HelpForm({ need: n }: { need: Need }) {
 
   return (
     <form onSubmit={submit} className="grid gap-4">
+      {/* grab handle, phones only */}
+      <span aria-hidden="true" className="mx-auto -mt-2 h-1 w-10 rounded-full bg-border sm:hidden" />
       <div className="grid gap-1">
         <Heading id="help-title" level="section">
           Help a neighbor
@@ -74,7 +76,7 @@ function HelpForm({ need: n }: { need: Need }) {
               value={o.value}
               checked={method === o.value}
               onChange={() => setMethod(o.value)}
-              className="mt-1 size-4 accent-success"
+              className="mt-1 size-4 accent-primary"
             />
             <span>
               <span className="block font-bold">{o.title}</span>
@@ -92,7 +94,7 @@ function HelpForm({ need: n }: { need: Need }) {
         <Button variant="secondary" onClick={closeHelp}>
           Cancel
         </Button>
-        <Button type="submit" variant="help" grow disabled={busy}>
+        <Button type="submit" variant="primary" className="flex-1" disabled={busy}>
           {busy ? "Saving…" : "Count me in"}
         </Button>
       </div>

@@ -2,49 +2,38 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 // Use <Button> for buttons. For links that look like buttons, use
-// className={buttonVariants({ ... })} on <Link> or <a>.
+// className={buttonVariants({ ... })} on <Link> or <a> (combine with cn()).
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap [&_svg]:size-5 [&_svg]:shrink-0 rounded-md border font-extrabold no-underline transition-[transform,background-color,box-shadow,border-color] duration-200 ease-smooth active:scale-[.98] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full border font-bold no-underline transition-[transform,background-color,box-shadow,border-color,color] duration-200 ease-smooth active:scale-[.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // main brand action
+        // the one brand action: I'll help, Post, Count me in, I got it
         primary: "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-glow",
-        // the giving action: I'll help, Count me in, Post my need, I got it
-        help: "border-success bg-success text-success-foreground hover:bg-success/90 hover:shadow-glow-success",
-        // the one big call to action on a page
-        hero: "border-transparent bg-gradient-primary text-brand-surface-foreground shadow-card hover:scale-[1.03] hover:shadow-glow",
-        // white button sitting on a primary/gradient surface
-        inverse: "border-transparent bg-brand-surface-foreground text-brand-surface hover:bg-brand-surface-foreground/90 hover:shadow-lift",
-        // quiet neutral: Cancel, Remove post
-        // see-through button on a primary/gradient surface
-        // icon button in the top bar
-        ghostOnPrimary: "border-transparent bg-transparent text-brand-surface-foreground hover:bg-brand-surface-foreground/15",
-        onPrimary: "border-brand-surface-foreground/40 bg-transparent text-brand-surface-foreground hover:bg-brand-surface-foreground/10",
+        // quiet filled: Cancel, Remove
         secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-border",
-        outline: "border-border bg-surface text-foreground hover:border-primary hover:text-primary-soft-foreground",
+        outline: "border-border bg-surface text-foreground hover:bg-muted",
+        // text-only, for icon rows and low-priority actions
         ghost: "border-transparent bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
         destructive: "border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        // dev/testing-only controls, deliberately low-key
-        dev: "border-dashed border-input bg-transparent font-bold text-muted-foreground hover:bg-muted",
+        // preview-only testing controls, deliberately low-key
+        dev: "border-dashed border-input bg-transparent font-semibold text-muted-foreground hover:bg-muted",
       },
       size: {
-        sm: "min-h-9 px-3 text-sm",
-        md: "min-h-11 px-4 text-base",
+        sm: "min-h-9 px-4 text-sm [&_svg]:size-4",
+        md: "min-h-11 px-5 text-base",
         lg: "min-h-12 px-6 text-lg",
         // round icon-only button; always pass an aria-label
-        icon: "size-10 rounded-full p-0",
+        icon: "size-10 p-0",
       },
-      // stretch to share a row with other buttons
-      grow: { true: "min-w-36 flex-1", false: "" },
       block: { true: "w-full", false: "" },
     },
-    defaultVariants: { variant: "outline", size: "md", grow: false, block: false },
+    defaultVariants: { variant: "outline", size: "md", block: false },
   },
 );
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants>;
 
-export function Button({ className, variant, size, grow, block, type = "button", ...props }: ButtonProps) {
-  return <button type={type} className={cn(buttonVariants({ variant, size, grow, block }), className)} {...props} />;
+export function Button({ className, variant, size, block, type = "button", ...props }: ButtonProps) {
+  return <button type={type} className={cn(buttonVariants({ variant, size, block }), className)} {...props} />;
 }

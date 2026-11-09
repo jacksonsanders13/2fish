@@ -10,86 +10,83 @@ token and variant renders at **`/styleguide`** when the app is running.
 
 | | |
 |---|---|
-| **Project type** | Community needs board (web app, phone-first) |
-| **Industry** | Mutual aid / civic / nonprofit |
-| **Audience** | Neighbors of every tech level. Some are posting during a hard week, on a phone, maybe on slow data. Others are helpers with a few spare minutes. |
-| **Personality** | Warm, trustworthy, dignified, hopeful. Never pity, never "charity poster". |
+| **Project type** | Community needs board, built as a **social feed** (phone first, desktop welcome) |
+| **Industry** | Mutual aid / civic |
+| **Audience** | Neighbors of every tech level. Some are posting during a hard week, on a phone. Others are helpers with a few spare minutes, scrolling like they would any feed. |
+| **Personality** | Warm, human, a little playful. Never corporate, never "charity poster". |
 | **Tagline** | *A little is enough.* |
 
-**What people should feel:** *safe* asking (posters) and *glad* giving (helpers).
-Nothing should look like a bank, a hospital or a donation drive.
+**What people should feel:** this is *people*, not an institution. Posts look
+like posts from neighbors, not tickets in a queue.
 
-**Conventions we follow:** neighborhood/social apps (cards, avatars, a feed),
-plus nonprofit plain language. **Conventions we avoid:** red "urgent"
-fundraising styling, guilt imagery, dense dashboards.
+**Conventions we follow:** social feeds (Instagram, Nextdoor, X): avatar-first
+posts as rows, a stories-style filter row, a bottom tab bar on phones, three
+columns on desktop. **Conventions we avoid:** boxed corporate cards, big
+marketing heroes, red "urgent" fundraising styling.
 
 ---
 
-## 2. Color psychology and harmony
+## 2. Color
 
-**Harmony: complementary.** Blue 218° ↔ amber 38°, with a functional green.
+**One brand color on white.** Social apps get their identity from a single
+signature color against clean white, with everything else neutral.
 
 | Role | Token | Why |
 |---|---|---|
-| **Primary: blue 218°** | `--primary` | Trust and safety. Posters share personal needs, so the brand has to read as dependable before anything else. Kept from the original prototype so 2fish still looks like itself. |
-| **Accent: amber 38°** | `--accent` | The complement of the blue. Warmth, optimism, attention. Used **sparingly**: "being helped" status, urgent due dates, the preview banner. |
-| **Success: green 152°** | `--success` | Growth and "it worked". Every *giving* action (I'll help, Count me in, Post my need, I got it) is green, so the act of helping has one consistent color. |
-| **Destructive: red 0°** | `--destructive` | Only for real problems (form errors, safety warnings). Never used to make needs look urgent: that would feel like pressure. |
-| **Neutrals: warm paper** | `--background`, `--muted`, `--border` | A slightly warm off-white (40° hue) instead of a cold grey, so the app feels homey rather than clinical. |
+| **Primary: koi coral (8°)** | `--primary` | Two fish, so koi. Warm, friendly and unmistakably 2fish. It's the color of every action that brings people together: *I'll help*, *Post a need*, *Count me in*, *I got it*. Also the selected category ring and the logo. |
+| **Neutrals: white + warm ink** | `--background` `--foreground` `--muted` `--border` | Pure white keeps the feed calm so photos-less text posts still breathe; the ink and greys lean slightly warm (20–30°) to sit well next to coral. |
+| **Accent: amber (38°)** | `--accent` | Only for *time*: "Needed today/tomorrow" and "A neighbor is helping". |
+| **Success: sage (150°)** | `--success` | Only for "Received". Good news, quietly. |
+| **Destructive: red (0°)** | `--destructive` | Real errors only. |
+| **Focus ring: ink** | `--ring` | Deliberately *not* coral: a coral ring looked like an error state next to the red. |
 
-**Category colors** (`--cat-*`) give each post a recognizable band. They are
-spread around the wheel at similar weight. Each one passes **4.5:1 with white
-text**, which the original palette did not: the old orange, teal, cyan and
-green were all around 3:1.
+**Categories** each have an icon and a color (`--cat-*`), shown as a small
+colored "● Food" label on posts and as the icon color in the stories row.
+They no longer fill big bands, so the feed isn't a rainbow.
 
-**Dark mode** is not just inverted. Big blue areas (top bar, hero) switch to a
-deep navy `--brand-surface` so they don't glare, and the bright tokens are
-toned down.
+**Dark mode** is a warm near-black (not blue-black) with a lighter coral and
+dark text on coral buttons.
 
-### Contrast (all checked numerically)
+### Contrast (checked numerically, WCAG AA)
 
 | Pair | Light | Dark |
 |---|---|---|
-| foreground / background | 16.7 | 15+ |
-| muted-foreground / background | 6.0 | 7.7 |
-| primary-foreground / primary | 6.2 | 6.4 |
-| success-foreground / success | 5.3 | 5.9 |
-| accent-foreground / accent | 7.3 | 9.0 |
-| soft badges (open / pledged / done) | 6.3 / 6.7 / 5.6 | 6.2 / 8.9 / 7.4 |
-| white / every category band | 5.4 to 7.1 | same |
-| input border / surface (non-text, 3:1 rule) | 3.2 | 3.5 |
+| foreground / background | 17.5 | 16.4 |
+| muted-foreground / background | 5.8 | 7.7 |
+| button text / primary (coral) | 4.85 | 6.55 |
+| accent text / accent (urgent badge) | 7.3 | 9.0 |
+| soft badges and status lines (coral / amber / sage) | 5.6 / 6.1 / 6.6 | 7.0 / 8.9 / 7.8 |
+| input border / surface (non-text, needs 3:1) | 3.3 | 3.7 |
 
 ---
 
 ## 3. Token architecture
 
-All colors are **bare HSL channels** so they work at any opacity:
+Colors are **bare HSL channels** so they work at any opacity:
 
 ```css
---primary: 218 77% 45%;            /* stored */
-background: hsl(var(--primary));    /* used */
+--primary: 8 78% 47%;               /* stored */
+background: hsl(var(--primary));     /* used */
 box-shadow: 0 0 40px hsl(var(--primary) / 0.3);
 ```
 
-Each color has a `-foreground` partner for text on top of it, and most have a
-`-soft` pair (a pale background plus a readable text color) for badges and notices.
+Each color has a `-foreground` partner for text on top of it, and most have
+a `-soft` pair (pale background + readable text) for badges and status lines.
 
 | Group | Tokens |
 |---|---|
 | Surfaces | `background` `surface` `muted` `border` `input` `overlay` |
 | Text | `foreground` `muted-foreground` `on-color` |
-| Brand | `primary` `primary-glow` `primary-soft` `brand-surface` `brand-surface-glow` |
+| Brand | `primary` `primary-glow` `primary-soft` (`brand-surface` reserved for a future large coral area) |
 | Meaning | `accent` `success` `destructive` `secondary` (each with `-foreground` / `-soft`) |
 | Categories | `cat-baby` `cat-food` `cat-clothing` `cat-household` `cat-school` `cat-hygiene` `cat-other` |
 | Avatars | `avatar-1` … `avatar-8` |
-| Effects | `--gradient-primary` `--gradient-warm` `--shadow-card` `--shadow-lift` `--shadow-pop` `--shadow-glow` `--shadow-glow-success` `--shadow-glow-accent` `--transition-smooth` |
-| Motion | `--ease-smooth` `--ease-out-soft` |
-| Radius | `rounded-sm` 8px · `rounded-md` 12px · `rounded-lg` 16px · `rounded-xl` 24px |
+| Effects | `--shadow-card` `--shadow-lift` `--shadow-pop` `--shadow-glow` `--transition-smooth` |
+| Type | `font-display` (Bricolage Grotesque) · `font-sans` (Figtree) |
+| Radius | `rounded-sm` 8 · `rounded-md` 12 · `rounded-lg` 16 · `rounded-xl` 24 · `rounded-full` for buttons, inputs, avatars |
 
-> **Tailwind v4 note.** The methodology mentions `tailwind.config.ts`.
-> Tailwind v4 has no config file: the same mapping is the `@theme` block in
-> `globals.css`. That block is what turns `--primary` into `bg-primary`,
-> `text-primary`, `border-primary/40` and so on.
+> **Tailwind v4 note.** There is no `tailwind.config.ts`; the `@theme`
+> block in `globals.css` is what turns `--primary` into `bg-primary` etc.
 
 ---
 
@@ -100,164 +97,140 @@ Don't pass color classes in from outside.**
 
 | Component | File | Variants |
 |---|---|---|
-| `Button` / `buttonVariants` | `ui/button.tsx` | `primary` `help` `hero` `inverse` `onPrimary` `secondary` `outline` `ghost` `destructive` `dev` · sizes `sm` `md` `lg` · `grow` · `block` |
-| `Card` | `ui/card.tsx` | `default` `interactive` `hero` `muted` · padding `none` `sm` `md` `lg` |
+| `Button` / `buttonVariants` | `ui/button.tsx` | `primary` `secondary` `outline` `ghost` `destructive` `dev` · sizes `sm` `md` `lg` `icon` · `block`. All pill-shaped. |
+| `Card` | `ui/card.tsx` | `default` `flat` (sidebar widgets) `muted` · padding `none` `sm` `md` `lg`. Posts are **not** cards. |
 | `Badge` | `ui/badge.tsx` | `open` `pledged` `done` `example` `due` `urgent` `tag` |
-| `Chip` | `ui/chip.tsx` | toggle filter; selected state comes from `aria-pressed` |
-| `Input` `Textarea` `Select` `Field` `Label` | `ui/input.tsx` | tones `default` `pill` `onPrimary` · `width: zip` · `withIcon` · invalid via `aria-invalid` |
+| `Segmented` | `ui/segmented.tsx` | iOS-style switch: My ZIP / Nearby / Anywhere, My posts / I'm helping |
+| `Input` `Textarea` `Select` `Field` `Label` | `ui/input.tsx` | tones `default` `pill` `search` · `width: zip` · `withIcon` · invalid via `aria-invalid` |
 | `choiceVariants` | `ui/input.tsx` | `card` (radio option) · `plain` (checkbox row) |
-| `Notice` | `ui/notice.tsx` | `info` `warning` `success` `danger` |
+| `Notice` | `ui/notice.tsx` | `info` `warning` `success` `danger` `banner` |
+| `Heading` / `Text` | `ui/typography.tsx` | see §7 |
 | `Avatar` | `ui/avatar.tsx` | sizes `sm` `md` `lg` · tone `auto` (hashed) or `brand` |
-| `StatusProgress` | `ui/progress.tsx` | `open` → `pledged` → `done` |
 | `Skeleton` | `ui/skeleton.tsx` | loading placeholder |
-| `Heading` | `ui/typography.tsx` | levels `hero` `page` `section` `card`; `as` picks the HTML tag separately |
-| `Text` | `ui/typography.tsx` | `lead` `body` `meta` `eyebrow` `micro` · tone `default` `muted` `soft` |
-| `Logo` | `Logo.tsx` | tone `brand` / `inherit` · motion `still` / `float` |
-| `navLinkVariants`, `BottomNav` | `Nav.tsx` | top-bar links (md+) and the phone bottom bar; active state comes from `aria-current` |
-| `ThemeToggle` | `ThemeToggle.tsx` | light/dark switch in the top bar, saved per browser |
+| `NeedCard` | `NeedCard.tsx` | one post row: avatar · name/place/time · category + due · title · story · spot/wishlist · status line · actions |
+| `CategoryStories` | `CategoryStories.tsx` | round category filters; selected = coral ring (`aria-pressed`) |
+| `CATEGORY_META`, `CategoryTag` | `category.tsx` | icon + color per category |
+| `Logo`, `Wordmark` | `Logo.tsx` | tone `brand` (coral koi) / `muted` · motion `still` / `float` |
+| `BottomNav`, `railLinkVariants` | `Nav.tsx` | phone tab bar; desktop rail links. Active state from `aria-current` |
+| `LeftRail`, `RightRail` | `Rails.tsx` | desktop columns |
+| `ThemeToggle` | `ThemeToggle.tsx` | light/dark switch, saved per browser; `withLabel` in the rail |
 
-**Semantic mapping to remember:**
-- Giving help → `variant="help"` (green). Brand navigation → `primary`. Backing out → `secondary`.
-- Need status → `<Badge variant={need.status}>`: the status *is* the variant.
-- Category → `CATEGORY_TONE[category]` from `lib/categories.ts`.
+**Status is words, not a progress bar.** Open posts just show their actions.
+Pledged posts show an amber line: "A neighbor is helping with this. 'note'".
+Received posts show a sage line.
 
 ---
 
 ## 5. Motion
 
-Every animation moves only `transform` and `opacity`, so it runs on the GPU.
+Every animation moves only `transform` and `opacity`.
 
 | Category | Utility | Used on |
 |---|---|---|
-| Entrance | `animate-fade-in-up` + `stagger` (set `--i`) | need cards, hero, post form |
-| | `animate-scale-in` | help dialog |
-| | `animate-toast-in` | toast |
-| | `animate-fade-in` | dialog backdrop, error notice |
-| Hover / interaction | `hover-lift`, `hover-scale`, `active:scale-[.98]` on all buttons | cards, buttons |
-| Ambient | `animate-float` | fish in the hero and in empty states |
-| Attention (sparingly) | `attention-glow` | **only** "Needed today/tomorrow" on open posts. The halo pulses; the text never fades. |
+| Entrance | `animate-fade-in-up` + `stagger` (set `--i`) | feed posts, post form |
+| | `animate-sheet-in` | help sheet sliding up on phones |
+| | `animate-scale-in` | help dialog on larger screens |
+| | `animate-toast-in`, `animate-fade-in` | toast, backdrop, error notice |
+| Hover / interaction | row tint on hover, `hover-scale`, `active:scale-[.97]` on all buttons | posts, story bubbles, buttons |
+| Ambient | `animate-float` | koi in empty states |
+| Attention (sparingly) | `attention-glow` | **only** "Needed today/tomorrow" on open posts |
 
-- Entrance animations use `backwards` fill so they don't block hover transforms afterwards.
-- The progress bar fills with `scaleX`, not `width`.
-- `prefers-reduced-motion: reduce` turns all of it off globally.
+Entrance animations use `backwards` fill so hover transforms still work
+afterwards. `prefers-reduced-motion: reduce` turns all of it off.
 
 ---
 
 ## 6. Icons
 
-[lucide-react](https://lucide.dev): one consistent stroke style, tree-shaken (only the icons used ship).
+[lucide-react](https://lucide.dev), one consistent stroke style, tree-shaken.
 
-- Buttons size icons to 20px and badges to 14px automatically (`[&_svg]` rules in the variants). Don't size icons by hand inside them.
-- Icons sit **before** the label, except "opens in a new tab" (`ExternalLink`), which goes after.
-- Decorative icons get `aria-hidden="true"`. An icon-only button (`size="icon"`) always needs an `aria-label`.
-- Current set: `House` Feed · `Plus` Post · `HeartHandshake` help/My activity · `Search` · `Sun`/`Moon` theme · `MapPin` drop-off · `Gift` wishlist · `Clock` due date · `ExternalLink` · `ShieldCheck` safety · `ArrowDown`.
+- Buttons size icons to 20px (16px at `sm`), badges to 14px, automatically.
+- Icons go **before** the label, except "opens in a new tab" (`ExternalLink`).
+- Decorative icons get `aria-hidden="true"`; icon-only buttons need `aria-label`.
+- Categories: `Baby` · `Apple` Food · `Shirt` · `Sofa` Household · `Backpack` School · `Droplets` Hygiene · `Package` Other · `LayoutGrid` All.
+- App: `House` Feed · `Plus` Post · `HeartHandshake` help / My activity · `Search` · `Sun`/`Moon` · `MapPin` · `Gift` · `Clock` · `CircleCheck` · `ExternalLink` · `ShieldCheck`.
+
+---
 
 ## 7. Spacing and typography
 
-**Spacing: 8px rhythm.** `gap-2` (8) tight · `gap-4` (16) default · `gap-6` (24)
-between blocks · `gap-8` (32) between columns · card padding `p-4` → `md:p-6`.
-`gap-1` / `gap-3` are allowed only inside small clusters (stats, avatar + name).
+**Spacing: 8px rhythm.** Feed rows are `px-4 py-4`, separated by a 1px
+`border-border` line. `gap-2` inside a post, `gap-3` between avatar and
+content, `gap-4` between sections of the rails.
 
-**Type: Nunito Sans**, a rounded, friendly sans. Always use `<Heading>` / `<Text>`,
-never hand-written font sizes. Mobile first, then larger:
+**Type:** **Bricolage Grotesque** (display: wordmark, headings, big numbers)
+gives 2fish its character; **Figtree** (body) is friendly and very legible
+at small sizes. Always use the components:
 
 | Component | Size |
 |---|---|
-| `<Heading level="hero">` | 36 → 60px, black |
-| `<Heading level="page">` (usually `as="h1"`) | 30 → 36px |
-| `<Heading level="section">` (`h2`) | 20 → 24px |
-| `<Heading level="card">` (`h3`) | 18 → 20px |
-| `<Text variant="lead">` | 16 → 18px |
+| `<Heading level="hero">` | 36 → 48px |
+| `<Heading level="page">` | 24 → 30px |
+| `<Heading level="section">` | 18 → 20px |
+| `<Heading level="card">` (post title) | 18px |
 | `<Text>` body | 16px (never smaller for reading text) |
-| `<Text variant="meta">` | 14px, muted |
-| `<Text variant="eyebrow">` / `micro` | small caps labels |
+| `<Text variant="meta">` | 14px muted: place, time |
+| `<Text variant="eyebrow" / "micro">` | 12px labels |
 
 ---
 
 ## 8. Responsive strategy
 
-Mobile first. Content width tops out at `max-w-6xl` (1152px).
+The feed column is **620px max** at every size, like a social app.
 
 | Width | Layout |
 |---|---|
-| **< 640** | One column. Top bar is just logo, search and theme toggle. A **fixed bottom bar** (Feed · raised green Post · My activity) handles navigation, within thumb reach and clear of the home indicator (`safe-area-inset-bottom`). Hero shows one button. Category chips scroll sideways. |
-| **sm 640+** | Form fields pair up into 2 columns. Hero shows both buttons. |
-| **md 768+** | The bottom bar goes away; Feed/My activity links and "Post a need" move into the top bar. Cards go **2 columns**. |
-| **lg 1024+** | Feed gets a **sticky sidebar** (post box, ZIP, stats, safety tip). Cards drop back to 1 column beside it. |
-| **xl 1280+** | Feed cards go back to 2 columns. Full-width pages (My activity) use 3. |
+| **< 1024** | One column. Top bar: wordmark, search, theme toggle. **Bottom tab bar** (Feed · coral Post · My activity) with `safe-area-inset-bottom`. ZIP + distance switch sit at the top of the feed. Help opens as a **bottom sheet**. |
+| **lg 1024+** | **Left rail** appears (wordmark, Feed, My activity, big Post button, theme switch). Bottom bar goes away. Top bar shrinks to just search. |
+| **xl 1280+** | **Right rail** appears (search, Your area, Near you numbers, safety tip). The top bar and the in-feed ZIP row go away. |
 
-Column counts live in one place: `NeedList`'s `layout` variant (`feed` / `wide`).
-Tap targets are 44px (`min-h-11`) for main actions and 36px minimum for chips.
+Tap targets: 44px for main actions, 36px minimum for small pills.
 
 ---
 
 ## 9. Rules (common mistakes to avoid)
 
-1. **No raw colors in components.** No hex, `rgb()`, `bg-white`, `text-gray-500`
-   or `style={{ background }}`. If a color is missing, add a token.
-2. **Never put white text on a mid-tone color** without checking 4.5:1. Use the
-   token's `-foreground`.
-3. **`className` on a ui component is for layout only:** grid placement,
-   margins, width, `hidden lg:block`. Never color, radius, shadow or font.
-   A new look means a new variant.
-4. **State comes from ARIA attributes:** `aria-pressed` (chips),
-   `aria-current` (nav), `aria-invalid` (inputs). Never keep a separate
-   "active" class that can drift out of sync.
-5. **Write Tailwind classes out in full.** `bg-cat-${x}` won't be found when
-   Tailwind scans the code. Use a lookup object like `CATEGORY_TONE`.
-6. **Animate transform/opacity only.** No animating width, height, top or box-shadow directly.
-7. **Pulse at most one thing per card**, and only for something time-sensitive.
-8. **Edit both dark blocks** in `globals.css` together (system preference and `data-theme="dark"`).
-9. **Keep the theme-color hex in `layout.tsx`** in sync with `--primary`. Metadata can't read CSS variables.
-10. **Combine variant classes with `cn()`**, not string templates. `` `hidden ${buttonVariants()}` `` loses to the button's own `inline-flex`; `cn(buttonVariants(), "hidden md:inline-flex")` works.
+1. **No raw colors in components.** No hex, `rgb()`, `bg-white`, `text-gray-500` or `style={{ background }}`.
+2. **One coral thing per post.** The "I'll help" button is the post's coral moment; everything else on the row stays neutral.
+3. **Posts are rows, not cards.** Don't wrap a post in a bordered box.
+4. **`className` on a ui component is for layout only:** spacing, width, grid placement, `hidden xl:grid`. Never color, radius, shadow or font.
+5. **State from ARIA:** `aria-pressed` (stories, segmented), `aria-current` (nav), `aria-invalid` (inputs).
+6. **Write Tailwind classes out in full** (`CATEGORY_META` lists them). `bg-cat-${x}` won't be found.
+7. **Combine classes with `cn()`**, not string templates, whenever both sides could set the same property (`cn(buttonVariants(), "hidden md:inline-flex")`).
+8. **Animate transform/opacity only.** Pulse at most one thing per post.
+9. **Edit both dark blocks** in `globals.css` together.
+10. **Keep the theme-color hex in `layout.tsx`** in sync with `--background`.
 
 ---
 
 ## 10. Quality checklist
 
 **Design system compliance**
-- [x] No direct colors in components (`grep -rE "#[0-9a-f]{3,6}|rgba?\(" src/components` comes back empty)
-- [x] Gradients defined as CSS variables
+- [x] No direct colors in components
 - [x] Variants instead of overrides
-- [x] 8px spacing rhythm
-- [x] Typography hierarchy with one `h1` per page
+- [x] 8px rhythm; one feed column width
+- [x] Type only through `Heading` / `Text`
 
 **Visual polish**
 - [x] WCAG AA contrast on every text pair (table above)
-- [x] One radius scale (8 / 12 / 16 / 24)
-- [x] One shadow scale (card / lift / pop / glow)
 - [x] Hover states on every interactive element
-- [x] Loading (skeleton cards), empty (floating fish plus an action) and error states (field `aria-invalid` + focus + danger notice)
+- [x] Loading (skeleton post rows), empty (floating koi + action), error (field `aria-invalid` + focus + danger notice; retry if the board can't load)
 
 **Performance and accessibility**
-- [x] Animations use transform/opacity only
-- [x] `prefers-reduced-motion` respected
-- [x] Semantic HTML: `header` / `main` / `nav` / `aside` / `section` / `article`, a list of needs, `fieldset` + `legend`, a `progressbar` role
-- [x] Visible 3px focus ring that flips color on the blue surfaces
-- [x] Skip-to-content link
-- [x] Decorative SVGs are `aria-hidden`; links that open new tabs say so
+- [x] Animations use transform/opacity; reduced motion respected
+- [x] Semantic HTML: rails are `header`/`aside`, posts are `article` in a list, `fieldset` + `legend`, a visually hidden `h1` on the feed
+- [x] Visible 3px ink focus ring; skip-to-content link
+- [x] Decorative SVGs `aria-hidden`; new-tab links say so
 
-**Theme:** the top-bar toggle switches light/dark and remembers the choice. With nothing saved, the app follows the device setting. A tiny script in `<head>` applies the saved choice before the page draws, so there's no flash.
+**Theme:** the toggle remembers the choice; with none saved the app follows the device. A tiny `<head>` script applies it before first paint.
 
-**Before every PR:** open `/styleguide` and use the toggle to check light *and* dark, then check the feed at 390px and 1360px.
+**Before every PR:** `/styleguide` in light and dark, then the feed at 390px, 1100px and 1440px.
 
 ---
 
-## 11. Industry adaptations: mutual aid
+## 11. Mutual-aid specifics
 
-Things that matter for 2fish specifically, beyond generic app guidance:
-
-- **Dignity first.** No "urgent!!" reds, no progress bars toward a goal, no
-  totals of money. Status words are gentle: *Open · Being helped · Received*.
-- **Safety is designed in, not bolted on.** Safety tips use the calm `info`
-  notice, sitting beside the action, never as a scary modal. The street-address
-  check points straight at the field that triggered it.
-- **Low-bandwidth friendly.** One web font, no images in the feed, an SVG logo,
-  skeletons instead of spinners.
-- **Plain language.** Labels describe the action ("I'll help", "I got it,
-  thank you"), never system terms ("Submit", "Claim").
-- **Phone first, desktop welcome.** Most posters will be on phones; many
-  helpers browse from a laptop, so the desktop layout adds the sidebar
-  instead of just stretching the phone layout.
-- **If 2fish adds partners later** (food banks, schools), give them a variant
-  (for example a `verified` badge), not a new color scheme.
+- **Dignity first.** Status words are gentle: *A neighbor is helping with this*, *Received. Thank you, neighbor.* No goal bars, no money totals.
+- **Safety in context.** The safety tip sits in the rail and the post form, calm and visible. The street-address check points at the field that triggered it.
+- **Low-bandwidth friendly.** Two web fonts, no images in the feed, SVG logo, skeletons not spinners.
+- **Plain language.** Actions say what happens ("I'll help", "I got it, thank you"), never "Submit" or "Claim".

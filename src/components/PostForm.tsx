@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useBoard } from "./BoardProvider";
 import { Button, buttonVariants } from "./ui/button";
-import { Card } from "./ui/card";
 import { Field, Input, Select, Textarea, choiceVariants } from "./ui/input";
 import { Notice } from "./ui/notice";
 import { Heading, Text } from "./ui/typography";
@@ -81,7 +80,7 @@ export default function PostForm() {
   }
 
   return (
-    <Card as="form" padding="lg" onSubmit={submit} noValidate className="grid gap-6 animate-fade-in-up">
+    <form onSubmit={submit} noValidate className="grid gap-6 px-4 py-6 animate-fade-in-up">
       <div className="flex items-start justify-between gap-4">
         <div className="grid gap-1">
           <Heading as="h1" level="page">
@@ -177,9 +176,9 @@ export default function PostForm() {
 
       <div role="alert">{problem && <Notice key={problem.msg} variant="danger">{problem.msg}</Notice>}</div>
 
-      <Button type="submit" variant="help" size="lg" block disabled={busy}>
+      <Button type="submit" variant="primary" size="lg" block disabled={busy}>
         {busy ? "Posting…" : "Post my need"}
       </Button>
-    </Card>
+    </form>
   );
 }

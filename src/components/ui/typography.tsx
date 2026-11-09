@@ -1,15 +1,16 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// The type scale. Mobile size first, larger from md up.
-// Pick the level for how important it looks; pick `as` for the outline.
-export const headingVariants = cva("m-0 font-black text-balance", {
+// The type scale. Headings use the display face (Bricolage Grotesque),
+// everything else the body face (Figtree). Mobile size first.
+export const headingVariants = cva("m-0 font-display font-extrabold text-balance tracking-tight", {
   variants: {
     level: {
-      hero: "text-4xl leading-none tracking-tight md:text-6xl",
-      page: "text-3xl leading-tight tracking-tight md:text-4xl",
-      section: "text-xl leading-tight md:text-2xl",
-      card: "text-lg leading-tight md:text-xl",
+      hero: "text-4xl leading-none md:text-5xl",
+      page: "text-2xl leading-tight md:text-3xl",
+      section: "text-lg leading-tight md:text-xl",
+      // a post's title in the feed
+      card: "text-lg leading-snug",
     },
   },
   defaultVariants: { level: "section" },
@@ -25,21 +26,17 @@ export function Heading({ as: Tag = "h2", level, className, ...props }: HeadingP
 export const textVariants = cva("m-0", {
   variants: {
     variant: {
-      // intro paragraph under a page or hero heading
       lead: "text-base md:text-lg",
       body: "text-base",
-      // secondary info: places, times, hints
+      // places, times, hints
       meta: "text-sm text-muted-foreground",
-      // small all-caps label above a heading
-      eyebrow: "text-sm font-extrabold uppercase tracking-widest",
-      // tiny labels under numbers
-      micro: "text-xs font-bold uppercase tracking-wide text-muted-foreground",
+      eyebrow: "text-xs font-bold uppercase tracking-widest",
+      // labels under numbers
+      micro: "text-xs font-semibold text-muted-foreground",
     },
     tone: {
       default: "",
       muted: "text-muted-foreground",
-      // on the blue hero: slightly softer than the heading
-      soft: "opacity-90",
     },
   },
   defaultVariants: { variant: "body", tone: "default" },

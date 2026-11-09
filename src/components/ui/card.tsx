@@ -2,16 +2,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { headingVariants } from "./typography";
 
-export const cardVariants = cva("rounded-lg border", {
+// Posts themselves are not cards (they're rows in the feed). Cards are for
+// side widgets, forms and empty states.
+export const cardVariants = cva("rounded-lg", {
   variants: {
     variant: {
-      default: "border-border bg-surface shadow-card",
-      // need cards in a list: lift on hover, fade in on load
-      interactive: "overflow-hidden border-border bg-surface shadow-card hover-lift animate-fade-in-up stagger",
-      // the big welcome banner
-      hero: "relative overflow-hidden rounded-xl border-transparent bg-gradient-primary text-brand-surface-foreground shadow-lift on-primary",
+      default: "border border-border bg-surface",
+      // soft grey panel with no border: sidebar widgets
+      flat: "bg-muted",
       // empty states, quiet info blocks
-      muted: "border-dashed border-border bg-transparent",
+      muted: "border border-dashed border-border bg-transparent",
     },
     padding: {
       none: "",

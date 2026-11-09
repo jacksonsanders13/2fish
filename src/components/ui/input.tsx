@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 export const inputVariants = cva(
-  "w-full rounded-md border border-input bg-surface text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-200 ease-smooth focus-visible:border-primary aria-invalid:border-destructive",
+  "w-full rounded-md border border-input bg-surface text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-200 ease-smooth focus-visible:border-foreground aria-invalid:border-destructive",
   {
     variants: {
       size: {
@@ -15,9 +15,8 @@ export const inputVariants = cva(
         default: "",
         // soft rounded "fake input" that opens the post form
         pill: "flex items-center rounded-full border-transparent bg-muted text-muted-foreground no-underline hover:bg-border",
-        // search field inside the primary top bar
-        onPrimary:
-          "rounded-full border-transparent bg-brand-surface-foreground/15 text-brand-surface-foreground placeholder:text-brand-surface-foreground/80 focus-visible:border-brand-surface-foreground",
+        // search fields
+        search: "rounded-full border-transparent bg-muted focus-visible:border-foreground",
       },
       // leaves room for a leading icon
       withIcon: { true: "pl-9", false: "" },
@@ -60,7 +59,7 @@ export const choiceVariants = cva("flex cursor-pointer items-start gap-3 rounded
   variants: {
     variant: {
       // bordered option card (radio groups)
-      card: "border-border hover:border-primary/50 has-[:checked]:border-success has-[:checked]:bg-success-soft",
+      card: "border-border hover:border-primary/50 has-[:checked]:border-primary has-[:checked]:bg-primary-soft",
       // plain row (checkbox list)
       plain: "border-transparent px-0 py-1 font-semibold",
     },

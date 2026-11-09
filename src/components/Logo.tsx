@@ -1,14 +1,11 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-// Same drawing as assets/logo.svg, as a component so it can take on token
-// colors. SVG fill/stroke inherit through CSS, so the "inherit" tone picks
-// up whatever fill-* / stroke-* its parent sets (used on category bands).
-
+// Two koi. Same drawing as assets/logo.svg; colors come from tokens.
 const logoVariants = cva("", {
   variants: {
     tone: {
-      brand: "fill-logo-body stroke-logo-line",
-      inherit: "stroke-on-color",
+      brand: "fill-primary stroke-foreground",
+      muted: "fill-muted stroke-muted-foreground",
     },
     motion: { still: "", float: "animate-float" },
   },
@@ -34,5 +31,15 @@ export default function Logo({ size = 32, tone, motion }: { size?: number } & Va
       <Fish transform="translate(9,8) scale(.88)" />
       <Fish transform="translate(111,60) scale(-.88,.88)" />
     </svg>
+  );
+}
+
+// Logo + "2fish" wordmark.
+export function Wordmark({ size = 32 }: { size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Logo size={size} />
+      <b className="font-display text-2xl font-extrabold tracking-tight">2fish</b>
+    </span>
   );
 }
