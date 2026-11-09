@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Clock, ExternalLink, Gift, HeartHandshake, MapPin } from "lucide-react";
 import Logo from "./Logo";
 import { useBoard } from "./BoardProvider";
 import { Avatar } from "./ui/avatar";
@@ -9,6 +10,7 @@ import { Button, buttonVariants } from "./ui/button";
 import { Card } from "./ui/card";
 import { Notice } from "./ui/notice";
 import { StatusProgress } from "./ui/progress";
+import { Heading, Text } from "./ui/typography";
 import { CATEGORY_TONE } from "@/lib/categories";
 import { daysUntil, dueLabel, safeUrl, timeAgo } from "@/lib/format";
 import type { Need } from "@/lib/types";
@@ -34,17 +36,17 @@ export default function NeedCard({ need: n }: { need: Need }) {
             {n.displayName || "A neighbor"}
             {n.example && <Badge variant="example">Example</Badge>}
           </p>
-          <p className="m-0 text-sm text-muted-foreground">
+          <Text variant="meta">
             {where} · <time dateTime={new Date(n.createdAt).toISOString()}>{timeAgo(n.createdAt)}</time>
-          </p>
+          </Text>
         </div>
         <Badge variant={n.status}>{STATUS_LABEL[n.status]}</Badge>
       </header>
 
       <div className="grid gap-2 px-4 pb-4">
-        <h3 id={`need-${n.id}`} className="m-0 text-lg font-black leading-tight text-balance md:text-xl">
+        <Heading as="h3" level="card" id={`need-${n.id}`}>
           {n.title}
-        </h3>
+        </Heading>
         {n.story && <p className="m-0 max-w-prose">{n.story}</p>}
       </div>
 
@@ -56,6 +58,7 @@ export default function NeedCard({ need: n }: { need: Need }) {
         </div>
         {n.neededBy && n.status !== "done" && (
           <Badge variant={urgent ? "urgent" : "due"} size="md">
+            <Clock aria-hidden="true" />
             {dueLabel(n.neededBy)}
           </Badge>
         )}
@@ -67,8 +70,16 @@ export default function NeedCard({ need: n }: { need: Need }) {
 
       {(n.inPerson || wishlist) && (
         <div className="flex flex-wrap gap-2 px-4 pt-4">
-          {n.inPerson && <Badge size="md">Drop off: {n.meetSpot || "public spot"}</Badge>}
-          {wishlist && <Badge size="md">Wishlist</Badge>}
+          {n.inPerson && <Badge size="md">
+              <MapPin aria-hidden="true" />
+              Drop off: {n.meetSpot || "public spot"}
+            </Badge>}
+          {wishlist && (
+            <Badge size="md">
+              <Gift aria-hidden="true" />
+              Wishlist
+            </Badge>
+          )}
         </div>
       )}
 
@@ -99,6 +110,7 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
   if (!mine && n.status === "open") {
     buttons.push(
       <Button key="help" variant="help" grow onClick={() => openHelp(n)}>
+        <HeartHandshake aria-hidden="true" />
         I&apos;ll help
       </Button>,
     );
@@ -106,7 +118,9 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
   if (wishlist && n.status !== "done") {
     buttons.push(
       <a key="wish" className={buttonVariants({ variant: "outline" })} href={wishlist} target="_blank" rel="noopener noreferrer">
-        View wishlist<span className="sr-only"> (opens in a new tab)</span>
+        View wishlist
+        <ExternalLink aria-hidden="true" />
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>,
     );
   }

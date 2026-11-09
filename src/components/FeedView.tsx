@@ -5,7 +5,6 @@ import Link from "next/link";
 import { cva } from "class-variance-authority";
 import Logo from "./Logo";
 import NeedList from "./NeedList";
-import Tabs from "./Tabs";
 import Loading from "./Loading";
 import LoadError from "./LoadError";
 import { useBoard } from "./BoardProvider";
@@ -15,7 +14,10 @@ import { Card } from "./ui/card";
 import { Chip } from "./ui/chip";
 import { Input, Label, inputVariants } from "./ui/input";
 import { Notice } from "./ui/notice";
+import { Heading, Text, textVariants } from "./ui/typography";
+import { ArrowDown, Plus, ShieldCheck } from "lucide-react";
 import { CATEGORIES, type Category } from "@/lib/categories";
+import { cn } from "@/lib/utils";
 import { digitsOnly, zipOk } from "@/lib/format";
 import type { Need, Range } from "@/lib/types";
 
@@ -124,21 +126,23 @@ export default function FeedView() {
           </Card>
         )}
 
-        <Notice variant="info" className="hidden lg:block">
-          <b>Stay safe:</b> meet at public spots like libraries or church lobbies, and never share a home address.
+        <Notice variant="info" className="hidden gap-2 lg:flex">
+          <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 flex-none text-primary-soft-foreground" />
+          <span>
+            <b>Stay safe:</b> meet at public spots like libraries or church lobbies, and never share a home address.
+          </span>
         </Notice>
       </aside>
 
       <section id="needs" className="grid min-w-0 gap-4" aria-labelledby="needs-title">
-        <Tabs active="/" />
         <div className="flex items-baseline justify-between gap-4">
-          <h2 id="needs-title" className="m-0 text-xl font-black md:text-2xl">
+          <Heading id="needs-title" level="section">
             {query ? `Results for “${b.q.trim()}”` : "Needs near you"}
-          </h2>
+          </Heading>
           {b.ready && (
-            <span className="text-sm font-bold text-muted-foreground">
+            <Text as="span" variant="meta" className="font-bold">
               {shown.length} {shown.length === 1 ? "post" : "posts"}
-            </span>
+            </Text>
           )}
         </div>
 
@@ -177,18 +181,23 @@ function Hero() {
         <Logo size={180} motion="float" />
       </div>
       <div className="relative grid max-w-2xl gap-4 animate-fade-in-up">
-        <p className="m-0 text-sm font-extrabold uppercase tracking-widest opacity-90">Neighbors helping neighbors</p>
-        <h1 id="hero-title" className="m-0 text-4xl font-black leading-none tracking-tight md:text-6xl">
+        <Text variant="eyebrow" tone="soft">
+          Neighbors helping neighbors
+        </Text>
+        <Heading as="h1" id="hero-title" level="hero">
           A little is enough.
-        </h1>
-        <p className="m-0 text-base opacity-90 md:text-lg">
+        </Heading>
+        <Text variant="lead" tone="soft">
           Post something you need. Someone nearby drops it off at a public spot or sends it straight from your wishlist.
-        </p>
+        </Text>
         <div className="flex flex-wrap gap-2 pt-2">
           <Link href="/post" className={buttonVariants({ variant: "inverse", size: "lg" })}>
+            <Plus aria-hidden="true" />
             Post a need
           </Link>
-          <a href="#needs" className={buttonVariants({ variant: "onPrimary", size: "lg" })}>
+          {/* phones already have the bottom bar and a short scroll to the feed */}
+          <a href="#needs" className={cn(buttonVariants({ variant: "onPrimary", size: "lg" }), "hidden sm:inline-flex")}>
+            <ArrowDown aria-hidden="true" />
             See who needs help
           </a>
         </div>
@@ -211,7 +220,7 @@ function Stat({ value, label, tone }: { value: number; label: string; tone: "ope
   return (
     <div className="grid gap-1">
       <b className={statVariants({ tone })}>{value}</b>
-      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className={textVariants({ variant: "micro" })}>{label}</span>
     </div>
   );
 }

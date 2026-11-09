@@ -110,8 +110,11 @@ Don't pass color classes in from outside.**
 | `Avatar` | `ui/avatar.tsx` | sizes `sm` `md` `lg` · tone `auto` (hashed) or `brand` |
 | `StatusProgress` | `ui/progress.tsx` | `open` → `pledged` → `done` |
 | `Skeleton` | `ui/skeleton.tsx` | loading placeholder |
+| `Heading` | `ui/typography.tsx` | levels `hero` `page` `section` `card`; `as` picks the HTML tag separately |
+| `Text` | `ui/typography.tsx` | `lead` `body` `meta` `eyebrow` `micro` · tone `default` `muted` `soft` |
 | `Logo` | `Logo.tsx` | tone `brand` / `inherit` · motion `still` / `float` |
-| `navLinkVariants` | `Tabs.tsx` | `default` / `onPrimary`; active state comes from `aria-current` |
+| `navLinkVariants`, `BottomNav` | `Nav.tsx` | top-bar links (md+) and the phone bottom bar; active state comes from `aria-current` |
+| `ThemeToggle` | `ThemeToggle.tsx` | light/dark switch in the top bar, saved per browser |
 
 **Semantic mapping to remember:**
 - Giving help → `variant="help"` (green). Brand navigation → `primary`. Backing out → `secondary`.
@@ -140,35 +143,46 @@ Every animation moves only `transform` and `opacity`, so it runs on the GPU.
 
 ---
 
-## 6. Spacing and typography
+## 6. Icons
+
+[lucide-react](https://lucide.dev): one consistent stroke style, tree-shaken (only the icons used ship).
+
+- Buttons size icons to 20px and badges to 14px automatically (`[&_svg]` rules in the variants). Don't size icons by hand inside them.
+- Icons sit **before** the label, except "opens in a new tab" (`ExternalLink`), which goes after.
+- Decorative icons get `aria-hidden="true"`. An icon-only button (`size="icon"`) always needs an `aria-label`.
+- Current set: `House` Feed · `Plus` Post · `HeartHandshake` help/My activity · `Search` · `Sun`/`Moon` theme · `MapPin` drop-off · `Gift` wishlist · `Clock` due date · `ExternalLink` · `ShieldCheck` safety · `ArrowDown`.
+
+## 7. Spacing and typography
 
 **Spacing: 8px rhythm.** `gap-2` (8) tight · `gap-4` (16) default · `gap-6` (24)
 between blocks · `gap-8` (32) between columns · card padding `p-4` → `md:p-6`.
 `gap-1` / `gap-3` are allowed only inside small clusters (stats, avatar + name).
 
-**Type: Nunito Sans**, a rounded, friendly sans. Mobile first, then larger:
+**Type: Nunito Sans**, a rounded, friendly sans. Always use `<Heading>` / `<Text>`,
+never hand-written font sizes. Mobile first, then larger:
 
-| Level | Classes |
+| Component | Size |
 |---|---|
-| Hero | `text-4xl md:text-6xl font-black tracking-tight` |
-| Page heading (`h1`) | `text-3xl md:text-4xl font-black` |
-| Section heading (`h2`) | `text-xl md:text-2xl font-black` |
-| Card title (`h3`) | `text-lg md:text-xl font-black` |
-| Body | `text-base` (16px; never smaller for reading text) |
-| Meta | `text-sm text-muted-foreground` |
-| Micro labels | `text-xs font-bold uppercase tracking-wide` |
+| `<Heading level="hero">` | 36 → 60px, black |
+| `<Heading level="page">` (usually `as="h1"`) | 30 → 36px |
+| `<Heading level="section">` (`h2`) | 20 → 24px |
+| `<Heading level="card">` (`h3`) | 18 → 20px |
+| `<Text variant="lead">` | 16 → 18px |
+| `<Text>` body | 16px (never smaller for reading text) |
+| `<Text variant="meta">` | 14px, muted |
+| `<Text variant="eyebrow">` / `micro` | small caps labels |
 
 ---
 
-## 7. Responsive strategy
+## 8. Responsive strategy
 
 Mobile first. Content width tops out at `max-w-6xl` (1152px).
 
 | Width | Layout |
 |---|---|
-| **< 640** | One column. Search drops to its own row in the top bar. Feed/My activity tabs show in the page. Category chips scroll sideways. |
-| **sm 640+** | Search moves inline. Form fields pair up into 2 columns. |
-| **md 768+** | Nav moves into the top bar and the in-page tabs hide. Cards go **2 columns**. |
+| **< 640** | One column. Top bar is just logo, search and theme toggle. A **fixed bottom bar** (Feed · raised green Post · My activity) handles navigation, within thumb reach and clear of the home indicator (`safe-area-inset-bottom`). Hero shows one button. Category chips scroll sideways. |
+| **sm 640+** | Form fields pair up into 2 columns. Hero shows both buttons. |
+| **md 768+** | The bottom bar goes away; Feed/My activity links and "Post a need" move into the top bar. Cards go **2 columns**. |
 | **lg 1024+** | Feed gets a **sticky sidebar** (post box, ZIP, stats, safety tip). Cards drop back to 1 column beside it. |
 | **xl 1280+** | Feed cards go back to 2 columns. Full-width pages (My activity) use 3. |
 
@@ -177,7 +191,7 @@ Tap targets are 44px (`min-h-11`) for main actions and 36px minimum for chips.
 
 ---
 
-## 8. Rules (common mistakes to avoid)
+## 9. Rules (common mistakes to avoid)
 
 1. **No raw colors in components.** No hex, `rgb()`, `bg-white`, `text-gray-500`
    or `style={{ background }}`. If a color is missing, add a token.
@@ -195,10 +209,11 @@ Tap targets are 44px (`min-h-11`) for main actions and 36px minimum for chips.
 7. **Pulse at most one thing per card**, and only for something time-sensitive.
 8. **Edit both dark blocks** in `globals.css` together (system preference and `data-theme="dark"`).
 9. **Keep the theme-color hex in `layout.tsx`** in sync with `--primary`. Metadata can't read CSS variables.
+10. **Combine variant classes with `cn()`**, not string templates. `` `hidden ${buttonVariants()}` `` loses to the button's own `inline-flex`; `cn(buttonVariants(), "hidden md:inline-flex")` works.
 
 ---
 
-## 9. Quality checklist
+## 10. Quality checklist
 
 **Design system compliance**
 - [x] No direct colors in components (`grep -rE "#[0-9a-f]{3,6}|rgba?\(" src/components` comes back empty)
@@ -222,11 +237,13 @@ Tap targets are 44px (`min-h-11`) for main actions and 36px minimum for chips.
 - [x] Skip-to-content link
 - [x] Decorative SVGs are `aria-hidden`; links that open new tabs say so
 
-**Before every PR:** open `/styleguide` in light *and* dark, then check the feed at 390px and 1360px.
+**Theme:** the top-bar toggle switches light/dark and remembers the choice. With nothing saved, the app follows the device setting. A tiny script in `<head>` applies the saved choice before the page draws, so there's no flash.
+
+**Before every PR:** open `/styleguide` and use the toggle to check light *and* dark, then check the feed at 390px and 1360px.
 
 ---
 
-## 10. Industry adaptations: mutual aid
+## 11. Industry adaptations: mutual aid
 
 Things that matter for 2fish specifically, beyond generic app guidance:
 

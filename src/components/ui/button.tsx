@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 // Use <Button> for buttons. For links that look like buttons, use
 // className={buttonVariants({ ... })} on <Link> or <a>.
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border font-extrabold no-underline transition-[transform,background-color,box-shadow,border-color] duration-200 ease-smooth active:scale-[.98] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap [&_svg]:size-5 [&_svg]:shrink-0 rounded-md border font-extrabold no-underline transition-[transform,background-color,box-shadow,border-color] duration-200 ease-smooth active:scale-[.98] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -18,6 +18,8 @@ export const buttonVariants = cva(
         inverse: "border-transparent bg-brand-surface-foreground text-brand-surface hover:bg-brand-surface-foreground/90 hover:shadow-lift",
         // quiet neutral: Cancel, Remove post
         // see-through button on a primary/gradient surface
+        // icon button in the top bar
+        ghostOnPrimary: "border-transparent bg-transparent text-brand-surface-foreground hover:bg-brand-surface-foreground/15",
         onPrimary: "border-brand-surface-foreground/40 bg-transparent text-brand-surface-foreground hover:bg-brand-surface-foreground/10",
         secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-border",
         outline: "border-border bg-surface text-foreground hover:border-primary hover:text-primary-soft-foreground",
@@ -30,6 +32,8 @@ export const buttonVariants = cva(
         sm: "min-h-9 px-3 text-sm",
         md: "min-h-11 px-4 text-base",
         lg: "min-h-12 px-6 text-lg",
+        // round icon-only button; always pass an aria-label
+        icon: "size-10 rounded-full p-0",
       },
       // stretch to share a row with other buttons
       grow: { true: "min-w-36 flex-1", false: "" },

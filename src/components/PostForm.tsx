@@ -8,6 +8,7 @@ import { Button, buttonVariants } from "./ui/button";
 import { Card } from "./ui/card";
 import { Field, Input, Select, Textarea, choiceVariants } from "./ui/input";
 import { Notice } from "./ui/notice";
+import { Heading, Text } from "./ui/typography";
 import { CATEGORIES, type Category } from "@/lib/categories";
 import { digitsOnly, looksLikeAddress, safeUrl, zipOk } from "@/lib/format";
 
@@ -83,8 +84,10 @@ export default function PostForm() {
     <Card as="form" padding="lg" onSubmit={submit} noValidate className="grid gap-6 animate-fade-in-up">
       <div className="flex items-start justify-between gap-4">
         <div className="grid gap-1">
-          <h1 className="m-0 text-3xl font-black tracking-tight md:text-4xl">Post a need</h1>
-          <p className="m-0 text-muted-foreground">It only takes a minute. Neighbors near your ZIP will see it.</p>
+          <Heading as="h1" level="page">
+            Post a need
+          </Heading>
+          <Text tone="muted">It only takes a minute. Neighbors near your ZIP will see it.</Text>
         </div>
         <Link href="/" className={buttonVariants({ variant: "secondary", size: "sm" })}>
           Cancel

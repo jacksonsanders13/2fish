@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-export const badgeVariants = cva("inline-flex items-center gap-1 whitespace-nowrap rounded-full font-extrabold", {
+export const badgeVariants = cva("inline-flex items-center gap-1 whitespace-nowrap rounded-full font-extrabold [&_svg]:size-3.5 [&_svg]:shrink-0", {
   variants: {
     variant: {
       open: "bg-primary-soft text-primary-soft-foreground",

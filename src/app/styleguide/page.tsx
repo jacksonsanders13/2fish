@@ -9,6 +9,8 @@ import { Field, Input, Select, choiceVariants } from "@/components/ui/input";
 import { Notice } from "@/components/ui/notice";
 import { StatusProgress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Heading, Text } from "@/components/ui/typography";
+import { ExternalLink, Gift, HeartHandshake, MapPin } from "lucide-react";
 import { CATEGORIES, CATEGORY_TONE } from "@/lib/categories";
 
 // A living reference for the design system. Not linked from the app;
@@ -48,10 +50,12 @@ export default function StyleGuide() {
   return (
     <div className="grid gap-6">
       <div className="grid gap-2">
-        <h1 className="m-0 text-4xl font-black tracking-tight md:text-6xl">Style guide</h1>
-        <p className="m-0 max-w-prose text-muted-foreground md:text-lg">
+        <Heading as="h1" level="hero">
+          Style guide
+        </Heading>
+        <Text variant="lead" tone="muted" className="max-w-prose">
           Every token and component variant in one place. Reasoning and rules are in <code>docs/design-system.md</code>.
-        </p>
+        </Text>
       </div>
 
       <Section title="Color tokens">
@@ -78,13 +82,40 @@ export default function StyleGuide() {
 
       <Section title="Typography">
         <div className="grid gap-2">
-          <p className="m-0 text-4xl font-black leading-none tracking-tight md:text-6xl">Hero · A little is enough.</p>
-          <p className="m-0 text-3xl font-black tracking-tight md:text-4xl">Page heading</p>
-          <p className="m-0 text-xl font-black md:text-2xl">Section heading</p>
-          <p className="m-0 text-lg font-black md:text-xl">Card title</p>
-          <p className="m-0">Body text. Plain, warm, short sentences.</p>
-          <p className="m-0 text-sm text-muted-foreground">Meta text · North Raleigh · 3h</p>
+          <Text variant="eyebrow" tone="muted">eyebrow</Text>
+          <Heading as="p" level="hero">hero · A little is enough.</Heading>
+          <Heading as="p" level="page">page heading</Heading>
+          <Heading as="p" level="section">section heading</Heading>
+          <Heading as="p" level="card">card heading</Heading>
+          <Text variant="lead">lead: an intro paragraph under a heading.</Text>
+          <Text>body: plain, warm, short sentences.</Text>
+          <Text variant="meta">meta · North Raleigh · 3h</Text>
+          <Text variant="micro">micro label</Text>
         </div>
+      </Section>
+
+      <Section title="Icons">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="help">
+            <HeartHandshake aria-hidden="true" />
+            I&apos;ll help
+          </Button>
+          <Button variant="outline">
+            View wishlist
+            <ExternalLink aria-hidden="true" />
+          </Button>
+          <Badge size="md">
+            <MapPin aria-hidden="true" />
+            Drop off: Library
+          </Badge>
+          <Badge size="md">
+            <Gift aria-hidden="true" />
+            Wishlist
+          </Badge>
+        </div>
+        <Text variant="meta">
+          Icons come from lucide-react. Buttons size them to 20px and badges to 14px automatically; decorative icons get aria-hidden.
+        </Text>
       </Section>
 
       <Section title="Buttons">
@@ -106,6 +137,7 @@ export default function StyleGuide() {
         <Card variant="hero" padding="md" className="flex flex-wrap gap-2">
           <Button variant="inverse">inverse</Button>
           <Button variant="onPrimary">onPrimary</Button>
+          <Button variant="ghostOnPrimary">ghostOnPrimary</Button>
         </Card>
       </Section>
 

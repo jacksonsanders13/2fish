@@ -5,6 +5,7 @@ import { useBoard } from "./BoardProvider";
 import { Button } from "./ui/button";
 import { Field, Input, choiceVariants } from "./ui/input";
 import { safeUrl } from "@/lib/format";
+import { Heading, Text } from "./ui/typography";
 import type { HelpMethod, Need } from "@/lib/types";
 
 export default function HelpDialog() {
@@ -55,12 +56,12 @@ function HelpForm({ need: n }: { need: Need }) {
   return (
     <form onSubmit={submit} className="grid gap-4">
       <div className="grid gap-1">
-        <h2 id="help-title" className="m-0 text-2xl font-black">
+        <Heading id="help-title" level="section">
           Help a neighbor
-        </h2>
-        <p className="m-0 text-muted-foreground">
+        </Heading>
+        <Text tone="muted">
           {n.title} for {n.displayName || "a neighbor"} in {n.zip}
-        </p>
+        </Text>
       </div>
 
       <fieldset className="m-0 grid gap-2 border-0 p-0">

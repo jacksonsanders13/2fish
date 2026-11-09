@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import NeedList from "./NeedList";
-import Tabs from "./Tabs";
+import { Heading } from "./ui/typography";
 import Loading from "./Loading";
 import LoadError from "./LoadError";
 import { useBoard } from "./BoardProvider";
@@ -13,8 +13,9 @@ export default function ActivityView() {
 
   return (
     <div className="grid gap-6">
-      <Tabs active="/activity" />
-      <h1 className="m-0 text-3xl font-black tracking-tight md:text-4xl">My activity</h1>
+      <Heading as="h1" level="page">
+        My activity
+      </Heading>
       {!ready ? (
         <Loading />
       ) : loadError ? (
@@ -22,9 +23,7 @@ export default function ActivityView() {
       ) : (
         <>
           <section className="grid gap-4" aria-labelledby="mine-title">
-            <h2 id="mine-title" className="m-0 text-xl font-black md:text-2xl">
-              Needs I posted
-            </h2>
+            <Heading id="mine-title">Needs I posted</Heading>
             <NeedList
               layout="wide"
               needs={needs.filter((n) => n.posterId === me)}
@@ -37,9 +36,7 @@ export default function ActivityView() {
             />
           </section>
           <section className="grid gap-4" aria-labelledby="helping-title">
-            <h2 id="helping-title" className="m-0 text-xl font-black md:text-2xl">
-              Needs I&apos;m helping with
-            </h2>
+            <Heading id="helping-title">Needs I&apos;m helping with</Heading>
             <NeedList
               layout="wide"
               needs={needs.filter((n) => n.helper?.id === me)}

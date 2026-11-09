@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Nunito_Sans } from "next/font/google";
 import BoardProvider from "@/components/BoardProvider";
 import TopBar from "@/components/TopBar";
+import { BottomNav } from "@/components/Nav";
+import { themeScript } from "@/components/ThemeToggle";
 import HelpDialog from "@/components/HelpDialog";
 import Toast from "@/components/Toast";
 import { Notice } from "@/components/ui/notice";
@@ -18,6 +20,8 @@ export const metadata: Metadata = {
 // Browser chrome color. Metadata can't read CSS variables, so these are the
 // hex versions of --primary (light) and --primary (dark) from globals.css.
 export const viewport: Viewport = {
+  // lets the bottom bar sit above the phone's home indicator
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#1a5bcb" },
     { media: "(prefers-color-scheme: dark)", color: "#5f97f2" },
@@ -26,7 +30,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={nunito.variable}>
+    // the theme script may set data-theme before React loads
+    <html lang="en" className={nunito.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-sans antialiased">
         <a
           href="#main"
@@ -36,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <BoardProvider>
           <TopBar />
-          <main id="main" className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-24 pt-4 md:px-6 md:pt-6">
+          <main id="main" className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-32 pt-4 md:px-6 md:pb-24 md:pt-6">
             {!supabaseConfigured && (
               <Notice variant="warning">
                 Preview mode: example posts only. Changes stay on this screen and go away when you refresh.
@@ -44,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             )}
             {children}
           </main>
+          <BottomNav />
           <HelpDialog />
           <Toast />
         </BoardProvider>

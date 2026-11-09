@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { headingVariants } from "./typography";
 
 export const cardVariants = cva("rounded-lg border", {
   variants: {
@@ -30,5 +31,5 @@ export function Card({ as: Tag = "div", className, variant, padding, ...props }:
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={cn("m-0 text-lg font-black leading-tight md:text-xl", className)} {...props} />;
+  return <h2 className={cn(headingVariants({ level: "card" }), className)} {...props} />;
 }
