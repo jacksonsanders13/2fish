@@ -40,11 +40,15 @@ function HelpForm({ need: n }: { need: Need }) {
 
   const [method, setMethod] = useState<HelpMethod>(options[0]?.value ?? "inperson");
   const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    pledge(n.id, method, note.trim());
+    setBusy(true);
+    const ok = await pledge(n.id, method, note.trim());
+    setBusy(false);
     closeHelp();
+    if (!ok) return;
     toast(method === "wishlist" ? "Thank you! Open the wishlist to place the order." : "Thank you! Meet at the spot listed on the post.");
   }
 
@@ -87,8 +91,8 @@ function HelpForm({ need: n }: { need: Need }) {
         <Button variant="secondary" onClick={closeHelp}>
           Cancel
         </Button>
-        <Button type="submit" variant="help" grow>
-          Count me in
+        <Button type="submit" variant="help" grow disabled={busy}>
+          {busy ? "Saving…" : "Count me in"}
         </Button>
       </div>
     </form>

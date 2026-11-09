@@ -5,6 +5,7 @@ import TopBar from "@/components/TopBar";
 import HelpDialog from "@/components/HelpDialog";
 import Toast from "@/components/Toast";
 import { Notice } from "@/components/ui/notice";
+import { supabaseConfigured } from "@/lib/supabase";
 import "./globals.css";
 
 const nunito = Nunito_Sans({ subsets: ["latin"], variable: "--font-nunito" });
@@ -36,9 +37,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BoardProvider>
           <TopBar />
           <main id="main" className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-24 pt-4 md:px-6 md:pt-6">
-            <Notice variant="warning">
-              Preview mode: example posts only. Changes stay on this screen and go away when you refresh.
-            </Notice>
+            {!supabaseConfigured && (
+              <Notice variant="warning">
+                Preview mode: example posts only. Changes stay on this screen and go away when you refresh.
+              </Notice>
+            )}
             {children}
           </main>
           <HelpDialog />

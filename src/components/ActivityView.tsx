@@ -4,11 +4,12 @@ import Link from "next/link";
 import NeedList from "./NeedList";
 import Tabs from "./Tabs";
 import Loading from "./Loading";
+import LoadError from "./LoadError";
 import { useBoard } from "./BoardProvider";
 import { buttonVariants } from "./ui/button";
 
 export default function ActivityView() {
-  const { ready, needs, me } = useBoard();
+  const { ready, needs, me, loadError, reload } = useBoard();
 
   return (
     <div className="grid gap-6">
@@ -16,6 +17,8 @@ export default function ActivityView() {
       <h1 className="m-0 text-3xl font-black tracking-tight md:text-4xl">My activity</h1>
       {!ready ? (
         <Loading />
+      ) : loadError ? (
+        <LoadError message={loadError} onRetry={reload} />
       ) : (
         <>
           <section className="grid gap-4" aria-labelledby="mine-title">

@@ -7,6 +7,7 @@ import Logo from "./Logo";
 import NeedList from "./NeedList";
 import Tabs from "./Tabs";
 import Loading from "./Loading";
+import LoadError from "./LoadError";
 import { useBoard } from "./BoardProvider";
 import { Avatar } from "./ui/avatar";
 import { Button, buttonVariants } from "./ui/button";
@@ -149,7 +150,9 @@ export default function FeedView() {
           ))}
         </div>
 
-        {b.ready ? (
+        {b.ready && b.loadError ? (
+          <LoadError message={b.loadError} onRetry={b.reload} />
+        ) : b.ready ? (
           <NeedList
             needs={shown}
             empty={emptyText}

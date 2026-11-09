@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Logo from "./Logo";
 import { useBoard } from "./BoardProvider";
 import { Avatar } from "./ui/avatar";
@@ -83,8 +84,17 @@ export default function NeedCard({ need: n }: { need: Need }) {
 }
 
 function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boolean; helping: boolean; wishlist: string | null }) {
-  const { openHelp, cancelPledge, markReceived, removeNeed, fakeNeighborHelps, toast } = useBoard();
+  const { live, openHelp, cancelPledge, markReceived, removeNeed, fakeNeighborHelps, toast } = useBoard();
+  const [busy, setBusy] = useState(false);
   const buttons: React.ReactNode[] = [];
+
+  // runs a board action, keeps buttons disabled meanwhile, toasts on success
+  const run = async (action: () => Promise<boolean>, done: string) => {
+    setBusy(true);
+    const ok = await action();
+    setBusy(false);
+    if (ok) toast(done);
+  };
 
   if (!mine && n.status === "open") {
     buttons.push(
@@ -105,10 +115,8 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
       <Button
         key="cancel"
         variant="secondary"
-        onClick={() => {
-          cancelPledge(n.id);
-          toast("Offer cancelled. The post is open again.");
-        }}
+        disabled={busy}
+        onClick={() => run(() => cancelPledge(n.id), "Offer cancelled. The post is open again.")}
       >
         Cancel my offer
       </Button>,
@@ -120,10 +128,8 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
         key="got"
         variant="help"
         grow
-        onClick={() => {
-          markReceived(n.id);
-          toast("Marked received. So glad it came through.");
-        }}
+        disabled={busy}
+        onClick={() => run(() => markReceived(n.id), "Marked received. So glad it came through.")}
       >
         I got it, thank you
       </Button>,
@@ -134,14 +140,16 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
       <Button
         key="remove"
         variant="secondary"
-        onClick={() => {
-          removeNeed(n.id);
-          toast("Post removed.");
-        }}
+        disabled={busy}
+        onClick={() => run(() => removeNeed(n.id), "Post removed.")}
       >
         Remove post
       </Button>,
-      // TODO: delete this once real helpers exist (Milestone 4)
+    );
+  }
+  if (mine && n.status === "open" && !live) {
+    buttons.push(
+      // preview mode only: lets you try "I got it" on your own post
       <Button
         key="fake"
         variant="dev"

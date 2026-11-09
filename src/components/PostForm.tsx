@@ -29,6 +29,7 @@ export default function PostForm() {
   const [useWishlist, setUseWishlist] = useState(false);
   const [wishlistUrl, setWishlistUrl] = useState("");
   const [problem, setProblem] = useState<Problem>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     titleRef.current?.focus();
@@ -49,7 +50,7 @@ export default function PostForm() {
 
   const bad = (id: string) => (problem?.field === id ? true : undefined);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     const p = check();
     setProblem(p);
@@ -58,7 +59,8 @@ export default function PostForm() {
       return;
     }
 
-    b.addNeed({
+    setBusy(true);
+    const ok = await b.addNeed({
       title: title.trim(),
       category,
       story: story.trim(),
@@ -70,6 +72,8 @@ export default function PostForm() {
       meetSpot: inPerson ? meetSpot.trim() : "",
       wishlistUrl: useWishlist ? (safeUrl(wishlistUrl.trim()) ?? "") : "",
     });
+    setBusy(false);
+    if (!ok) return;
     b.setDraftCategory(null);
     b.toast("Posted. Neighbors near " + zip + " can see it now.");
     router.push("/activity");
@@ -170,8 +174,8 @@ export default function PostForm() {
 
       <div role="alert">{problem && <Notice key={problem.msg} variant="danger">{problem.msg}</Notice>}</div>
 
-      <Button type="submit" variant="help" size="lg" block>
-        Post my need
+      <Button type="submit" variant="help" size="lg" block disabled={busy}>
+        {busy ? "Posting…" : "Post my need"}
       </Button>
     </Card>
   );

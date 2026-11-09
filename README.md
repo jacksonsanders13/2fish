@@ -13,7 +13,15 @@ npm run dev
 
 Then open http://localhost:3000 (and http://localhost:3000/styleguide to see every design token and component).
 
-Right now everything runs on example data in memory (refreshing resets it). Supabase comes next.
+Without Supabase keys it runs on example data in memory (refreshing resets it).
+
+## Connecting Supabase
+
+1. Create a Supabase project.
+2. Run `supabase/migrations/20261109000000_create_needs.sql` in the SQL editor (or `supabase db push`).
+3. In **Authentication → Sign In / Providers**, turn on **Allow anonymous sign-ins**. Visitors are signed in quietly in the background so they can post and help without making an account.
+4. Copy `.env.example` to `.env.local` and fill in the project URL and publishable key (**Project Settings → API Keys**).
+5. Restart `npm run dev`. The preview banner disappears and the feed updates live.
 
 ## Design system
 
