@@ -1,5 +1,19 @@
-// Same drawing as assets/logo.svg, as a component so we can recolor it
-// (white in the top bar, category color on each post card).
+import { cva, type VariantProps } from "class-variance-authority";
+
+// Same drawing as assets/logo.svg, as a component so it can take on token
+// colors. SVG fill/stroke inherit through CSS, so the "inherit" tone picks
+// up whatever fill-* / stroke-* its parent sets (used on category bands).
+
+const logoVariants = cva("", {
+  variants: {
+    tone: {
+      brand: "fill-logo-body stroke-logo-line",
+      inherit: "stroke-on-color",
+    },
+    motion: { still: "", float: "animate-float" },
+  },
+  defaultVariants: { tone: "brand", motion: "still" },
+});
 
 function Fish({ transform }: { transform: string }) {
   return (
@@ -14,9 +28,9 @@ function Fish({ transform }: { transform: string }) {
   );
 }
 
-export default function Logo({ size = 32, fill = "#fff", stroke = "#14212b" }: { size?: number; fill?: string; stroke?: string }) {
+export default function Logo({ size = 32, tone, motion }: { size?: number } & VariantProps<typeof logoVariants>) {
   return (
-    <svg width={size} height={size} viewBox="0 0 120 120" fill={fill} stroke={stroke} aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 120 120" className={logoVariants({ tone, motion })} aria-hidden="true">
       <Fish transform="translate(9,8) scale(.88)" />
       <Fish transform="translate(111,60) scale(-.88,.88)" />
     </svg>

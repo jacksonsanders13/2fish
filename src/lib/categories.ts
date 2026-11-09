@@ -1,14 +1,15 @@
 export const CATEGORIES = ["Baby", "Food", "Clothing", "Household", "School", "Hygiene", "Other"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-export const CAT_COLOR: Record<Category, string> = {
-  Baby: "#2f7de1",
-  Food: "#e07a1f",
-  Clothing: "#8a4fd6",
-  Household: "#2a9d8f",
-  School: "#d64570",
-  Hygiene: "#1fa2c9",
-  Other: "#5b6b7a",
+// Category colors live in globals.css as --cat-* tokens.
+// The class names are written out in full so Tailwind can find them.
+// `fill-*` is there because the fish logo on the band inherits it.
+export const CATEGORY_TONE: Record<Category, string> = {
+  Baby: "bg-cat-baby fill-cat-baby",
+  Food: "bg-cat-food fill-cat-food",
+  Clothing: "bg-cat-clothing fill-cat-clothing",
+  Household: "bg-cat-household fill-cat-household",
+  School: "bg-cat-school fill-cat-school",
+  Hygiene: "bg-cat-hygiene fill-cat-hygiene",
+  Other: "bg-cat-other fill-cat-other",
 };
-
-export const AVATAR_COLORS = ["#1b5fd1", "#12a05c", "#e07a1f", "#8a4fd6", "#d64570", "#2a9d8f", "#c2410c", "#0e7490"];

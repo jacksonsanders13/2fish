@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useBoard } from "./BoardProvider";
+import { Button } from "./ui/button";
+import { Field, Input, choiceVariants } from "./ui/input";
 import { safeUrl } from "@/lib/format";
 import type { HelpMethod, Need } from "@/lib/types";
 
@@ -22,7 +24,7 @@ export default function HelpDialog() {
       ref={ref}
       onClose={closeHelp}
       aria-labelledby="help-title"
-      className="m-auto w-[calc(100%-32px)] max-w-[420px] rounded-2xl border-0 bg-surface p-[18px] text-ink"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border-0 bg-surface p-6 text-foreground shadow-pop open:animate-scale-in"
     >
       {helpTarget && <HelpForm key={helpTarget.id} need={helpTarget} />}
     </dialog>
@@ -47,40 +49,47 @@ function HelpForm({ need: n }: { need: Need }) {
   }
 
   return (
-    <form onSubmit={submit}>
-      <h2 id="help-title" className="m-0 mb-1 text-[21px] font-black">
-        Help a neighbor
-      </h2>
-      <p className="m-0 text-muted">
-        {n.title} for {n.displayName || "a neighbor"} in {n.zip}
-      </p>
+    <form onSubmit={submit} className="grid gap-4">
+      <div className="grid gap-1">
+        <h2 id="help-title" className="m-0 text-2xl font-black">
+          Help a neighbor
+        </h2>
+        <p className="m-0 text-muted-foreground">
+          {n.title} for {n.displayName || "a neighbor"} in {n.zip}
+        </p>
+      </div>
 
-      <div className="my-3 grid gap-2">
+      <fieldset className="m-0 grid gap-2 border-0 p-0">
+        <legend className="sr-only">How you&apos;ll help</legend>
         {options.map((o) => (
-          <label key={o.value} className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-line p-2.5 has-[:checked]:border-go">
-            <input type="radio" name="method" value={o.value} checked={method === o.value} onChange={() => setMethod(o.value)} className="mt-1" />
-            <div>
-              <div className="font-bold">{o.title}</div>
-              <div className="text-[13px] text-muted">{o.detail}</div>
-            </div>
+          <label key={o.value} className={choiceVariants({ variant: "card" })}>
+            <input
+              type="radio"
+              name="method"
+              value={o.value}
+              checked={method === o.value}
+              onChange={() => setMethod(o.value)}
+              className="mt-1 size-4 accent-success"
+            />
+            <span>
+              <span className="block font-bold">{o.title}</span>
+              <span className="block text-sm text-muted-foreground">{o.detail}</span>
+            </span>
           </label>
         ))}
-      </div>
+      </fieldset>
 
-      <div className="grid gap-1.5">
-        <label htmlFor="h-note" className="label">
-          Note to them (optional)
-        </label>
-        <input id="h-note" className="input" maxLength={140} placeholder="I can drop off Saturday morning" value={note} onChange={(e) => setNote(e.target.value)} />
-      </div>
+      <Field label="Note to them (optional)" id="h-note">
+        <Input id="h-note" maxLength={140} placeholder="I can drop off Saturday morning" value={note} onChange={(e) => setNote(e.target.value)} />
+      </Field>
 
-      <div className="flex flex-wrap justify-end gap-2 pt-4">
-        <button type="button" className="btn btn-soft" onClick={closeHelp}>
+      <div className="flex flex-wrap justify-end gap-2 pt-2">
+        <Button variant="secondary" onClick={closeHelp}>
           Cancel
-        </button>
-        <button type="submit" className="btn btn-go">
+        </Button>
+        <Button type="submit" variant="help" grow>
           Count me in
-        </button>
+        </Button>
       </div>
     </form>
   );

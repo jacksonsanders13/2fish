@@ -1,102 +1,84 @@
 "use client";
 
-import Avatar from "./Avatar";
 import Logo from "./Logo";
 import { useBoard } from "./BoardProvider";
-import { CAT_COLOR } from "@/lib/categories";
+import { Avatar } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { Button, buttonVariants } from "./ui/button";
+import { Card } from "./ui/card";
+import { Notice } from "./ui/notice";
+import { StatusProgress } from "./ui/progress";
+import { CATEGORY_TONE } from "@/lib/categories";
 import { daysUntil, dueLabel, safeUrl, timeAgo } from "@/lib/format";
 import type { Need } from "@/lib/types";
 
-const STATUS_LABEL = { open: "Open", pledged: "Being helped", done: "Received" };
-const STATUS_STYLE = {
-  open: "bg-brand-soft text-brand",
-  pledged: "bg-warn-soft text-ink",
-  done: "bg-go-soft text-go",
-};
-const PROGRESS = { open: "12%", pledged: "60%", done: "100%" };
-const STEP = { open: 0, pledged: 1, done: 2 };
+const STATUS_LABEL = { open: "Open", pledged: "Being helped", done: "Received" } as const;
 
 export default function NeedCard({ need: n }: { need: Need }) {
   const board = useBoard();
   const mine = n.posterId === board.me;
   const helping = n.helper?.id === board.me;
-  const color = CAT_COLOR[n.category] ?? CAT_COLOR.Other;
   const wishlist = safeUrl(n.wishlistUrl);
   const due = daysUntil(n.neededBy);
+  const urgent = due !== null && due <= 1 && n.status === "open";
   const where = [n.area, n.zip].filter(Boolean).join(" · ");
 
   return (
-    <article className="box overflow-hidden">
+    <Card as="article" variant="interactive" padding="none" className="grid content-start" aria-labelledby={`need-${n.id}`}>
       {/* who posted it */}
-      <div className="flex items-center gap-2.5 px-3 pb-2 pt-3">
+      <header className="flex items-center gap-3 px-4 pb-2 pt-4">
         <Avatar name={n.displayName || "Neighbor"} seed={n.posterId} />
         <div className="min-w-0 flex-1">
-          <b className="block font-extrabold">
+          <p className="m-0 flex flex-wrap items-center gap-2 font-extrabold">
             {n.displayName || "A neighbor"}
-            {n.example && (
-              <span className="ml-1.5 rounded-md border border-dashed border-muted px-1.5 py-px align-[2px] text-[11px] font-extrabold text-muted">
-                Example
-              </span>
-            )}
-          </b>
-          <small className="text-[13px] text-muted">
-            {where} · {timeAgo(n.createdAt)}
-          </small>
+            {n.example && <Badge variant="example">Example</Badge>}
+          </p>
+          <p className="m-0 text-sm text-muted-foreground">
+            {where} · <time dateTime={new Date(n.createdAt).toISOString()}>{timeAgo(n.createdAt)}</time>
+          </p>
         </div>
-        <span className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-extrabold ${STATUS_STYLE[n.status]}`}>
-          {STATUS_LABEL[n.status]}
-        </span>
-      </div>
+        <Badge variant={n.status}>{STATUS_LABEL[n.status]}</Badge>
+      </header>
 
-      <div className="grid gap-1.5 px-3 pb-2.5">
-        <h3 className="m-0 text-[19px] font-black leading-tight text-balance">{n.title}</h3>
-        {n.story && <p className="m-0 max-w-[65ch]">{n.story}</p>}
+      <div className="grid gap-2 px-4 pb-4">
+        <h3 id={`need-${n.id}`} className="m-0 text-lg font-black leading-tight text-balance md:text-xl">
+          {n.title}
+        </h3>
+        {n.story && <p className="m-0 max-w-prose">{n.story}</p>}
       </div>
 
       {/* colored category band */}
-      <div className="flex items-center justify-between gap-2.5 p-3.5 font-extrabold text-white" style={{ background: color }}>
-        <div className="flex items-center gap-2.5">
-          <span className="opacity-90">
-            <Logo size={34} fill={color} stroke="#fff" />
-          </span>
-          <span className="text-[13px] uppercase tracking-[.08em] opacity-95">{n.category}</span>
+      <div className={`flex items-center justify-between gap-2 px-4 py-3 font-extrabold text-on-color ${CATEGORY_TONE[n.category]}`}>
+        <div className="flex items-center gap-2">
+          <Logo size={32} tone="inherit" />
+          <span className="text-sm uppercase tracking-widest">{n.category}</span>
         </div>
         {n.neededBy && n.status !== "done" && (
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-sm ${due !== null && due <= 2 ? "bg-white text-[#7a4700]" : "bg-black/20"}`}
-          >
+          <Badge variant={urgent ? "urgent" : "due"} size="md">
             {dueLabel(n.neededBy)}
-          </span>
+          </Badge>
         )}
       </div>
 
-      {/* Posted -> Helper found -> Received */}
-      <div className="px-3 pb-1 pt-3">
-        <div className="h-2 overflow-hidden rounded-full bg-line">
-          <i className="block h-full rounded-full bg-go transition-[width] duration-500" style={{ width: PROGRESS[n.status] }} />
-        </div>
-        <div className="mt-1.5 flex justify-between text-xs font-bold text-muted">
-          {["Posted", "Helper found", "Received"].map((label, i) => (
-            <span key={label} className={i <= STEP[n.status] ? "text-ink" : undefined}>
-              {label}
-            </span>
-          ))}
-        </div>
+      <div className="px-4 pt-4">
+        <StatusProgress status={n.status} />
       </div>
 
       {(n.inPerson || wishlist) && (
-        <div className="flex flex-wrap gap-1.5 px-3 pb-0.5 pt-1.5 text-[13px]">
-          {n.inPerson && <span className="rounded-lg bg-page px-2 py-1 font-semibold text-muted">Drop off: {n.meetSpot || "public spot"}</span>}
-          {wishlist && <span className="rounded-lg bg-page px-2 py-1 font-semibold text-muted">Wishlist</span>}
+        <div className="flex flex-wrap gap-2 px-4 pt-4">
+          {n.inPerson && <Badge size="md">Drop off: {n.meetSpot || "public spot"}</Badge>}
+          {wishlist && <Badge size="md">Wishlist</Badge>}
         </div>
       )}
 
       {n.helper && n.status !== "open" && n.helper.note && (
-        <div className="mx-3 mt-1.5 rounded-[10px] bg-go-soft px-2.5 py-2 text-sm">Helper: {n.helper.note}</div>
+        <Notice variant="success" className="mx-4 mt-4">
+          <b>Helper:</b> {n.helper.note}
+        </Notice>
       )}
 
       <Actions need={n} mine={mine} helping={helping} wishlist={wishlist} />
-    </article>
+    </Card>
   );
 }
 
@@ -106,76 +88,74 @@ function Actions({ need: n, mine, helping, wishlist }: { need: Need; mine: boole
 
   if (!mine && n.status === "open") {
     buttons.push(
-      <button key="help" type="button" className="btn btn-go" onClick={() => openHelp(n)}>
+      <Button key="help" variant="help" grow onClick={() => openHelp(n)}>
         I&apos;ll help
-      </button>,
+      </Button>,
     );
   }
   if (wishlist && n.status !== "done") {
     buttons.push(
-      <a key="wish" className="btn" href={wishlist} target="_blank" rel="noopener noreferrer">
-        View wishlist
+      <a key="wish" className={buttonVariants({ variant: "outline" })} href={wishlist} target="_blank" rel="noopener noreferrer">
+        View wishlist<span className="sr-only"> (opens in a new tab)</span>
       </a>,
     );
   }
   if (helping && n.status === "pledged") {
     buttons.push(
-      <button
+      <Button
         key="cancel"
-        type="button"
-        className="btn btn-soft"
+        variant="secondary"
         onClick={() => {
           cancelPledge(n.id);
           toast("Offer cancelled. The post is open again.");
         }}
       >
         Cancel my offer
-      </button>,
+      </Button>,
     );
   }
   if (mine && n.status === "pledged") {
     buttons.push(
-      <button
+      <Button
         key="got"
-        type="button"
-        className="btn btn-go"
+        variant="help"
+        grow
         onClick={() => {
           markReceived(n.id);
           toast("Marked received. So glad it came through.");
         }}
       >
         I got it, thank you
-      </button>,
+      </Button>,
     );
   }
   if (mine && n.status === "open") {
     buttons.push(
-      <button
+      <Button
         key="remove"
-        type="button"
-        className="btn btn-soft"
+        variant="secondary"
         onClick={() => {
           removeNeed(n.id);
           toast("Post removed.");
         }}
       >
         Remove post
-      </button>,
+      </Button>,
       // TODO: delete this once real helpers exist (Milestone 4)
-      <button
+      <Button
         key="fake"
-        type="button"
-        className="btn btn-soft border-dashed border-muted text-sm text-muted"
+        variant="dev"
+        size="sm"
         onClick={() => {
           fakeNeighborHelps(n.id);
           toast("Test mode: a pretend neighbor offered to help.");
         }}
       >
         Test: pretend a neighbor helps
-      </button>,
+      </Button>,
     );
   }
 
-  if (!buttons.length) return null;
-  return <div className="flex flex-wrap gap-2 px-3 pb-3 pt-2.5">{buttons}</div>;
+  if (!buttons.length) return <div className="pb-4" />;
+  return <footer className="flex flex-wrap items-center gap-2 p-4">{buttons}</footer>;
 }

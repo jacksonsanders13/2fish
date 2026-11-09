@@ -4,8 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useBoard } from "./BoardProvider";
+import { Button, buttonVariants } from "./ui/button";
+import { Card } from "./ui/card";
+import { Field, Input, Select, Textarea, choiceVariants } from "./ui/input";
+import { Notice } from "./ui/notice";
 import { CATEGORIES, type Category } from "@/lib/categories";
 import { digitsOnly, looksLikeAddress, safeUrl, zipOk } from "@/lib/format";
+
+type Problem = { msg: string; field: string } | null;
 
 export default function PostForm() {
   const b = useBoard();
@@ -22,28 +28,35 @@ export default function PostForm() {
   const [meetSpot, setMeetSpot] = useState("");
   const [useWishlist, setUseWishlist] = useState(false);
   const [wishlistUrl, setWishlistUrl] = useState("");
-  const [error, setError] = useState("");
+  const [problem, setProblem] = useState<Problem>(null);
 
   useEffect(() => {
     titleRef.current?.focus();
   }, []);
 
-  // returns an error message, or "" if it's good to go
-  function check() {
-    if (!title.trim()) return 'Add what you need, like "Size 4 diapers".';
-    if (!zipOk(zip)) return "Enter a 5-digit ZIP so nearby neighbors can find your post.";
-    if (!inPerson && !useWishlist) return "Choose at least one way to receive help.";
-    if (inPerson && !meetSpot.trim()) return "Add a public meeting spot, like a library or church lobby.";
-    if (useWishlist && !safeUrl(wishlistUrl.trim())) return "Paste the full wishlist link, starting with https://";
-    if (looksLikeAddress((inPerson ? meetSpot : "") + " " + story)) return "That looks like a street address. Use a public spot instead to stay safe.";
-    return "";
+  // returns what's wrong and which field to point at, or null if it's good to go
+  function check(): Problem {
+    if (!title.trim()) return { msg: 'Add what you need, like "Size 4 diapers".', field: "f-title" };
+    if (!zipOk(zip)) return { msg: "Enter a 5-digit ZIP so nearby neighbors can find your post.", field: "f-zip" };
+    if (!inPerson && !useWishlist) return { msg: "Choose at least one way to receive help.", field: "f-inperson" };
+    if (inPerson && !meetSpot.trim()) return { msg: "Add a public meeting spot, like a library or church lobby.", field: "f-spot" };
+    if (useWishlist && !safeUrl(wishlistUrl.trim())) return { msg: "Paste the full wishlist link, starting with https://", field: "f-wish" };
+    if (looksLikeAddress(inPerson ? meetSpot : ""))
+      return { msg: "That looks like a street address. Use a public spot instead to stay safe.", field: "f-spot" };
+    if (looksLikeAddress(story)) return { msg: "That looks like a street address. Use a public spot instead to stay safe.", field: "f-story" };
+    return null;
   }
+
+  const bad = (id: string) => (problem?.field === id ? true : undefined);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const problem = check();
-    setError(problem);
-    if (problem) return;
+    const p = check();
+    setProblem(p);
+    if (p) {
+      document.getElementById(p.field)?.focus();
+      return;
+    }
 
     b.addNeed({
       title: title.trim(),
@@ -63,35 +76,38 @@ export default function PostForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="box grid gap-3.5 p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="m-0 text-xl font-black">Post a need</h2>
-        <Link href="/" className="btn btn-soft">
+    <Card as="form" padding="lg" onSubmit={submit} noValidate className="grid gap-6 animate-fade-in-up">
+      <div className="flex items-start justify-between gap-4">
+        <div className="grid gap-1">
+          <h1 className="m-0 text-3xl font-black tracking-tight md:text-4xl">Post a need</h1>
+          <p className="m-0 text-muted-foreground">It only takes a minute. Neighbors near your ZIP will see it.</p>
+        </div>
+        <Link href="/" className={buttonVariants({ variant: "secondary", size: "sm" })}>
           Cancel
         </Link>
       </div>
 
       <Field label="What do you need?" id="f-title">
-        <input ref={titleRef} id="f-title" className="input" maxLength={80} placeholder="Size 4 diapers" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input ref={titleRef} id="f-title" aria-invalid={bad("f-title")} maxLength={80} placeholder="Size 4 diapers" value={title} onChange={(e) => setTitle(e.target.value)} />
       </Field>
 
-      <div className="grid gap-3 min-[481px]:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Category" id="f-cat">
-          <select id="f-cat" className="input" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
+          <Select id="f-cat" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Needed by" id="f-by">
-          <input id="f-by" type="date" className="input" value={neededBy} onChange={(e) => setNeededBy(e.target.value)} />
+          <Input id="f-by" type="date" value={neededBy} onChange={(e) => setNeededBy(e.target.value)} />
         </Field>
       </div>
 
       <Field label="Tell your story" id="f-story">
-        <textarea
+        <Textarea
           id="f-story"
-          className="input"
+          aria-invalid={bad("f-story")}
           rows={3}
           maxLength={400}
           placeholder="A little about your situation, plus sizes or quantity so neighbors pick the right thing."
@@ -100,41 +116,45 @@ export default function PostForm() {
         />
       </Field>
 
-      <div className="grid gap-3 min-[481px]:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="ZIP code" id="f-zip">
-          <input id="f-zip" className="input" inputMode="numeric" maxLength={5} placeholder="27615" value={zip} onChange={(e) => setZip(digitsOnly(e.target.value))} />
+          <Input id="f-zip" aria-invalid={bad("f-zip")} inputMode="numeric" maxLength={5} placeholder="27615" value={zip} onChange={(e) => setZip(digitsOnly(e.target.value))} />
         </Field>
         <Field label="Neighborhood (optional)" id="f-area">
-          <input id="f-area" className="input" maxLength={40} placeholder="North Raleigh" value={area} onChange={(e) => setArea(e.target.value)} />
+          <Input id="f-area" maxLength={40} placeholder="North Raleigh" value={area} onChange={(e) => setArea(e.target.value)} />
         </Field>
       </div>
 
       <Field label="First name or nickname" id="f-name" hint='Leave it blank to post as "A neighbor".'>
-        <input id="f-name" className="input" maxLength={24} placeholder="Jess" value={b.displayName} onChange={(e) => b.setDisplayName(e.target.value)} />
+        <Input id="f-name" maxLength={24} placeholder="Jess" value={b.displayName} onChange={(e) => b.setDisplayName(e.target.value)} />
       </Field>
 
-      <div className="grid gap-1.5">
-        <span className="label">How can neighbors get it to you?</span>
-        <label className="flex items-center gap-2 font-semibold">
-          <input type="checkbox" checked={inPerson} onChange={(e) => setInPerson(e.target.checked)} /> Drop off in person at a public spot
+      <fieldset className="m-0 grid gap-2 border-0 p-0">
+        <legend className="mb-2 p-0 text-sm font-extrabold">How can neighbors get it to you?</legend>
+        <label className={choiceVariants({ variant: "plain" })}>
+          <input id="f-inperson" type="checkbox" className="mt-1 size-4 accent-primary" checked={inPerson} onChange={(e) => setInPerson(e.target.checked)} />
+          Drop off in person at a public spot
         </label>
         {inPerson && (
-          <input
-            className="input"
+          <Input
+            id="f-spot"
             aria-label="Meeting spot"
+            aria-invalid={bad("f-spot")}
             maxLength={60}
             placeholder="Meeting spot, e.g. North Regional Library lobby"
             value={meetSpot}
             onChange={(e) => setMeetSpot(e.target.value)}
           />
         )}
-        <label className="flex items-center gap-2 font-semibold">
-          <input type="checkbox" checked={useWishlist} onChange={(e) => setUseWishlist(e.target.checked)} /> Buy it from my wishlist
+        <label className={choiceVariants({ variant: "plain" })}>
+          <input type="checkbox" className="mt-1 size-4 accent-primary" checked={useWishlist} onChange={(e) => setUseWishlist(e.target.checked)} />
+          Buy it from my wishlist
         </label>
         {useWishlist && (
-          <input
-            className="input"
+          <Input
+            id="f-wish"
             aria-label="Wishlist link"
+            aria-invalid={bad("f-wish")}
             type="url"
             maxLength={300}
             placeholder="https://www.amazon.com/hz/wishlist/ls/..."
@@ -142,31 +162,17 @@ export default function PostForm() {
             onChange={(e) => setWishlistUrl(e.target.value)}
           />
         )}
-      </div>
+      </fieldset>
 
-      <div className="rounded-[10px] bg-brand-soft px-3 py-2.5 text-sm">
-        Never put your home address in a post. Pick a public meeting spot, or use a wishlist so the store ships to you privately.
-      </div>
+      <Notice variant="info">
+        <b>Stay safe:</b> never put your home address in a post. Pick a public meeting spot, or use a wishlist so the store ships to you privately.
+      </Notice>
 
-      <div role="alert" className="min-h-[1em] text-sm font-bold text-[#c62828]">
-        {error}
-      </div>
+      <div role="alert">{problem && <Notice key={problem.msg} variant="danger">{problem.msg}</Notice>}</div>
 
-      <button type="submit" className="btn btn-go">
+      <Button type="submit" variant="help" size="lg" block>
         Post my need
-      </button>
-    </form>
-  );
-}
-
-function Field({ label, id, hint, children }: { label: string; id: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div className="grid gap-1.5">
-      <label htmlFor={id} className="label">
-        {label}
-      </label>
-      {children}
-      {hint && <span className="text-[13px] text-muted">{hint}</span>}
-    </div>
+      </Button>
+    </Card>
   );
 }
