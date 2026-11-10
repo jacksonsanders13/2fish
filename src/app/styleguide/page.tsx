@@ -187,6 +187,7 @@ export default function StyleGuide() {
           <Avatar name="Big" size="lg" seed="x" />
           <Avatar name="Small" size="sm" seed="y" />
           <Logo size={48} />
+          <Logo size={48} tone="ink" />
           <Logo size={48} tone="muted" />
         </div>
         <div className="grid gap-2">

@@ -33,7 +33,7 @@ signature color against clean white, with everything else neutral.
 
 | Role | Token | Why |
 |---|---|---|
-| **Primary: koi coral (8°)** | `--primary` | Two fish, so koi. Warm, friendly and unmistakably 2fish. It's the color of every action that brings people together: *I'll help*, *Post a need*, *Count me in*, *I got it*. Also the selected category ring and the logo. |
+| **Primary: koi coral (8°)** | `--primary` | Two fish, so koi; it's also the color of the logo mark. Warm, friendly and unmistakably 2fish. It's the color of every action that brings people together: *I'll help*, *Post a need*, *Count me in*, *I got it*. Also the selected category ring and the logo. |
 | **Neutrals: white + warm ink** | `--background` `--foreground` `--muted` `--border` | Pure white keeps the feed calm so photos-less text posts still breathe; the ink and greys lean slightly warm (20–30°) to sit well next to coral. |
 | **Accent: amber (38°)** | `--accent` | Only for *time*: "Needed today/tomorrow" and "A neighbor is helping". |
 | **Success: sage (150°)** | `--success` | Only for "Received". Good news, quietly. |
@@ -110,7 +110,7 @@ Don't pass color classes in from outside.**
 | `NeedCard` | `NeedCard.tsx` | one post row: avatar · name/place/time · category + due · title · story · spot/wishlist · status line · actions |
 | `CategoryStories` | `CategoryStories.tsx` | round category filters; selected = coral ring (`aria-pressed`) |
 | `CATEGORY_META`, `CategoryTag` | `category.tsx` | icon + color per category |
-| `Logo`, `Wordmark` | `Logo.tsx` | tone `brand` (coral koi) / `muted` · motion `still` / `float` |
+| `Logo`, `Wordmark` | `Logo.tsx` | the two-fish "2" mark, one color · tone `brand` (coral) / `ink` / `muted` · motion `still` / `float` |
 | `BottomNav`, `railLinkVariants` | `Nav.tsx` | phone tab bar; desktop rail links. Active state from `aria-current` |
 | `LeftRail`, `RightRail` | `Rails.tsx` | desktop columns |
 | `ThemeToggle` | `ThemeToggle.tsx` | light/dark switch, saved per browser; `withLabel` in the rail |
@@ -232,5 +232,16 @@ Tap targets: 44px for main actions, 36px minimum for small pills.
 
 - **Dignity first.** Status words are gentle: *A neighbor is helping with this*, *Received. Thank you, neighbor.* No goal bars, no money totals.
 - **Safety in context.** The safety tip sits in the rail and the post form, calm and visible. The street-address check points at the field that triggered it.
-- **Low-bandwidth friendly.** Two web fonts, no images in the feed, SVG logo, skeletons not spinners.
+- **Low-bandwidth friendly.** Two web fonts, no images in the feed, SVG logo (~3 KB), skeletons not spinners.
+
+## 12. Logo
+
+The mark is two fish swimming around each other, their bodies forming a **2**. Files:
+
+- `assets/logo-source.png`: the original artwork
+- `assets/logo.svg` (ink) and `assets/logo-coral.svg`: vector versions traced with potrace
+- `src/app/icon.svg`: favicon, white mark on a coral rounded square
+- `src/components/logo-paths.ts`: the same paths, used by `<Logo>` so it can take any token color
+
+The mark is a single color. Use coral (`brand`) by default, ink where coral would compete with a coral button, never more than one color inside the mark.
 - **Plain language.** Actions say what happens ("I'll help", "I got it, thank you"), never "Submit" or "Claim".
