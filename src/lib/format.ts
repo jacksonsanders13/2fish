@@ -5,7 +5,8 @@ export const zipOk = (z: string) => /^\d{5}$/.test(z);
 export const digitsOnly = (s: string, max = 5) => s.replace(/\D/g, "").slice(0, max);
 
 // only allow real web links, never javascript: or anything weird
-export function safeUrl(u: string): string | null {
+export function safeUrl(u: string | null | undefined): string | null {
+  if (!u) return null;
   try {
     const x = new URL(u);
     return x.protocol === "https:" || x.protocol === "http:" ? x.href : null;
@@ -14,50 +15,46 @@ export function safeUrl(u: string): string | null {
   }
 }
 
-// catches stuff like "123 Oak St" so nobody posts their home address
+// catches stuff like "123 Oak St" so nobody posts their home address in public
 export const looksLikeAddress = (text: string) =>
-  /\d+\s+\w+\s+(st|street|rd|road|ave|avenue|dr|drive|ln|lane|ct|court|blvd)\b/i.test(text);
+  /\b\d{1,6}\s+(?:[A-Za-z]+\s){0,3}(st|street|rd|road|ave|avenue|dr|drive|ln|lane|ct|court|blvd|boulevard|way|pl|place|cir|circle|ter|terrace|pkwy|parkway|hwy|highway)\b\.?/i.test(
+    text,
+  );
 
-function today() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-export function isoInDays(n: number) {
-  const d = today();
-  d.setDate(d.getDate() + n);
-  const pad = (x: number) => String(x).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-export function daysUntil(iso: string) {
-  if (!iso) return null;
-  return Math.round((new Date(iso + "T00:00:00").getTime() - today().getTime()) / 86400000);
-}
-
-export const fmtDate = (iso: string) =>
-  new Date(iso + "T00:00:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
-
-export function dueLabel(iso: string) {
-  const d = daysUntil(iso);
-  if (d === null) return "";
-  if (d < 0) return "Past due";
-  if (d === 0) return "Needed today";
-  if (d === 1) return "Needed tomorrow";
-  return "By " + fmtDate(iso);
-}
-
-export function timeAgo(ms: number) {
-  const m = Math.round((Date.now() - ms) / 60000);
-  if (m < 60) return m <= 1 ? "just now" : m + "m";
+export function timeAgo(input: string | number | Date) {
+  const ms = Date.now() - new Date(input).getTime();
+  const m = Math.round(ms / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
   const h = Math.round(m / 60);
-  if (h < 24) return h + "h";
-  return Math.round(h / 24) + "d";
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  if (d < 7) return `${d}d ago`;
+  const w = Math.round(d / 7);
+  if (w < 5) return `${w}w ago`;
+  return new Date(input).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function hash(s: string) {
-  let h = 0;
-  for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) | 0;
-  return Math.abs(h);
+export function formatDistance(miles: number | null | undefined) {
+  if (miles == null || Number.isNaN(miles)) return null;
+  if (miles < 1) return "under 1 mi away";
+  return `~${Math.round(miles)} mi away`;
+}
+
+export function initials(name: string | null | undefined) {
+  const n = (name ?? "").trim();
+  if (!n) return "?";
+  return n
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+export function pluralize(n: number, one: string, many = one + "s") {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+export function truncate(s: string, max: number) {
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + "…" : s;
 }

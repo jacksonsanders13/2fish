@@ -1,37 +1,55 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito_Sans } from "next/font/google";
-import BoardProvider from "@/components/BoardProvider";
-import TopBar from "@/components/TopBar";
-import HelpDialog from "@/components/HelpDialog";
-import Toast from "@/components/Toast";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { SITE } from "@/lib/site";
 import "./globals.css";
 
-const nunito = Nunito_Sans({ subsets: ["latin"], variable: "--font-nunito" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
-  title: "2fish · A little is enough",
-  description: "Post what you need. Neighbors nearby help by dropping it off or buying from your wishlist.",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} · A little is enough`,
+    template: `%s · ${SITE.name}`,
+  },
+  description: SITE.description,
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: `${SITE.name} · A little is enough`,
+    description: SITE.description,
+    url: SITE.url,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} · A little is enough`,
+    description: SITE.description,
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1b5fd1",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfbfa" },
+    { media: "(prefers-color-scheme: dark)", color: "#19171a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={nunito.variable}>
-      <body className="font-sans antialiased">
-        <BoardProvider>
-          <TopBar />
-          <main className="mx-auto grid max-w-[680px] gap-3 px-4 pb-[72px] pt-3">
-            <div className="rounded-xl border border-warn bg-warn-soft px-3 py-2.5 text-sm">
-              Preview mode: example posts only. Changes stay on this screen and go away when you refresh.
-            </div>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <body className="min-h-dvh flex flex-col">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <TooltipProvider>
             {children}
-          </main>
-          <HelpDialog />
-          <Toast />
-        </BoardProvider>
+            <Toaster position="bottom-center" richColors closeButton />
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
