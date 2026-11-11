@@ -1,11 +1,11 @@
-import { SiteHeader } from "@/components/layout/site-header";
+import { Header } from "@/components/layout/header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Faq, Features, FinalCta, Hero, HowItWorks, Origin, PrinciplesStrip } from "@/components/marketing/sections";
 
 export default function HomePage() {
   return (
     <>
-      <SiteHeader />
+      <Header />
       <main>
         <Hero />
         <PrinciplesStrip />

@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/layout/site-header";
+import { Header } from "@/components/layout/header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Container } from "@/components/layout/container";
 
@@ -16,7 +16,7 @@ export function ProsePage({
 }) {
   return (
     <>
-      <SiteHeader />
+      <Header />
       <main className="relative">
         <div className="glow-amber pointer-events-none absolute inset-x-0 top-0 h-72" />
         <Container size="sm" className="relative py-16 sm:py-24">

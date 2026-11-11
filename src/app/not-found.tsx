@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/layout/site-header";
+import { Header } from "@/components/layout/header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Container } from "@/components/layout/container";
 import { LogoMark } from "@/components/brand/logo";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <>
-      <SiteHeader />
+      <Header />
       <main className="relative flex flex-1 items-center">
         <div className="glow-amber pointer-events-none absolute inset-x-0 top-0 h-80" />
         <Container size="sm" className="relative py-24 text-center">
