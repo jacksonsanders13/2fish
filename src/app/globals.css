@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* Six named colors. Solid only. See DESIGN.md for roles. */
+:root {
+  --white: #ffffff;
+  --surface: #f4f6f9;
+  --sand: #ece5d6;
+  --sand-deep: #d9cdb0;
+  --navy: #0c2340;
+  --navy-deep: #071a33;
+  --navy-tint: #1a3a66;
+  --ink: #0c2340;
+  --muted: #5b6b81;
+  --line: #d9dfe8;
+  --cash: #157347;
+  --cash-bright: #6ad49c;
+  --on-navy-muted: #a7b5ca;
+  --on-navy-line: rgba(255, 255, 255, 0.16);
+
+  /* Direction A is the default so the index page has something to wear. */
+  --font-display: var(--font-instrument-serif), Georgia, serif;
+  --font-body: var(--font-instrument-sans), system-ui, sans-serif;
+  --r-ctl: 6px;
+  --r-card: 10px;
+  --shadow-raised: none;
+}
+
+[data-dir="b"] {
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-body: "Satoshi", var(--font-instrument-sans), system-ui, sans-serif;
+  --r-ctl: 10px;
+  --r-card: 16px;
+  --shadow-raised: 0 1px 2px rgba(12, 35, 64, 0.06), 0 8px 24px rgba(12, 35, 64, 0.08);
+}
+
+@theme inline {
+  --color-white: var(--white);
+  --color-surface: var(--surface);
+  --color-sand: var(--sand);
+  --color-sand-deep: var(--sand-deep);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-navy-tint: var(--navy-tint);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-cash: var(--cash);
+  --color-cash-bright: var(--cash-bright);
+  --color-on-navy-muted: var(--on-navy-muted);
+  --color-on-navy-line: var(--on-navy-line);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+
+  --radius-ctl: var(--r-ctl);
+  --radius-card: var(--r-card);
+
+  --shadow-raised: var(--shadow-raised);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+[data-dir] {
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.on-navy :focus-visible {
+  outline-color: var(--white);
+}
+
+/* Dollar figures always line up. */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Range input, styled once so both directions share it. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: 3px solid var(--white);
+  box-shadow: 0 0 0 1px var(--navy);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: 3px solid var(--white);
+  box-shadow: 0 0 0 1px var(--navy);
+  cursor: pointer;
+}
