@@ -42,7 +42,6 @@ export function LandingB({ dir }: { dir: Dir }) {
                   <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
                 </Button>
               </div>
-              <p className="mt-4 text-sm text-on-navy-muted">Free. No card. About 5 minutes.</p>
             </div>
             <div className="mt-14 min-w-0 translate-y-12 sm:translate-y-16">
               <DashboardPreview chrome="navy" />

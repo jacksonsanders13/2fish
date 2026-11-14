@@ -11,9 +11,7 @@ export function SiteFooter({ dir }: { dir: Dir }) {
           <Link href={`/${dir}`} className="inline-block rounded-md">
             <Logo />
           </Link>
-          <p className="mt-3 max-w-sm text-sm">
-            Named for the two fish that fed a crowd. A little, multiplied. Made in Raleigh, NC.
-          </p>
+          <p className="mt-3 text-sm">Made in Raleigh, NC.</p>
         </div>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <li>

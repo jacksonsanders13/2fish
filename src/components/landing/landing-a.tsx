@@ -39,7 +39,6 @@ export function LandingA({ dir }: { dir: Dir }) {
                   <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
                 </Button>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">Free. No card. About 5 minutes.</p>
             </div>
           </Container>
         </section>

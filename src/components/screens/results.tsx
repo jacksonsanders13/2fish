@@ -105,7 +105,6 @@ export function ResultsScreen({ dir }: { dir: Dir }) {
                 <Button asChild className="mt-5 w-full">
                   <Link href={`/${dir}/dashboard`}>Start with step 1</Link>
                 </Button>
-                <p className="mt-3 text-sm text-muted-foreground">Free to see the plan. Pro turns the steps on.</p>
               </div>
             </aside>
           </Container>
