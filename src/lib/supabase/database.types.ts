@@ -157,6 +157,7 @@ export type Database = {
     };
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
+      miles_between: { Args: { lat1: number; lng1: number; lat2: number; lng2: number }; Returns: number };
       offer_help: { Args: { p_need_id: string }; Returns: ThreadRow };
       cancel_offer: { Args: { p_need_id: string }; Returns: undefined };
       mark_fulfilled: { Args: { p_need_id: string }; Returns: undefined };
