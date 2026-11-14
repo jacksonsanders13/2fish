@@ -17,7 +17,7 @@ const BLOCKED_RE = new RegExp(
         .map((ch) => (leet[ch] ?? ch) + "+[^a-z0-9]{0,1}")
         .join(""),
     ).join("|") +
-    ")\\b",
+    ")(?:ing|ers?|ed|s|y)?\\b",
   "i",
 );
 

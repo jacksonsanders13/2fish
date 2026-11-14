@@ -42,7 +42,8 @@ export function SignupForm() {
           <Field orientation="horizontal">
             <Checkbox id="over18" name="over18" />
             <FieldLabel htmlFor="over18" className="font-normal leading-snug text-muted-foreground">
-              I'm 18 or older and I agree to the{" "}
+              <span>
+                I'm 18 or older and I agree to the{" "}
               <Link href="/terms" className="text-foreground underline underline-offset-4" target="_blank">
                 Terms
               </Link>{" "}
@@ -51,6 +52,7 @@ export function SignupForm() {
                 Privacy Policy
               </Link>
               .
+            </span>
             </FieldLabel>
           </Field>
           <FieldError errors={fieldError(state, "over18")} />

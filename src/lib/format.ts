@@ -17,7 +17,7 @@ export function safeUrl(u: string | null | undefined): string | null {
 
 // catches stuff like "123 Oak St" so nobody posts their home address in public
 export const looksLikeAddress = (text: string) =>
-  /\b\d{1,6}\s+(?:[A-Za-z]+\s){0,3}(st|street|rd|road|ave|avenue|dr|drive|ln|lane|ct|court|blvd|boulevard|way|pl|place|cir|circle|ter|terrace|pkwy|parkway|hwy|highway)\b\.?/i.test(
+  /\b\d{1,6}\s+(?:[A-Za-z]+\.?\s){0,3}(st|street|rd|road|ave|avenue|dr|drive|ln|lane|ct|court|blvd|boulevard|way|pl|place|cir|circle|ter|terrace|pkwy|parkway|hwy|highway)\b\.?/i.test(
     text,
   );
 
