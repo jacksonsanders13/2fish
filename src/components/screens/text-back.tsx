@@ -1,5 +1,6 @@
 import { CircleCheck, PhoneMissed, ShieldCheck } from "lucide-react";
 import { AppShell, PageBody } from "@/components/app/shell";
+import { Reveal } from "@/components/motion/reveal";
 import { Money } from "@/components/ui/money";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,63 +12,69 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
   return (
     <AppShell dir={dir} active="text-back">
       <PageBody>
-        <header className="max-w-2xl">
-          <p className="text-sm text-muted-foreground">Plan · Step 1</p>
-          <h1 className="mt-1 text-display font-semibold">Text back every missed call</h1>
-          <p className="mt-3">
-            When you can&apos;t pick up, the caller gets a text in 10 seconds. You see the reply here and on your
-            phone, and 2fish drafts answers for you to approve.
-          </p>
-        </header>
+        <Reveal immediate>
+          <header className="max-w-2xl">
+            <p className="text-sm text-muted-foreground">Plan · Step 1</p>
+            <h1 className="mt-1 text-display font-semibold">Text back every missed call</h1>
+            <p className="mt-3">
+              When you can&apos;t pick up, the caller gets a text in 10 seconds. You see the reply here and on your
+              phone, and 2fish drafts answers for you to approve.
+            </p>
+          </header>
+        </Reveal>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
-          <section className="rounded-lg border border-line bg-white" aria-labelledby="setup">
-            <div className="flex items-center justify-between gap-4 border-b border-line p-5">
-              <div>
-                <h2 id="setup" className="font-semibold">
-                  Setup
-                </h2>
-                <p className="text-sm text-muted-foreground">Live since Nov 3</p>
+          <Reveal immediate delay={0.08}>
+            <section className="rounded-lg border border-line bg-white" aria-labelledby="setup">
+              <div className="flex items-center justify-between gap-4 border-b border-line p-5">
+                <div>
+                  <h2 id="setup" className="font-semibold">
+                    Setup
+                  </h2>
+                  <p className="text-sm text-muted-foreground">Live since Nov 3</p>
+                </div>
+                <label className="flex items-center gap-2 text-sm font-semibold">
+                  <Switch defaultChecked aria-label="Text-back on" />
+                  On
+                </label>
               </div>
-              <label className="flex items-center gap-2 text-sm font-semibold">
-                <Switch defaultChecked aria-label="Text-back on" />
-                On
-              </label>
-            </div>
-            <dl className="divide-y divide-line">
-              <Row label="Business line" value={textBackSetup.line}>
-                Missed calls forward here from your existing number. Nothing changes for callers.
-              </Row>
-              <Row label="Text goes out after" value={textBackSetup.delay} />
-              <Row label="Texting hours" value={textBackSetup.hours}>
-                Calls missed outside these hours get a text at 8 the next morning.
-              </Row>
-              <div className="p-5">
-                <dt className="text-sm text-muted-foreground">First message</dt>
-                <dd className="mt-2">
-                  <Textarea
-                    readOnly
-                    rows={4}
-                    defaultValue={textBackSetup.template}
-                    aria-label="First message"
-                    className="resize-none bg-surface p-3 text-sm"
-                  />
-                </dd>
-                <dd className="mt-2 text-sm text-muted-foreground">Replies to STOP and HELP are handled automatically.</dd>
-              </div>
-            </dl>
-            <p className="flex gap-2 border-t border-line p-5 text-sm">
-              <ShieldCheck size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-              Only people who called you get a text. No lists, no cold outreach.
-            </p>
-          </section>
+              <dl className="divide-y divide-line">
+                <Row label="Business line" value={textBackSetup.line}>
+                  Missed calls forward here from your existing number. Nothing changes for callers.
+                </Row>
+                <Row label="Text goes out after" value={textBackSetup.delay} />
+                <Row label="Texting hours" value={textBackSetup.hours}>
+                  Calls missed outside these hours get a text at 8 the next morning.
+                </Row>
+                <div className="p-5">
+                  <dt className="text-sm text-muted-foreground">First message</dt>
+                  <dd className="mt-2">
+                    <Textarea
+                      readOnly
+                      rows={4}
+                      defaultValue={textBackSetup.template}
+                      aria-label="First message"
+                      className="resize-none bg-surface p-3 text-sm"
+                    />
+                  </dd>
+                  <dd className="mt-2 text-sm text-muted-foreground">Replies to STOP and HELP are handled automatically.</dd>
+                </div>
+              </dl>
+              <p className="flex gap-2 border-t border-line p-5 text-sm">
+                <ShieldCheck size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+                Only people who called you get a text. No lists, no cold outreach.
+              </p>
+            </section>
+          </Reveal>
 
           <aside>
-            <h2 className="font-semibold">A conversation from Tuesday</h2>
-            <p className="text-sm text-muted-foreground">(919) 555-0142</p>
+            <Reveal immediate delay={0.12}>
+              <h2 className="font-semibold">A conversation from Tuesday</h2>
+              <p className="text-sm text-muted-foreground">(919) 555-0142</p>
+            </Reveal>
             <ol className="mt-3 space-y-3 rounded-lg border border-line bg-white p-4">
               {conversation.map((m, i) => (
-                <Bubble key={i} {...m} />
+                <Bubble key={i} index={i} {...m} />
               ))}
             </ol>
           </aside>
@@ -89,11 +96,14 @@ function Row({ label, value, children }: { label: string; value: string; childre
   );
 }
 
-function Bubble({ from, text, time }: { from: string; text: string; time?: string }) {
+// Messages appear one after another, like a conversation replaying.
+function Bubble({ from, text, time, index }: { from: string; text: string; time?: string; index: number }) {
+  const delay = 0.2 + index * 0.12;
+
   if (from === "system") {
     const booked = text.startsWith("Booked");
     return (
-      <li className="flex items-center justify-center gap-1.5 py-1 text-sm text-muted-foreground">
+      <Reveal as="li" delay={delay} y={6} className="flex items-center justify-center gap-1.5 py-1 text-sm text-muted-foreground">
         {booked ? <CircleCheck size={14} aria-hidden="true" /> : <PhoneMissed size={14} aria-hidden="true" />}
         {booked ? (
           <span>
@@ -103,15 +113,19 @@ function Bubble({ from, text, time }: { from: string; text: string; time?: strin
           <span>{text}</span>
         )}
         {time ? <span className="num">· {time}</span> : null}
-      </li>
+      </Reveal>
     );
   }
   if (from === "owner-note") {
-    return <li className="rounded-md border border-line bg-surface px-3 py-2 text-sm">{text}</li>;
+    return (
+      <Reveal as="li" delay={delay} y={6} className="rounded-md border border-line bg-surface px-3 py-2 text-sm">
+        {text}
+      </Reveal>
+    );
   }
   const mine = from === "business";
   return (
-    <li className={cn("flex", mine ? "justify-end" : "justify-start")}>
+    <Reveal as="li" delay={delay} y={8} className={cn("flex", mine ? "justify-end" : "justify-start")}>
       <div className={cn("max-w-[85%]", mine ? "text-right" : "text-left")}>
         <p
           className={cn(
@@ -123,6 +137,6 @@ function Bubble({ from, text, time }: { from: string; text: string; time?: strin
         </p>
         {time ? <p className="num mt-1 text-sm text-muted-foreground">{time}</p> : null}
       </div>
-    </li>
+    </Reveal>
   );
 }

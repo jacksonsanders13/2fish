@@ -66,3 +66,17 @@ Jackson's own mark: two fish whose bodies link into a 2. Single colour, so it ta
 | Navy usage | Buttons and links. One navy band at the end. | Hero, app header, stat strip. |
 | Landing hero | Headline, then full-width dashboard shot on a surface panel | Navy hero, dashboard shot overlapping into the white section |
 | Dashboard | Left sidebar, plan as a ledger-style list | Top bar, big navy stat strip, plan as stacked cards |
+
+## Motion
+
+Added at Jackson's request on Nov 14. Built with the `motion` library, and every piece checks the viewer's reduce-motion setting and turns itself off.
+
+- **Entrance.** Above-the-fold content (hero headline, subhead, buttons, product shot) fades and rises in with an 80ms stagger. 550ms, ease-out.
+- **Reveal on scroll.** Sections fade and rise 14px the first time they enter the viewport, once. No parallax, no scroll-jacking, nothing tied to scroll position.
+- **Numbers.** Dollar figures count up the first time they're seen (about 1.2s) and tween between values in the calculator (0.6s). Progress bars fill from zero.
+- **Audit.** Questions slide 20px in the direction of travel over 240ms. Selected options get a small spring on the checkmark.
+- **Video step.** A sliding bar while clips are "cutting", cards stagger in by 70ms, the approved mark springs in, the scheduled notice expands.
+- **Text-back.** Chat bubbles appear one after another, 120ms apart, like a replay.
+- **Buttons.** 150ms colour transitions and a 2% press scale.
+
+Not allowed: looping decorative animation, cursor effects, parallax, anything longer than about a second.

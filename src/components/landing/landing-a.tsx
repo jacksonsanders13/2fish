@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { MissedCallCalculator } from "./calculator";
@@ -19,15 +20,17 @@ export function LandingA({ dir }: { dir: Dir }) {
         <section>
           <Container className="pt-14 pb-10 sm:pt-20 sm:pb-12">
             <div className="max-w-3xl">
-              <h1 className="text-display font-semibold">
-                Find the money your business is losing. Then get it back.
-              </h1>
-              <p className="mt-6 max-w-xl">
-                2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
-                2fish do the work, from texting back missed calls to turning your phone clips into a week of
-                videos.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Reveal immediate>
+                <h1 className="text-display font-semibold">Find the money your business is losing. Then get it back.</h1>
+              </Reveal>
+              <Reveal immediate delay={0.08}>
+                <p className="mt-6 max-w-xl">
+                  2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
+                  2fish do the work, from texting back missed calls to turning your phone clips into a week of
+                  videos.
+                </p>
+              </Reveal>
+              <Reveal immediate delay={0.16} className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 px-5 text-base">
                   <Link href={`/${dir}/audit`}>
                     Start your free audit
@@ -37,7 +40,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                 <Button asChild size="lg" variant="outline" className="h-12 px-5 text-base">
                   <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
                 </Button>
-              </div>
+              </Reveal>
             </div>
           </Container>
         </section>
@@ -45,9 +48,9 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* Product shot */}
         <section aria-label="Sample dashboard">
           <Container>
-            <div className="rounded-lg bg-surface p-3 sm:p-6 lg:p-8">
+            <Reveal immediate delay={0.28} y={24} className="rounded-lg bg-surface p-3 sm:p-6 lg:p-8">
               <DashboardPreview />
-            </div>
+            </Reveal>
             <p className="mt-3 text-sm text-muted-foreground">
               The dashboard for a Raleigh power washing company. Sample data.
             </p>
@@ -57,16 +60,17 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* The loop */}
         <section id="how" className="mt-16 border-t border-line sm:mt-24">
           <Container className="grid gap-10 py-16 lg:grid-cols-[1fr_1.3fr] lg:gap-20 lg:py-24">
-            <div className="lg:sticky lg:top-10 lg:self-start">
+            <Reveal className="lg:sticky lg:top-10 lg:self-start">
               <p className="text-sm font-semibold">How it works</p>
               <h2 className="mt-3 text-display font-semibold">Consultants help McDonald&apos;s. We help you.</h2>
               <p className="mt-5 max-w-md">
-                Big firms charge big companies to find where money leaks out and fix it. 2fish does the same four things for small businesses.
+                Big firms charge big companies to find where money leaks out and fix it. 2fish does the same four
+                things for small businesses.
               </p>
-            </div>
+            </Reveal>
             <ol className="space-y-14">
               {loop.map((step) => (
-                <li key={step.n} className="grid gap-4 sm:grid-cols-[3.5rem_1fr]">
+                <Reveal as="li" key={step.n} className="grid gap-4 sm:grid-cols-[3.5rem_1fr]">
                   <span className="num text-sm font-semibold text-muted-foreground">0{step.n}</span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{step.name}</p>
@@ -74,7 +78,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                     <p className="mt-2 max-w-lg">{step.body}</p>
                     <StepSnippet n={step.n} className="mt-6 max-w-md" />
                   </div>
-                </li>
+                </Reveal>
               ))}
             </ol>
           </Container>
@@ -83,7 +87,7 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* Calculator */}
         <section id="cost" className="border-t border-line bg-surface">
           <Container className="grid items-start gap-10 py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
-            <div>
+            <Reveal>
               <p className="text-sm font-semibold">The biggest leak</p>
               <h2 className="mt-3 text-display font-semibold">What a missed call costs you.</h2>
               <p className="mt-5 max-w-md">
@@ -94,29 +98,31 @@ export function LandingA({ dir }: { dir: Dir }) {
                 Move the slider to see what that costs at your prices. 2fish texts back within 10 seconds so the
                 caller waits for you instead.
               </p>
-            </div>
-            <MissedCallCalculator dir={dir} />
+            </Reveal>
+            <Reveal delay={0.1}>
+              <MissedCallCalculator dir={dir} />
+            </Reveal>
           </Container>
         </section>
 
         {/* What it does */}
         <section className="border-t border-line">
           <Container className="py-16 lg:py-24">
-            <div className="max-w-2xl">
+            <Reveal className="max-w-2xl">
               <p className="text-sm font-semibold">What 2fish does for you</p>
               <h2 className="mt-3 text-display font-semibold">Not advice. The actual work.</h2>
               <p className="mt-5">
                 Each step in your plan is something 2fish carries out. You approve it, it runs, and the result
                 shows up on your dashboard.
               </p>
-            </div>
+            </Reveal>
             <dl className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
-              {features.map((f) => (
-                <div key={f.title} className="bg-white p-6">
+              {features.map((f, i) => (
+                <Reveal key={f.title} delay={i * 0.06} className="bg-white p-6">
                   <dt className="font-semibold">{f.title}</dt>
                   <dd className="mt-2 text-sm">{f.body}</dd>
                   <dd className="mt-4 text-sm text-muted-foreground">{f.when}</dd>
-                </div>
+                </Reveal>
               ))}
             </dl>
           </Container>
@@ -125,13 +131,13 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* Pricing */}
         <section id="pricing" className="border-t border-line bg-surface">
           <Container className="grid gap-10 py-16 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:py-24">
-            <div>
+            <Reveal>
               <p className="text-sm font-semibold">Pricing</p>
               <h2 className="mt-3 text-display font-semibold">Free to find the leaks. Pay when 2fish fixes them.</h2>
               <p className="mt-5 max-w-md">The audit and the plan cost nothing, ever. Pro is for the work.</p>
-            </div>
+            </Reveal>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-line bg-white p-6">
+              <Reveal className="rounded-lg border border-line bg-white p-6">
                 <h3 className="font-semibold">Free</h3>
                 <p className="num mt-1">$0</p>
                 <ul className="mt-5 space-y-2 text-sm">
@@ -145,8 +151,8 @@ export function LandingA({ dir }: { dir: Dir }) {
                 <Button asChild variant="outline" className="mt-6 w-full">
                   <Link href={`/${dir}/audit`}>Start the audit</Link>
                 </Button>
-              </div>
-              <div className="rounded-lg border border-navy bg-white p-6">
+              </Reveal>
+              <Reveal delay={0.1} className="rounded-lg border border-navy bg-white p-6">
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="font-semibold">Pro</h3>
                   <span className="rounded-full border border-line px-2.5 py-0.5 text-sm text-muted-foreground">
@@ -171,7 +177,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                 <Button asChild className="mt-6 w-full">
                   <Link href={`/${dir}/audit`}>Start with the free audit</Link>
                 </Button>
-              </div>
+              </Reveal>
             </div>
           </Container>
         </section>
@@ -179,13 +185,13 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* Closing */}
         <section className="on-navy bg-navy text-white">
           <Container className="grid items-center gap-8 py-16 lg:grid-cols-[1.2fr_1fr] lg:py-24">
-            <div>
+            <Reveal>
               <h2 className="text-display font-semibold">Bring what you have. We&apos;ll multiply it.</h2>
               <p className="mt-4 max-w-md text-on-navy-muted">
                 Five minutes of questions. A plan ranked by dollars. The work done for you.
               </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+            </Reveal>
+            <Reveal delay={0.1} className="flex flex-col gap-3 sm:flex-row lg:justify-end">
               <Button asChild size="lg" className="h-12 bg-white px-5 text-base text-navy hover:bg-surface">
                 <Link href={`/${dir}/audit`}>Start your free audit</Link>
               </Button>
@@ -197,7 +203,7 @@ export function LandingA({ dir }: { dir: Dir }) {
               >
                 <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
               </Button>
-            </div>
+            </Reveal>
           </Container>
         </section>
       </main>

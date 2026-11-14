@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { AnimatedMoney } from "@/components/motion/animated-money";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Money } from "@/components/ui/money";
 import { roundTen, type Dir } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -62,11 +62,11 @@ export function MissedCallCalculator({ dir, className }: { dir: Dir; className?:
       <div className="mt-6 border-t border-line pt-5">
         <p className="text-sm font-semibold">Walking out the door each month</p>
         <p className="mt-1 text-display font-semibold">
-          <Money amount={monthly} tone="ink" />
+          <AnimatedMoney amount={monthly} tone="ink" duration={0.6} />
         </p>
         <p className="mt-2 text-sm">
-          About <Money amount={yearly} tone="ink" className="font-semibold" /> a year. Assumes you&apos;d book 3 of
-          every 10 callers you text back.
+          About <AnimatedMoney amount={yearly} tone="ink" duration={0.6} className="font-semibold" /> a year.
+          Assumes you&apos;d book 3 of every 10 callers you text back.
         </p>
       </div>
 

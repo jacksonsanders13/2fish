@@ -1,4 +1,5 @@
 import { Logo } from "@/components/brand/logo";
+import { AnimatedMoney } from "@/components/motion/animated-money";
 import { Money } from "@/components/ui/money";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { activity, business, plan, recovered } from "@/lib/data";
@@ -24,7 +25,7 @@ export function DashboardPreview({ chrome = "light", className }: { chrome?: "li
         <div className="min-w-0 border-b border-line p-4 sm:border-r sm:border-b-0 sm:p-5">
           <p className="font-semibold">Recovered this month</p>
           <p className="mt-1 text-display font-semibold">
-            <Money amount={recovered.amount} />
+            <AnimatedMoney amount={recovered.amount} duration={1.2} />
           </p>
           <p className="mt-2 text-muted-foreground">
             {recovered.jobs} jobs traced to your plan, {recovered.period}
