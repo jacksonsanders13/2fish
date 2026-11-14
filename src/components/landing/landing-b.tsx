@@ -55,8 +55,7 @@ export function LandingB({ dir }: { dir: Dir }) {
             <div className="max-w-2xl">
               <h2 className="text-display font-bold">Consultants help McDonald&apos;s. We help you.</h2>
               <p className="mt-5">
-                Big firms charge big companies to find where money leaks out and fix it. 2fish does the same four
-                things for a shop with two trucks. And it does the fixing itself.
+                Big firms charge big companies to find where money leaks out and fix it. 2fish does the same four things for small businesses.
               </p>
             </div>
             <ol className="mt-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
