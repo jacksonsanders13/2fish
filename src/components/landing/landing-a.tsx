@@ -19,8 +19,7 @@ export function LandingA({ dir }: { dir: Dir }) {
         <section>
           <Container className="pt-14 pb-10 sm:pt-20 sm:pb-12">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold">For local businesses with 1 to 9 employees</p>
-              <h1 className="mt-4 text-display font-semibold">
+              <h1 className="text-display font-semibold">
                 Find the money your business is losing. Then get it back.
               </h1>
               <p className="mt-6 max-w-xl">

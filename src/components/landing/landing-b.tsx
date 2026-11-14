@@ -19,8 +19,7 @@ export function LandingB({ dir }: { dir: Dir }) {
         <section className="on-navy bg-navy text-white">
           <Container className="pt-14 sm:pt-20">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold text-on-navy-muted">For local businesses with 1 to 9 employees</p>
-              <h1 className="mt-4 text-display font-bold">Find the money your business is losing. Then get it back.</h1>
+              <h1 className="text-display font-bold">Find the money your business is losing. Then get it back.</h1>
               <p className="mt-6 max-w-xl text-on-navy-muted">
                 2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
                 2fish do the work, from texting back missed calls to turning your phone clips into a week of
