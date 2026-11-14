@@ -3,7 +3,8 @@ import { Bell, LayoutDashboard, MessageSquareText, Settings, Star, Users, Video 
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { business } from "@/lib/data";
-import { cn, type Dir } from "@/lib/utils";
+import type { Dir } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export type Section = "dashboard" | "text-back" | "videos" | "reviews" | "customers";
 
@@ -38,10 +39,10 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
   return (
     <div className="min-h-dvh bg-surface lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="hidden border-r border-line bg-white lg:flex lg:flex-col lg:px-4 lg:py-5">
-        <Link href={`/${dir}`} className="rounded-ctl px-2">
+        <Link href={`/${dir}`} className="rounded-md px-2">
           <Logo />
         </Link>
-        <p className="mt-6 truncate px-2 text-xs font-medium text-muted">{business.name}</p>
+        <p className="mt-6 truncate px-2 text-sm font-semibold">{business.name}</p>
         <nav aria-label="App" className="mt-2">
           <ul className="space-y-0.5">
             {nav.map((item) => (
@@ -50,8 +51,8 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
                   href={`/${dir}/${item.href}`}
                   aria-current={item.key === active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-ctl px-2 py-2 text-sm",
-                    item.key === active ? "bg-surface font-medium text-ink" : "text-muted hover:bg-surface hover:text-ink",
+                    "flex items-center gap-2.5 rounded-md px-2 py-2 text-sm",
+                    item.key === active ? "bg-surface font-semibold" : "hover:bg-surface",
                   )}
                 >
                   <item.icon size={16} aria-hidden="true" />
@@ -63,11 +64,11 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
         </nav>
         <div className="mt-auto border-t border-line pt-4">
           <div className="flex items-center gap-2.5 px-2 text-sm">
-            <span className="flex size-7 items-center justify-center rounded-full bg-sand text-xs font-semibold text-navy">
+            <span className="flex size-7 items-center justify-center rounded-full bg-navy font-semibold text-white">
               DW
             </span>
             <span className="min-w-0 flex-1 truncate">{business.owner}</span>
-            <Settings size={16} className="text-muted" aria-label="Settings" />
+            <Settings size={16} className="text-muted-foreground" aria-label="Settings" />
           </div>
         </div>
       </aside>
@@ -75,10 +76,10 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
       <div className="min-w-0">
         <header className="sticky top-0 z-10 border-b border-line bg-white lg:hidden">
           <Container className="flex h-14 items-center justify-between">
-            <Link href={`/${dir}`} className="rounded-ctl">
+            <Link href={`/${dir}`} className="rounded-md">
               <Logo />
             </Link>
-            <button type="button" className="flex items-center gap-1.5 rounded-ctl px-2 py-1 text-sm text-muted">
+            <button type="button" className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm">
               <Bell size={16} aria-hidden="true" />
               Alerts
             </button>
@@ -92,7 +93,7 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
                     aria-current={item.key === active ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm",
-                      item.key === active ? "border-navy font-medium text-ink" : "border-transparent text-muted",
+                      item.key === active ? "border-navy font-semibold" : "border-transparent",
                     )}
                   >
                     <item.icon size={15} aria-hidden="true" />
@@ -115,7 +116,7 @@ function ShellB({ dir, active, children }: { dir: Dir; active: Section; children
     <div className="min-h-dvh bg-surface pb-20 md:pb-0">
       <header className="on-navy bg-navy text-white">
         <Container className="flex h-14 items-center justify-between gap-4">
-          <Link href={`/${dir}`} className="rounded-ctl">
+          <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>
           <nav aria-label="App" className="hidden md:block">
@@ -126,8 +127,8 @@ function ShellB({ dir, active, children }: { dir: Dir; active: Section; children
                     href={`/${dir}/${item.href}`}
                     aria-current={item.key === active ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-ctl px-3 py-1.5 text-sm",
-                      item.key === active ? "bg-white/12 font-medium text-white" : "text-white/75 hover:text-white",
+                      "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm",
+                      item.key === active ? "bg-white/12 font-semibold" : "text-white/80 hover:text-white",
                     )}
                   >
                     <item.icon size={15} aria-hidden="true" />
@@ -138,12 +139,12 @@ function ShellB({ dir, active, children }: { dir: Dir; active: Section; children
             </ul>
           </nav>
           <div className="flex items-center gap-3">
-            <button type="button" className="flex items-center gap-1.5 rounded-ctl text-sm text-white/80">
+            <button type="button" className="flex items-center gap-1.5 rounded-md text-sm text-white/80">
               <Bell size={16} aria-hidden="true" />
               <span className="sr-only md:not-sr-only">Alerts</span>
             </button>
             <span
-              className="flex size-8 items-center justify-center rounded-full bg-sand text-xs font-semibold text-navy"
+              className="flex size-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-navy"
               title={business.owner}
             >
               DW
@@ -160,8 +161,8 @@ function ShellB({ dir, active, children }: { dir: Dir; active: Section; children
                 href={`/${dir}/${item.href}`}
                 aria-current={item.key === active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 text-[11px]",
-                  item.key === active ? "font-medium text-navy" : "text-muted",
+                  "flex flex-col items-center gap-1 py-2.5 text-sm",
+                  item.key === active ? "font-semibold text-navy" : "text-muted-foreground",
                 )}
               >
                 <item.icon size={20} aria-hidden="true" />

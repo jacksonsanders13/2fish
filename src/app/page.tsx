@@ -8,12 +8,12 @@ const directions = [
   {
     key: "a",
     name: "Ledger",
-    blurb: "White, serif headlines, hairlines. Calm and bank-like. Sidebar dashboard.",
+    blurb: "Instrument Sans. White pages, navy buttons, hairlines. Sidebar dashboard.",
   },
   {
     key: "b",
     name: "Harbor",
-    blurb: "Navy hero and app chrome, grotesque headlines, bigger radius. Card dashboard with bottom tabs on phones.",
+    blurb: "Bricolage Grotesque. Navy hero and app header. Card dashboard with bottom tabs on phones.",
   },
 ];
 
@@ -31,17 +31,17 @@ export default function Home() {
     <main className="min-h-dvh bg-white">
       <Container className="max-w-3xl py-12 sm:py-20">
         <Logo />
-        <h1 className="mt-8 font-display text-4xl tracking-tight sm:text-5xl">Phase 1 mockup</h1>
-        <p className="mt-3 text-lg text-muted">
+        <h1 className="mt-8 text-display font-semibold">Phase 1 mockup</h1>
+        <p className="mt-3">
           Two visual directions, same copy and the same fake data. Open each on your phone. Nothing is connected
           to a backend.
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {directions.map((d) => (
-            <section key={d.key} className="rounded-card border border-line p-5">
-              <p className="text-sm text-muted">Direction {d.key.toUpperCase()}</p>
-              <h2 className="font-display text-2xl tracking-tight">{d.name}</h2>
-              <p className="mt-1 text-sm text-muted">{d.blurb}</p>
+            <section key={d.key} className="rounded-lg border border-line p-5">
+              <p className="text-sm text-muted-foreground">Direction {d.key.toUpperCase()}</p>
+              <h2 className="font-semibold">{d.name}</h2>
+              <p className="mt-1 text-sm">{d.blurb}</p>
               <ul className="mt-4 divide-y divide-line">
                 {screens.map((s) => (
                   <li key={s.path}>
@@ -50,7 +50,7 @@ export default function Home() {
                       className="flex items-center justify-between py-2.5 text-sm hover:underline"
                     >
                       {s.label}
-                      <ChevronRight size={16} className="text-muted" aria-hidden="true" />
+                      <ChevronRight size={16} aria-hidden="true" />
                     </Link>
                   </li>
                 ))}
@@ -58,7 +58,7 @@ export default function Home() {
             </section>
           ))}
         </div>
-        <p className="mt-10 text-sm text-muted">Design decisions are in DESIGN.md in the repo.</p>
+        <p className="mt-10 text-sm text-muted-foreground">Design decisions are in DESIGN.md in the repo.</p>
       </Container>
     </main>
   );

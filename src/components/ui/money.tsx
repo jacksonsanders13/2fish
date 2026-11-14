@@ -1,4 +1,5 @@
-import { cn, money } from "@/lib/utils";
+import { money } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 type Tone = "cash" | "cash-bright" | "ink" | "white";
 
@@ -9,7 +10,7 @@ const tones: Record<Tone, string> = {
   white: "text-white",
 };
 
-// Gains are green. Losses are navy. Every figure is tabular.
+// Gains are green. Losses are ink. Every figure is tabular.
 export function Money({
   amount,
   per,
@@ -27,7 +28,7 @@ export function Money({
     <span className={cn("num", tones[tone], className)}>
       {sign}
       {money(amount)}
-      {per ? <span className="text-[0.62em] font-normal opacity-80">{per}</span> : null}
+      {per ? <span className="font-normal opacity-80">{per}</span> : null}
     </span>
   );
 }

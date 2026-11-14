@@ -1,75 +1,116 @@
 @import "tailwindcss";
 
-/* Six named colors. Solid only. See DESIGN.md for roles. */
+@custom-variant dark (&:is(.dark *));
+
+/*
+  One neutral base (zinc) + one accent (navy). Green is reserved for dollar
+  figures. No gradients, no shadows except things that float. See DESIGN.md.
+*/
 :root {
   --white: #ffffff;
-  --surface: #f4f6f9;
-  --sand: #ece5d6;
-  --sand-deep: #d9cdb0;
+  --surface: #f4f4f5;
+  --line: #e4e4e7;
+  --ink: #18181b;
+  --muted: #71717a;
   --navy: #0c2340;
-  --navy-deep: #071a33;
   --navy-tint: #1a3a66;
-  --ink: #0c2340;
-  --muted: #5b6b81;
-  --line: #d9dfe8;
+  --navy-deep: #071a33;
   --cash: #157347;
   --cash-bright: #6ad49c;
   --on-navy-muted: #a7b5ca;
   --on-navy-line: rgba(255, 255, 255, 0.16);
 
+  /* shadcn tokens, mapped onto the palette above */
+  --background: var(--white);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--navy);
+  --primary-foreground: var(--white);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: #71717a;
+  --accent: var(--surface);
+  --accent-foreground: var(--ink);
+  --destructive: #b42318;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--navy);
+  --radius: 0.5rem;
+
   /* Direction A is the default so the index page has something to wear. */
-  --font-display: var(--font-instrument-serif), Georgia, serif;
-  --font-body: var(--font-instrument-sans), system-ui, sans-serif;
-  --r-ctl: 6px;
-  --r-card: 10px;
-  --shadow-raised: none;
+  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
 }
 
 [data-dir="b"] {
-  --font-display: var(--font-bricolage), system-ui, sans-serif;
-  --font-body: "Satoshi", var(--font-instrument-sans), system-ui, sans-serif;
-  --r-ctl: 10px;
-  --r-card: 16px;
-  --shadow-raised: 0 1px 2px rgba(12, 35, 64, 0.06), 0 8px 24px rgba(12, 35, 64, 0.08);
+  --font-sans: var(--font-bricolage), system-ui, sans-serif;
 }
 
 @theme inline {
-  --color-white: var(--white);
-  --color-surface: var(--surface);
-  --color-sand: var(--sand);
-  --color-sand-deep: var(--sand-deep);
-  --color-navy: var(--navy);
-  --color-navy-deep: var(--navy-deep);
-  --color-navy-tint: var(--navy-tint);
-  --color-ink: var(--ink);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-surface: var(--surface);
   --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-navy: var(--navy);
+  --color-navy-tint: var(--navy-tint);
+  --color-navy-deep: var(--navy-deep);
   --color-cash: var(--cash);
   --color-cash-bright: var(--cash-bright);
   --color-on-navy-muted: var(--on-navy-muted);
   --color-on-navy-line: var(--on-navy-line);
 
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --font-sans: var(--font-sans);
 
-  --radius-ctl: var(--r-ctl);
-  --radius-card: var(--r-card);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
 
-  --shadow-raised: var(--shadow-raised);
+  /* Three sizes per screen: display, base, small. */
+  --text-display: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.025em;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body,
-[data-dir] {
-  font-family: var(--font-body);
-}
-
-:focus-visible {
-  outline: 2px solid var(--navy);
-  outline-offset: 2px;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body,
+  [data-dir] {
+    font-family: var(--font-sans);
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 .on-navy :focus-visible {
@@ -81,7 +122,7 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-/* Range input, styled once so both directions share it. */
+/* Range input, styled once. */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;

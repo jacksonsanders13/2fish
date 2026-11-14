@@ -1,16 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans, Instrument_Serif } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
-  display: "swap",
-});
-
+// One font per direction. A wears Instrument Sans, B wears Bricolage Grotesque.
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument-sans",
@@ -38,19 +31,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={cn(instrumentSerif.variable, instrumentSans.variable, bricolage.variable)}
-    >
-      <head>
-        {/* Satoshi is only on Fontshare, so it loads the old-fashioned way. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
-        />
-      </head>
-      <body className="min-h-dvh bg-white font-body text-ink antialiased">{children}</body>
+    <html lang="en" className={cn(instrumentSans.variable, bricolage.variable)}>
+      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">{children}</body>
     </html>
   );
 }

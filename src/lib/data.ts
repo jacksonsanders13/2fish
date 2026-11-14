@@ -160,14 +160,14 @@ export type VideoCard = {
   length: string;
   day: string;
   caption: string;
-  tone: "navy" | "sand" | "surface";
+  tone: "navy" | "surface";
 };
 
 export const videos: VideoCard[] = [
   { id: 1, title: "Before and after: Cary driveway", length: "0:22", day: "Mon", caption: "Twelve years of grime, gone in an afternoon. Cary, NC.", tone: "navy" },
-  { id: 2, title: "Deck restore in 60 seconds", length: "0:58", day: "Tue", caption: "Soft wash, brighten, seal. Here's the whole thing sped up.", tone: "sand" },
+  { id: 2, title: "Deck restore in 60 seconds", length: "0:58", day: "Tue", caption: "Soft wash, brighten, seal. Here's the whole thing sped up.", tone: "surface" },
   { id: 3, title: "Why we soft wash roofs", length: "0:34", day: "Wed", caption: "Pressure washing a roof wrecks shingles. Here's what we do instead.", tone: "surface" },
-  { id: 4, title: "Gutter brightening, close up", length: "0:19", day: "Thu", caption: "Those black streaks aren't permanent. Watch.", tone: "sand" },
+  { id: 4, title: "Gutter brightening, close up", length: "0:19", day: "Thu", caption: "Those black streaks aren't permanent. Watch.", tone: "surface" },
   { id: 5, title: "Customer question: how often?", length: "0:41", day: "Fri", caption: "Most Raleigh driveways need it every 12 to 18 months.", tone: "navy" },
   { id: 6, title: "Meet the crew", length: "0:27", day: "Sat", caption: "Three of us, two trucks, since 2019.", tone: "surface" },
   { id: 7, title: "Oak & Ash in 15 seconds", length: "0:15", day: "Sun", caption: "Driveways, decks, roofs, gutters. Text us for a quote.", tone: "navy" },

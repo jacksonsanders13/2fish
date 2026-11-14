@@ -1,6 +1,7 @@
 import { Check, Play } from "lucide-react";
 import { Money } from "@/components/ui/money";
-import { StatusPill } from "@/components/ui/pill";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { money } from "@/lib/format";
 import { plan, recovered, videos } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -34,26 +35,26 @@ export const loop = [
 ] as const;
 
 export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: string }) {
-  const frame = cn("min-w-0 rounded-card border border-line bg-white p-4 text-sm", className);
+  const frame = cn("min-w-0 rounded-lg border border-line bg-white p-4 text-sm", className);
 
   if (n === 1) {
     const options = ["It goes to voicemail", "Nothing, it just rings", "Someone else answers"];
     return (
       <div className={frame} aria-hidden="true">
-        <div className="flex items-center justify-between text-xs text-muted">
-          <span>Question 3 of 9</span>
-          <span className="num">33%</span>
+        <div className="flex items-center justify-between">
+          <span className="font-semibold">Question 3 of 9</span>
+          <span className="num text-muted-foreground">33%</span>
         </div>
         <div className="mt-2 h-1 rounded-full bg-line">
           <div className="h-1 w-1/3 rounded-full bg-navy" />
         </div>
-        <p className="mt-4 font-display text-xl leading-snug">When you can&apos;t pick up, what happens?</p>
+        <p className="mt-4 font-semibold">When you can&apos;t pick up, what happens?</p>
         <ul className="mt-3 space-y-2">
           {options.map((o, i) => (
             <li
               key={o}
               className={cn(
-                "flex items-center justify-between rounded-ctl border px-3 py-2",
+                "flex items-center justify-between rounded-md border px-3 py-2",
                 i === 0 ? "border-navy bg-navy text-white" : "border-line",
               )}
             >
@@ -69,16 +70,16 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
   if (n === 2) {
     return (
       <div className={frame} aria-hidden="true">
-        <div className="flex items-center justify-between text-xs text-muted">
-          <span>Your plan</span>
-          <span>Biggest leak first</span>
+        <div className="flex items-center justify-between">
+          <span className="font-semibold">Your plan</span>
+          <span className="text-muted-foreground">Biggest leak first</span>
         </div>
         <ol className="mt-2 divide-y divide-line">
           {plan.slice(0, 3).map((s) => (
             <li key={s.rank} className="flex items-center gap-3 py-2.5">
-              <span className="num text-muted">{s.rank}</span>
+              <span className="num text-muted-foreground">{s.rank}</span>
               <span className="min-w-0 flex-1 truncate font-medium">{s.title}</span>
-              <StatusPill status={s.status} className="hidden sm:inline-flex" />
+              <StatusBadge status={s.status} className="hidden xl:inline-flex" />
               <Money amount={s.impact} per="/mo" sign="+" className="font-semibold" />
             </li>
           ))}
@@ -88,18 +89,18 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
   }
 
   if (n === 3) {
-    const tones = { navy: "bg-navy text-white", sand: "bg-sand text-navy", surface: "bg-surface text-navy" };
+    const tones = { navy: "bg-navy text-white", surface: "bg-surface text-ink" };
     return (
       <div className={frame} aria-hidden="true">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted">7 videos ready from Tuesday&apos;s clips</span>
-          <span className="rounded-ctl bg-navy px-2.5 py-1 text-xs font-medium text-white">Approve all</span>
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-semibold">7 videos ready from Tuesday&apos;s clips</span>
+          <span className="shrink-0 rounded-md bg-navy px-2.5 py-1 font-medium text-white">Approve all</span>
         </div>
         <ul className="mt-3 grid grid-cols-3 gap-2">
           {videos.slice(0, 3).map((v) => (
-            <li key={v.id} className={cn("relative flex aspect-[4/5] items-center justify-center rounded-ctl", tones[v.tone])}>
+            <li key={v.id} className={cn("relative flex aspect-[4/5] items-center justify-center rounded-md", tones[v.tone])}>
               <Play size={18} />
-              <span className="num absolute right-1.5 bottom-1.5 text-[10px] opacity-80">{v.length}</span>
+              <span className="num absolute right-1.5 bottom-1.5 opacity-80">{v.length}</span>
             </li>
           ))}
         </ul>
@@ -110,17 +111,17 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
   const pct = Math.round((recovered.amount / recovered.pace) * 100);
   return (
     <div className={frame} aria-hidden="true">
-      <p className="text-xs text-muted">Recovered this month</p>
-      <p className="mt-1 font-display text-4xl leading-none tracking-tight">
+      <p className="font-semibold">Recovered this month</p>
+      <p className="mt-1 text-display font-semibold">
         <Money amount={recovered.amount} />
       </p>
-      <p className="mt-2 text-xs text-muted">
+      <p className="mt-2 text-muted-foreground">
         {recovered.jobs} jobs, {recovered.period}
       </p>
       <div className="mt-3 h-1.5 rounded-full bg-line">
         <div className="h-1.5 rounded-full bg-cash" style={{ width: `${pct}%` }} />
       </div>
-      <p className="num mt-2 text-xs text-muted">On pace for about {recovered.pace.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })}</p>
+      <p className="num mt-2 text-muted-foreground">On pace for about {money(recovered.pace)}</p>
     </div>
   );
 }

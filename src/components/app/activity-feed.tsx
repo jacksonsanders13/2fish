@@ -17,10 +17,10 @@ export function ActivityFeed({ className }: { className?: string }) {
         const Icon = icons[a.kind];
         return (
           <li key={a.text} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-            <Icon size={16} className="mt-0.5 shrink-0 text-muted" aria-hidden="true" />
+            <Icon size={16} className="mt-1 shrink-0" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="text-sm">{a.text}</p>
-              <p className="num mt-0.5 text-xs text-muted">{a.when}</p>
+              <p>{a.text}</p>
+              <p className="num mt-0.5 text-sm text-muted-foreground">{a.when}</p>
             </div>
           </li>
         );

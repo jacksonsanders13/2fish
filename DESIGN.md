@@ -1,60 +1,68 @@
 # 2fish design decisions
 
-Phase 1 mockup. Two directions live side by side at `/a` and `/b`. They share one palette (navy, white, a beige accent, one green for money) and differ in typography, how much navy they use, corner radius, and layout.
+Phase 1 mockup. Two directions live side by side at `/a` and `/b`. They share one palette, one component library (shadcn/ui, re-themed) and one set of rules. They differ in typeface, how much navy they use, and layout.
+
+## Rules (from Jackson, Nov 14)
+
+1. UI is shadcn/ui components plus lucide-react icons. Never emoji as icons.
+2. No gradients, no glassmorphism, no purple or blue "AI" palette. One neutral base plus one accent colour.
+3. Type: one font per direction, at most three sizes on any screen. Hierarchy by weight, not colour.
+4. Spacing on a 4/8px scale. Left-aligned content. No centred hero with three cards.
+5. Radius 8px. Shadows only on things that float (menus, dialogs).
 
 ## Palette
 
-Six named colors, solid only. No gradients anywhere on the site in Phase 1.
-
 | Token | Hex | Role |
 | --- | --- | --- |
-| `white` | `#FFFFFF` | Page background. Always white, never cream. |
-| `surface` | `#F4F6F9` | Cool off-white for app backgrounds and quiet bands. |
-| `navy` | `#0C2340` | Brand color. Text, primary buttons, and in direction B the hero and app chrome. `navy-tint` (`#1A3A66`) is the hover shade, `navy-deep` (`#071A33`) the pressed shade. |
-| `sand` | `#ECE5D6` | The beige accent. Secondary surfaces only: tags, highlighted panels, the backdrop behind product shots. Never the page background (that would be the cream default the brief bans). `sand-deep` (`#D9CDB0`) for borders on sand. |
-| `muted` | `#5B6B81` | Secondary text. Passes AA on white and surface. |
-| `cash` | `#157347` | Dollar amounts only. On navy it becomes `cash-bright` (`#6AD49C`). Nothing else is green. |
+| `white` | `#FFFFFF` | Page and card background. |
+| `surface` | `#F4F4F5` | Neutral panel background (zinc-100). |
+| `line` | `#E4E4E7` | 1px borders (zinc-200). |
+| `ink` | `#18181B` | Text (zinc-900). |
+| `muted` | `#71717A` | Timestamps, help text, captions only (zinc-500). |
+| `navy` | `#0C2340` | The one accent. Buttons, links, active states, focus rings, and in direction B the hero band and app header. `navy-tint` `#1A3A66` is hover, `navy-deep` `#071A33` is pressed. |
+| `cash` | `#157347` | Dollar figures the owner gains or recovers. On navy it becomes `cash-bright` `#6AD49C`. Nothing else is green. |
 
-Also: `line` (`#D9DFE8`) for 1px borders. On navy, borders are white at 16% and muted text is `#A7B5CA`.
+Losses on the results page are shown in ink, not green. Every dollar figure uses tabular numerals.
 
-Rule for numbers: money the owner gains or recovers is green. Money the owner is losing (audit results) is navy. Every dollar figure uses tabular numerals.
+shadcn's own tokens (`--primary`, `--muted`, `--border`, `--ring`, `--radius`) are mapped onto this palette in `globals.css`, so every shadcn component picks it up without per-component overrides.
 
 ## Type
 
-- **Direction A, "Ledger".** Headlines in Instrument Serif (Google Fonts), body in Instrument Sans. Feels like a bank statement from a bank you'd trust. Serif only above 24px.
-- **Direction B, "Harbor".** Headlines in Bricolage Grotesque (Google Fonts), body in Satoshi (Fontshare). Bolder, more product-company.
-- Headline tracking is tight (-0.02em to -0.03em). Body is 16px on mobile, 17px for long marketing copy.
-- Type scale: 12, 13, 14, 15, 16, 18, 20, 24, 30, 36, 48, 60, 72.
+- **Direction A, "Ledger".** Instrument Sans only. Calm, Mercury-like.
+- **Direction B, "Harbor".** Bricolage Grotesque only. More character, more product-company.
+- Three sizes, defined once as Tailwind tokens:
+  - `text-display`: clamp(36px, fluid, 56px), line-height 1.05, tracking -0.025em. Headlines and the big dollar number.
+  - `text-base`: 16px. Body, card titles, buttons, inputs.
+  - `text-sm`: 14px. Labels, timestamps, nav, badges.
+- Hierarchy comes from weight: semibold for titles and labels, regular for body. Muted colour is only for metadata, never to signal "less important heading".
 
 ## Spacing, radius, shadow
 
-- Spacing on a 4px base: 4, 8, 12, 16, 24, 32, 48, 64, 96. Section padding is 64px on mobile and 96px on desktop.
-- Radius: A uses 6px on controls and 10px on cards. B uses 10px and 16px. Nothing is a pill except status tags.
-- Shadows: none in A. B allows one shadow level on raised product shots only (`0 1px 2px rgba(12,35,64,.06), 0 8px 24px rgba(12,35,64,.08)`). Cards are separated by 1px lines, not shadows.
+- 4px base: 4, 8, 12, 16, 24, 32, 48, 64, 96. Section padding 64px on phones, 96px on desktop.
+- Radius 8px on everything (`--radius: 0.5rem`). Only status badges are pills.
+- No shadows on cards, product shots, or buttons. Menus and dialogs may have one when they exist.
 - Max content width 1152px. Marketing copy columns max 640px.
 
 ## Icons
 
-Lucide, 16px or 20px, stroke 1.75, always next to a text label. No emoji.
+Lucide, 16px or 20px, always next to a text label.
 
 ## Logo
 
-Jackson's own mark: two fish whose bodies link into a 2. Single color, so it takes navy on white and white on navy. Wordmark is "2fish" in the body font, semibold.
+Jackson's own mark: two fish whose bodies link into a 2. Single colour, so it takes navy on white and white on navy. Wordmark is "2fish" in the direction's font, semibold.
 
 ## Layout habits
 
 - Left-aligned text. Asymmetric two-column sections. No three-identical-cards rows.
 - The dashboard is the hero image. It sits right under the headline on both landing pages.
-- Mobile first. Every screen is checked at 375px. Dashboard B gets a bottom tab bar on phones; dashboard A gets a horizontal tab strip.
-- Placeholders are labeled as placeholders (pricing, video thumbnails). No fake logos, testimonials, or made-up stats.
+- Mobile first. Every screen checked at 375px. Dashboard B gets a bottom tab bar on phones; dashboard A gets a horizontal tab strip.
+- Placeholders are labelled (pricing, video thumbnails, Privacy and Terms). No fake logos, testimonials or made-up stats.
 
 ## How the two directions differ
 
 | | A "Ledger" | B "Harbor" |
 | --- | --- | --- |
-| Feel | Calm, Mercury/Ramp | Confident, Linear/Attio |
-| Navy usage | Type and buttons. One navy band at the end. | Hero, app header, stat strip. |
-| Headline font | Instrument Serif | Bricolage Grotesque |
-| Landing hero | Headline, then full-width dashboard shot on a sand backdrop | Navy hero, dashboard shot overlapping into the white section |
+| Font | Instrument Sans | Bricolage Grotesque |
+| Navy usage | Buttons and links. One navy band at the end. | Hero, app header, stat strip. |
+| Landing hero | Headline, then full-width dashboard shot on a surface panel | Navy hero, dashboard shot overlapping into the white section |
 | Dashboard | Left sidebar, plan as a ledger-style list | Top bar, big navy stat strip, plan as stacked cards |
-| Radius | 6 / 10 | 10 / 16 |

@@ -15,7 +15,7 @@ export default async function DirLayout({
 }) {
   const dir = await getDir(params);
   return (
-    <div data-dir={dir} className="min-h-dvh bg-white font-body text-ink">
+    <div data-dir={dir} className="min-h-dvh bg-white font-sans text-ink">
       {children}
     </div>
   );
