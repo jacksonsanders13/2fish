@@ -58,16 +58,17 @@ export function AuditScreen({ dir }: { dir: Dir }) {
   }
 
   const slide = reduce ? 0 : 20;
+  const navy = dir === "b";
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
-      <header className="border-b border-line">
+      <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
         <Container className="flex h-14 items-center justify-between gap-4">
           <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>
           <span className="text-sm font-semibold">Free audit</span>
-          <Link href={`/${dir}/results`} className="text-sm underline underline-offset-2">
+          <Link href={`/${dir}/results`} className={cn("text-sm underline underline-offset-2", navy && "text-white/85")}>
             Skip to sample results
           </Link>
         </Container>

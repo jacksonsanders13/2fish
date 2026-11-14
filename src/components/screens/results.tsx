@@ -9,19 +9,21 @@ import { Container } from "@/components/ui/container";
 import { Money } from "@/components/ui/money";
 import { business, leaks, plan, totalLeak } from "@/lib/data";
 import type { Dir } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function ResultsScreen({ dir }: { dir: Dir }) {
   const biggest = leaks[0].perMonth;
+  const navy = dir === "b";
 
   return (
     <div className="min-h-dvh bg-white">
-      <header className="border-b border-line">
+      <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
         <Container className="flex h-14 items-center justify-between gap-4">
           <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>
           <span className="text-sm font-semibold">Your results</span>
-          <Link href={`/${dir}/audit`} className="text-sm underline underline-offset-2">
+          <Link href={`/${dir}/audit`} className={cn("text-sm underline underline-offset-2", navy && "text-white/85")}>
             Change answers
           </Link>
         </Container>
