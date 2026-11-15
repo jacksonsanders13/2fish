@@ -3,7 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { answersSchema } from "./schema";
+import { answersSchema, emailSchema, passwordSchema } from "./schema";
 import { createClient } from "@/lib/supabase/server";
 import { estimate, type Answers } from "./estimate";
 import { narrate } from "./narrate";
@@ -45,6 +45,69 @@ export async function requestMagicLink(input: { email: string; answers?: Answers
   });
   if (error) return { ok: false as const, message: error.message };
   return { ok: true as const };
+}
+
+/** Keep the audit answers in the cookie while the owner bounces through a sign-in. */
+export async function stashAnswers(input: Answers) {
+  const answers = answersSchema.parse(input);
+  const jar = await cookies();
+  jar.set(PENDING_COOKIE, JSON.stringify(answers), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60,
+    path: "/",
+  });
+}
+
+function friendly(message: string) {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login credentials")) return "That email or password isn't right.";
+  if (m.includes("already registered") || m.includes("already been registered")) return "You already have an account with that email. Sign in instead.";
+  if (m.includes("rate limit") || m.includes("too many")) return "Too many tries in a row. Give it a few minutes.";
+  if (m.includes("email not confirmed")) return "Confirm your email first. Check your inbox for the link.";
+  return message;
+}
+
+/**
+ * Create an account with email and password. If Supabase wants the email
+ * confirmed first, the answers wait in the cookie and the callback saves them.
+ */
+export async function signUpWithPassword(input: { email: string; password: string; answers?: Answers; next?: string }) {
+  const parsed = z.object({ email: emailSchema, password: passwordSchema }).safeParse(input);
+  if (!parsed.success) return { ok: false as const, message: parsed.error.issues[0]?.message ?? "Check your details." };
+  const next = input.next && input.next.startsWith("/") ? input.next : "/dashboard";
+  const answers = input.answers ? answersSchema.parse(input.answers) : undefined;
+
+  const supabase = await createClient();
+  const origin = await siteOrigin();
+  const { data, error } = await supabase.auth.signUp({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
+  });
+  if (error) return { ok: false as const, message: friendly(error.message) };
+
+  if (data.session) {
+    if (answers) await savePlan(answers);
+    return { ok: true as const, confirm: false as const, next };
+  }
+  if (answers) await stashAnswers(answers);
+  return { ok: true as const, confirm: true as const, next };
+}
+
+/** Sign in with email and password. Saves any answers that came along. */
+export async function signInWithPassword(input: { email: string; password: string; answers?: Answers; next?: string }) {
+  const parsed = z.object({ email: emailSchema, password: z.string().min(1, "Enter your password.") }).safeParse(input);
+  if (!parsed.success) return { ok: false as const, message: parsed.error.issues[0]?.message ?? "Check your details." };
+  const next = input.next && input.next.startsWith("/") ? input.next : "/dashboard";
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  if (error) return { ok: false as const, message: friendly(error.message) };
+
+  if (input.answers) await savePlan(answersSchema.parse(input.answers));
+  return { ok: true as const, next };
 }
 
 /** Read and clear the answers stashed before the magic link went out. */

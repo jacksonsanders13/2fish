@@ -12,3 +12,11 @@ export const answersSchema = z.object({
   winback: z.string().max(20),
   headache: z.string().max(600),
 });
+
+// Jackson's rule: at least 8 characters and at least one number.
+export const passwordSchema = z
+  .string()
+  .min(8, "Use at least 8 characters.")
+  .regex(/\d/, "Add at least one number.");
+
+export const emailSchema = z.string().trim().toLowerCase().email("That doesn't look like an email.");

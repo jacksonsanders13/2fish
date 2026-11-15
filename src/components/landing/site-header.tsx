@@ -20,13 +20,23 @@ export function SiteHeader({ tone = "light" }: { tone?: "light" | "navy" }) {
           <a href="#cost" className={link}>
             What a missed call costs
           </a>
-          <Link href="/dashboard" className={link}>
-            Sign in
-          </Link>
         </nav>
-        <Button asChild size="sm" className={navy ? "bg-white text-navy hover:bg-surface" : undefined}>
-          <Link href="/audit">Start your free audit</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className={navy ? "border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" : undefined}
+          >
+            <Link href="/login">Sign in</Link>
+          </Button>
+          <Button asChild size="sm" className={navy ? "bg-white text-navy hover:bg-surface" : undefined}>
+            <Link href="/audit">
+              <span className="sm:hidden">Free audit</span>
+              <span className="hidden sm:inline">Start your free audit</span>
+            </Link>
+          </Button>
+        </div>
       </Container>
     </header>
   );

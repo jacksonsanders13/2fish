@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { LoginScreen } from "@/components/screens/login";
+import { AuthScreen } from "@/components/screens/auth";
 
-export const metadata: Metadata = { title: "Save your plan" };
+export const metadata: Metadata = { title: "Create your account" };
 
-// Same screen as sign-in, framed around saving the plan the owner just saw.
+// Reached from the results page. Creating the account also saves the plan.
 export default function SignupPage() {
-  return <LoginScreen next="/dashboard" mode="save" />;
+  return <AuthScreen mode="signup" next="/dashboard" />;
 }
