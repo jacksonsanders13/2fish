@@ -10,16 +10,13 @@ import { Reveal } from "@/components/motion/reveal";
 import { RollingMoney } from "@/components/motion/rolling-money";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { Money } from "@/components/ui/money";
-import { PopoverForm, PopoverFormButton, PopoverFormSuccess } from "@/components/ui/popover-form";
 import { sampleAnswers } from "@/lib/data";
-import { requestMagicLink, savePlan } from "@/lib/plan/actions";
+import { savePlan } from "@/lib/plan/actions";
 import { estimate, type Answers } from "@/lib/plan/estimate";
 import { clearAnswers, readAnswers } from "@/lib/plan/storage";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
 // The results screen runs the estimate right here in the browser from the
 // answers saved during the audit. Nothing is stored until the owner asks to
@@ -173,9 +170,8 @@ export function ResultsScreen() {
   );
 }
 
-// "Save this plan". Signed in: saves straight away. Signed out: Cult UI's
-// popover form asks for an email, stashes the answers in a cookie and sends a
-// magic link. The callback route finishes the save.
+// "Save this plan". Signed in: saves straight away. Signed out: go to the
+// sign-up page, which emails a magic link and finishes the save on return.
 function SavePlan({
   answers,
   signedIn,
@@ -187,17 +183,14 @@ function SavePlan({
   onSaved: () => void;
   full?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const size = full ? "h-12 w-full text-base" : "h-12 px-5 text-base";
 
   if (signedIn) {
     return (
       <Button
         size="lg"
-        className={full ? "h-12 w-full text-base" : "h-12 px-5 text-base"}
+        className={size}
         disabled={pending}
         onClick={() =>
           start(async () => {
@@ -212,72 +205,12 @@ function SavePlan({
     );
   }
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    start(async () => {
-      const res = await requestMagicLink({ email, answers, next: "/dashboard" });
-      if (res.ok) setSent(true);
-      else setError(res.message);
-    });
-  }
-
   return (
-    <div
-      className={cn(
-        // Cult UI's PopoverForm centres itself in a 300px box and draws a small white trigger.
-        // Collapse the box and dress the trigger as our primary button.
-        "[&>div]:min-h-0 [&>div]:justify-start [&>div>button]:h-12 [&>div>button]:rounded-md! [&>div>button]:border-navy [&>div>button]:bg-navy [&>div>button]:px-5 [&>div>button]:text-base [&>div>button]:font-medium [&>div>button]:text-white [&>div>button:hover]:bg-navy-tint",
-        full ? "w-full [&>div]:w-full [&>div>button]:w-full [&>div>button]:justify-center" : "[&>div]:w-auto",
-      )}
-    >
-      <PopoverForm
-        title="Save this plan"
-        open={open}
-        setOpen={setOpen}
-        showSuccess={sent}
-        width={full ? "100%" : "360px"}
-        height="270px"
-        showCloseButton
-        openChild={
-          <form onSubmit={submit} className="flex h-full flex-col justify-between p-4">
-            <div>
-              <label htmlFor="save-email" className="text-sm font-semibold">
-                Where should we send your sign-in link?
-              </label>
-              <Input
-                id="save-email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                required
-                autoFocus
-                placeholder="you@yourbusiness.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-2 h-11"
-              />
-              <p className="mt-2 text-sm text-muted-foreground">
-                No password. One tap in your email and your plan is saved.
-              </p>
-              {error ? (
-                <p role="alert" className="mt-2 text-sm font-semibold text-destructive">
-                  {error}
-                </p>
-              ) : null}
-            </div>
-            <div className="flex justify-end">
-              <PopoverFormButton loading={pending} text="Email me the link" />
-            </div>
-          </form>
-        }
-        successChild={
-          <PopoverFormSuccess
-            title="Check your email"
-            description={`We sent a link to ${email}. Open it and your plan will be waiting on your dashboard.`}
-          />
-        }
-      />
-    </div>
+    <Button asChild size="lg" className={size}>
+      <Link href="/signup">
+        Save this plan
+        <ArrowRight aria-hidden="true" />
+      </Link>
+    </Button>
   );
 }

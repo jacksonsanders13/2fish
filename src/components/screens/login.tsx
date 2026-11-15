@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { requestMagicLink } from "@/lib/plan/actions";
+import { readAnswers } from "@/lib/plan/storage";
 
-export function LoginScreen({ next, error }: { next: string; error?: string }) {
+export function LoginScreen({ next, error, mode = "signin" }: { next: string; error?: string; mode?: "signin" | "save" }) {
+  const saving = mode === "save";
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [message, setMessage] = useState<string | null>(
@@ -22,7 +24,9 @@ export function LoginScreen({ next, error }: { next: string; error?: string }) {
     e.preventDefault();
     setMessage(null);
     start(async () => {
-      const res = await requestMagicLink({ email, next });
+      // In save mode the audit answers ride along so the callback can store the plan.
+      const answers = saving ? (readAnswers() ?? undefined) : undefined;
+      const res = await requestMagicLink({ email, answers, next });
       if (res.ok) setSent(true);
       else setMessage(res.message);
     });
@@ -35,9 +39,9 @@ export function LoginScreen({ next, error }: { next: string; error?: string }) {
           <Link href="/" className="rounded-md">
             <Logo />
           </Link>
-          <span className="text-sm font-semibold">Sign in</span>
-          <Link href="/audit" className="text-sm text-white/85 underline underline-offset-2">
-            Start the free audit
+          <span className="text-sm font-semibold">{saving ? "Save your plan" : "Sign in"}</span>
+          <Link href={saving ? "/results" : "/audit"} className="text-sm text-white/85 underline underline-offset-2">
+            {saving ? "Back to results" : "Start the free audit"}
           </Link>
         </Container>
       </header>
@@ -49,8 +53,8 @@ export function LoginScreen({ next, error }: { next: string; error?: string }) {
               <MailCheck size={28} aria-hidden="true" className="text-navy" />
               <h1 className="mt-4 text-display font-bold">Check your email.</h1>
               <p className="mt-4">
-                We sent a sign-in link to <span className="font-semibold">{email}</span>. Open it on this phone or
-                computer and you&apos;ll land on your dashboard.
+                We sent a link to <span className="font-semibold">{email}</span>. Open it on this phone or computer
+                and {saving ? "your plan will be waiting on your dashboard" : "you'll land on your dashboard"}.
               </p>
               <p className="mt-3 text-sm text-muted-foreground">Nothing there after a minute? Check spam, or try again.</p>
               <Button variant="outline" className="mt-6" onClick={() => setSent(false)}>
@@ -59,8 +63,12 @@ export function LoginScreen({ next, error }: { next: string; error?: string }) {
             </Reveal>
           ) : (
             <Reveal immediate>
-              <h1 className="text-display font-bold">Sign in to 2fish.</h1>
-              <p className="mt-4">No password. We email you a link that signs you in.</p>
+              <h1 className="text-display font-bold">{saving ? "Save your plan." : "Sign in to 2fish."}</h1>
+              <p className="mt-4">
+                {saving
+                  ? "Enter your email and we'll send you a link. One tap and your plan is saved to your dashboard. No password."
+                  : "No password. We email you a link that signs you in."}
+              </p>
               <form onSubmit={submit} className="mt-8 space-y-3">
                 <label htmlFor="email" className="block text-sm font-semibold">
                   Your email
@@ -83,14 +91,16 @@ export function LoginScreen({ next, error }: { next: string; error?: string }) {
                   </p>
                 ) : null}
                 <Button type="submit" size="lg" className="h-12 w-full" disabled={pending}>
-                  {pending ? "Sending…" : "Email me a sign-in link"}
+                  {pending ? "Sending…" : saving ? "Save my plan" : "Email me a sign-in link"}
                   <ArrowRight aria-hidden="true" />
                 </Button>
               </form>
-              <p className="mt-6 text-sm text-muted-foreground">
-                New here? <Link href="/audit" className="underline underline-offset-2">Take the 5-minute audit</Link> first.
-                You&apos;ll be asked for your email at the end.
-              </p>
+              {saving ? null : (
+                <p className="mt-6 text-sm text-muted-foreground">
+                  New here? <Link href="/audit" className="underline underline-offset-2">Take the 5-minute audit</Link>{" "}
+                  first. You&apos;ll be asked for your email at the end.
+                </p>
+              )}
             </Reveal>
           )}
         </Container>
