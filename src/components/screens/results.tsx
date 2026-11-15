@@ -18,7 +18,7 @@ export function ResultsScreen({ dir }: { dir: Dir }) {
   return (
     <div className="min-h-dvh bg-white">
       <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
-        <Container className="flex h-14 items-center justify-between gap-4">
+        <Container className="flex h-16 items-center justify-between gap-4">
           <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>

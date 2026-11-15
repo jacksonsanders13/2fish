@@ -63,7 +63,7 @@ export function AuditScreen({ dir }: { dir: Dir }) {
   return (
     <div className="flex min-h-dvh flex-col bg-white">
       <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
-        <Container className="flex h-14 items-center justify-between gap-4">
+        <Container className="flex h-16 items-center justify-between gap-4">
           <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>

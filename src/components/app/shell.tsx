@@ -75,7 +75,7 @@ function ShellA({ dir, active, children }: { dir: Dir; active: Section; children
 
       <div className="min-w-0">
         <header className="sticky top-0 z-10 border-b border-line bg-white lg:hidden">
-          <Container className="flex h-14 items-center justify-between">
+          <Container className="flex h-16 items-center justify-between">
             <Link href={`/${dir}`} className="rounded-md">
               <Logo />
             </Link>
@@ -115,7 +115,7 @@ function ShellB({ dir, active, children }: { dir: Dir; active: Section; children
   return (
     <div className="min-h-dvh bg-surface pb-20 md:pb-0">
       <header className="on-navy bg-navy text-white">
-        <Container className="flex h-14 items-center justify-between gap-4">
+        <Container className="flex h-16 items-center justify-between gap-4">
           <Link href={`/${dir}`} className="rounded-md">
             <Logo />
           </Link>

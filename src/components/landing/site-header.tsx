@@ -10,7 +10,7 @@ export function SiteHeader({ dir, tone = "light" }: { dir: Dir; tone?: "light" |
   const link = cn("text-sm hover:underline", navy ? "text-white/85" : "text-ink");
   return (
     <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
-      <Container className="flex h-16 items-center justify-between gap-4">
+      <Container className="flex h-[4.5rem] items-center justify-between gap-4">
         <Link href={`/${dir}`} className="rounded-md">
           <Logo />
         </Link>

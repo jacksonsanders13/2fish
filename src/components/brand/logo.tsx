@@ -18,11 +18,11 @@ export function LogoMark({ className, size = 28 }: { className?: string; size?: 
   );
 }
 
-export function Logo({ className, size = 22 }: { className?: string; size?: number }) {
+export function Logo({ className, size = 26 }: { className?: string; size?: number }) {
   return (
     <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
       <LogoMark size={size} />
-      <span className="text-[1.05rem] leading-none">2fish</span>
+      <span className="text-[1.2rem] leading-none">2fish</span>
       <span className="sr-only">home</span>
     </span>
   );
