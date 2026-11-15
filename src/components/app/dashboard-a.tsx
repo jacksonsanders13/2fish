@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AnimatedMoney } from "@/components/motion/animated-money";
+import { Count } from "@/components/motion/count";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/ui/money";
@@ -13,7 +14,7 @@ export function DashboardA({ dir }: { dir: Dir }) {
   return (
     <AppShell dir={dir} active="dashboard">
       <PageBody>
-        <Reveal immediate className="flex flex-wrap items-end justify-between gap-4">
+        <Reveal immediate y={16} className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm text-muted-foreground">{business.name} · November 2026</p>
             <h1 className="mt-1 font-semibold">Good afternoon, {business.ownerFirst}.</h1>
@@ -25,25 +26,27 @@ export function DashboardA({ dir }: { dir: Dir }) {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="min-w-0">
-            <Reveal immediate delay={0.06}>
+            <Reveal immediate delay={0.1}>
               <section aria-labelledby="recovered" className="rounded-lg border border-line bg-white p-5 sm:p-6">
                 <h2 id="recovered" className="text-sm font-semibold">
                   Recovered this month
                 </h2>
                 <p className="mt-2 text-display font-semibold">
-                  <AnimatedMoney amount={recovered.amount} duration={1.2} />
+                  <AnimatedMoney amount={recovered.amount} duration={1.6} delay={0.3} />
                 </p>
                 <p className="mt-3 text-sm">
                   {recovered.jobs} jobs traced back to your plan, {recovered.period}. On pace for about{" "}
                   <Money amount={recovered.pace} tone="ink" className="font-semibold" />.
                 </p>
                 <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-line pt-5">
-                  {stats.map((s) => (
-                    <div key={s.label}>
+                  {stats.map((s, i) => (
+                    <Reveal key={s.label} immediate delay={0.5 + i * 0.12} y={10}>
                       <dt className="text-sm text-muted-foreground">{s.label}</dt>
-                      <dd className="num mt-1 font-semibold">{s.value}</dd>
+                      <dd className="mt-1 font-semibold">
+                        <Count to={Number(s.value)} delay={0.6 + i * 0.12} />
+                      </dd>
                       <dd className="text-sm">{s.sub}</dd>
-                    </div>
+                    </Reveal>
                   ))}
                 </dl>
               </section>
@@ -58,13 +61,13 @@ export function DashboardA({ dir }: { dir: Dir }) {
               </Reveal>
               <ol className="mt-3 divide-y divide-line rounded-lg border border-line bg-white">
                 {plan.map((step, i) => (
-                  <PlanRow key={step.rank} dir={dir} step={step} delay={i * 0.06} />
+                  <PlanRow key={step.rank} dir={dir} step={step} delay={0.1 + i * 0.1} />
                 ))}
               </ol>
             </section>
           </div>
 
-          <Reveal as="div" delay={0.12}>
+          <Reveal as="div" delay={0.25} x={24} y={0}>
             <aside>
               <h2 className="font-semibold">Activity</h2>
               <div className="mt-3 rounded-lg border border-line bg-white p-4">
@@ -84,7 +87,7 @@ function PlanRow({ dir, step, delay }: { dir: Dir; step: PlanStep; delay: number
     <Reveal
       as="li"
       delay={delay}
-      y={8}
+      y={16}
       className="grid gap-3 p-4 transition-colors hover:bg-surface/60 sm:grid-cols-[2rem_1fr_auto] sm:items-center sm:gap-4 sm:p-5"
     >
       <span className="num text-sm font-semibold text-muted-foreground">{step.rank}</span>

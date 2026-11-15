@@ -12,7 +12,7 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
   return (
     <AppShell dir={dir} active="text-back">
       <PageBody>
-        <Reveal immediate>
+        <Reveal immediate y={16}>
           <header className="max-w-2xl">
             <p className="text-sm text-muted-foreground">Plan · Step 1</p>
             <h1 className="mt-1 text-display font-semibold">Text back every missed call</h1>
@@ -24,7 +24,7 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
         </Reveal>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
-          <Reveal immediate delay={0.08}>
+          <Reveal immediate delay={0.12}>
             <section className="rounded-lg border border-line bg-white" aria-labelledby="setup">
               <div className="flex items-center justify-between gap-4 border-b border-line p-5">
                 <div>
@@ -68,11 +68,11 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
           </Reveal>
 
           <aside>
-            <Reveal immediate delay={0.12}>
+            <Reveal immediate delay={0.2}>
               <h2 className="font-semibold">A conversation from Tuesday</h2>
               <p className="text-sm text-muted-foreground">(919) 555-0142</p>
             </Reveal>
-            <ol className="mt-3 space-y-3 rounded-lg border border-line bg-white p-4">
+            <ol className="mt-3 space-y-3 overflow-hidden rounded-lg border border-line bg-white p-4">
               {conversation.map((m, i) => (
                 <Bubble key={i} index={i} {...m} />
               ))}
@@ -96,14 +96,14 @@ function Row({ label, value, children }: { label: string; value: string; childre
   );
 }
 
-// Messages appear one after another, like a conversation replaying.
+// Messages appear one after another, sliding in from their side, like a conversation replaying.
 function Bubble({ from, text, time, index }: { from: string; text: string; time?: string; index: number }) {
-  const delay = 0.2 + index * 0.12;
+  const delay = 0.3 + index * 0.2;
 
   if (from === "system") {
     const booked = text.startsWith("Booked");
     return (
-      <Reveal as="li" delay={delay} y={6} className="flex items-center justify-center gap-1.5 py-1 text-sm text-muted-foreground">
+      <Reveal as="li" delay={delay} y={8} className="flex items-center justify-center gap-1.5 py-1 text-sm text-muted-foreground">
         {booked ? <CircleCheck size={14} aria-hidden="true" /> : <PhoneMissed size={14} aria-hidden="true" />}
         {booked ? (
           <span>
@@ -118,14 +118,14 @@ function Bubble({ from, text, time, index }: { from: string; text: string; time?
   }
   if (from === "owner-note") {
     return (
-      <Reveal as="li" delay={delay} y={6} className="rounded-md border border-line bg-surface px-3 py-2 text-sm">
+      <Reveal as="li" delay={delay} y={8} className="rounded-md border border-line bg-surface px-3 py-2 text-sm">
         {text}
       </Reveal>
     );
   }
   const mine = from === "business";
   return (
-    <Reveal as="li" delay={delay} y={8} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+    <Reveal as="li" delay={delay} y={0} x={mine ? 32 : -32} className={cn("flex", mine ? "justify-end" : "justify-start")}>
       <div className={cn("max-w-[85%]", mine ? "text-right" : "text-left")}>
         <p
           className={cn(

@@ -15,6 +15,12 @@ export function StatusBadge({ status, className }: { status: StepStatus; classNa
   const s = styles[status];
   return (
     <Badge variant="outline" className={cn("rounded-full px-2.5 py-0.5 text-sm font-medium", s.cls, className)}>
+      {status === "live" ? (
+        <span className="relative mr-0.5 flex size-1.5" aria-hidden="true">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-70 motion-reduce:animate-none" />
+          <span className="relative inline-flex size-1.5 rounded-full bg-white" />
+        </span>
+      ) : null}
       {s.label}
     </Badge>
   );

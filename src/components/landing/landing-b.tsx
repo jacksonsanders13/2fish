@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
+import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { MissedCallCalculator } from "./calculator";
@@ -20,17 +21,17 @@ export function LandingB({ dir }: { dir: Dir }) {
         <section className="on-navy bg-navy text-white">
           <Container className="pt-14 sm:pt-20">
             <div className="max-w-3xl">
-              <Reveal immediate>
-                <h1 className="text-display font-bold">Find the money your business is losing. Then get it back.</h1>
-              </Reveal>
-              <Reveal immediate delay={0.08}>
+              <h1 className="text-display font-bold">
+                <SplitWords text="Find the money your business is losing. Then get it back." />
+              </h1>
+              <Reveal immediate delay={0.45}>
                 <p className="mt-6 max-w-xl text-on-navy-muted">
                   2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
                   2fish do the work, from texting back missed calls to turning your phone clips into a week of
                   videos.
                 </p>
               </Reveal>
-              <Reveal immediate delay={0.16} className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Reveal immediate delay={0.6} className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 bg-white px-5 text-base text-navy hover:bg-surface">
                   <Link href={`/${dir}/audit`}>
                     Start your free audit
@@ -47,7 +48,7 @@ export function LandingB({ dir }: { dir: Dir }) {
                 </Button>
               </Reveal>
             </div>
-            <Reveal immediate delay={0.28} y={24} className="mt-14 min-w-0 translate-y-12 sm:translate-y-16">
+            <Reveal immediate delay={0.75} y={48} duration={0.9} className="mt-14 min-w-0 translate-y-12 sm:translate-y-16">
               <DashboardPreview chrome="navy" />
             </Reveal>
           </Container>
@@ -66,7 +67,7 @@ export function LandingB({ dir }: { dir: Dir }) {
             </Reveal>
             <ol className="mt-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
               {loop.map((step, i) => (
-                <Reveal as="li" key={step.n} delay={i * 0.08} className="min-w-0 border-t-2 border-navy pt-5">
+                <Reveal as="li" key={step.n} delay={i * 0.12} y={40} className="min-w-0 border-t-2 border-navy pt-5">
                   <p className="num text-sm font-semibold">
                     0{step.n} · {step.name}
                   </p>
@@ -82,7 +83,7 @@ export function LandingB({ dir }: { dir: Dir }) {
         {/* Calculator in a surface panel */}
         <section id="cost">
           <Container className="pb-16 lg:pb-24">
-            <Reveal className="grid items-start gap-8 rounded-lg bg-surface p-5 sm:p-8 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:p-12">
+            <Reveal y={40} className="grid items-start gap-8 rounded-lg bg-surface p-5 sm:p-8 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:p-12">
               <div>
                 <p className="text-sm font-semibold">The biggest leak</p>
                 <h2 className="mt-3 text-display font-bold">What a missed call costs you.</h2>
@@ -95,7 +96,9 @@ export function LandingB({ dir }: { dir: Dir }) {
                   caller waits for you instead.
                 </p>
               </div>
-              <MissedCallCalculator dir={dir} />
+              <Reveal delay={0.2}>
+                <MissedCallCalculator dir={dir} />
+              </Reveal>
             </Reveal>
           </Container>
         </section>
@@ -103,21 +106,23 @@ export function LandingB({ dir }: { dir: Dir }) {
         {/* What it does + pricing side by side on desktop */}
         <section className="border-t border-line">
           <Container className="grid gap-12 py-16 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:py-24">
-            <Reveal>
-              <h2 className="text-display font-bold">Not advice. The actual work.</h2>
+            <div>
+              <Reveal>
+                <h2 className="text-display font-bold">Not advice. The actual work.</h2>
+              </Reveal>
               <dl className="mt-8 divide-y divide-line border-y border-line">
-                {features.map((f) => (
-                  <div key={f.title} className="grid gap-1 py-4 sm:grid-cols-[1fr_auto] sm:gap-6">
+                {features.map((f, i) => (
+                  <Reveal key={f.title} delay={i * 0.1} y={16} className="grid gap-1 py-4 sm:grid-cols-[1fr_auto] sm:gap-6">
                     <div>
                       <dt className="font-bold">{f.title}</dt>
                       <dd className="mt-1 text-sm">{f.body}</dd>
                     </div>
                     <dd className="text-sm text-muted-foreground sm:pt-1 sm:text-right">{f.when}</dd>
-                  </div>
+                  </Reveal>
                 ))}
               </dl>
-            </Reveal>
-            <Reveal delay={0.1}>
+            </div>
+            <Reveal delay={0.15} y={40}>
               <div id="pricing">
                 <h2 className="text-display font-bold">Free to find the leaks.</h2>
                 <div className="mt-8 overflow-hidden rounded-lg border border-line">
@@ -160,7 +165,7 @@ export function LandingB({ dir }: { dir: Dir }) {
         {/* Closing */}
         <section className="border-t border-line bg-surface">
           <Container className="py-16 lg:py-24">
-            <Reveal>
+            <Reveal y={40}>
               <h2 className="max-w-2xl text-display font-bold">Bring what you have. We&apos;ll multiply it.</h2>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 px-5 text-base">

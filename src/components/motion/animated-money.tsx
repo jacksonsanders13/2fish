@@ -5,11 +5,11 @@ import { animate, useInView, useReducedMotion } from "motion/react";
 import { Money } from "@/components/ui/money";
 import { ease } from "./reveal";
 
-type Props = React.ComponentProps<typeof Money> & { duration?: number };
+type Props = React.ComponentProps<typeof Money> & { duration?: number; delay?: number };
 
 // Counts up to the amount the first time it scrolls into view, and tweens
 // between values after that (the calculator uses this).
-export function AnimatedMoney({ amount, duration = 1, ...rest }: Props) {
+export function AnimatedMoney({ amount, duration = 1.2, delay = 0, ...rest }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-10% 0px" });
   const reduce = useReducedMotion();
@@ -21,11 +21,12 @@ export function AnimatedMoney({ amount, duration = 1, ...rest }: Props) {
     const controls = animate(from.current, amount, {
       duration,
       ease,
+      delay: from.current === 0 ? delay : 0,
       onUpdate: (v) => setShown(Math.round(v)),
     });
     from.current = amount;
     return () => controls.stop();
-  }, [amount, inView, reduce, duration]);
+  }, [amount, inView, reduce, duration, delay]);
 
   return (
     <span ref={ref} className="inline-block">

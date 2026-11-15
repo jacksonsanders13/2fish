@@ -34,7 +34,7 @@ export function VideosScreen({ dir }: { dir: Dir }) {
   return (
     <AppShell dir={dir} active="videos">
       <PageBody>
-        <Reveal immediate>
+        <Reveal immediate y={16}>
           <header className="max-w-2xl">
             <p className="text-sm text-muted-foreground">Plan · Step 4</p>
             <h1 className="mt-1 text-display font-semibold">Post 7 short videos a week</h1>
@@ -140,9 +140,9 @@ export function VideosScreen({ dir }: { dir: Dir }) {
                   return (
                     <motion.li
                       key={v.id}
-                      initial={{ opacity: 0, y: reduce ? 0 : 16 }}
+                      initial={{ opacity: 0, y: reduce ? 0 : 28 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.45, ease, delay: reduce ? 0 : 0.1 + i * 0.07 }}
+                      transition={{ duration: 0.55, ease, delay: reduce ? 0 : 0.1 + i * 0.1 }}
                       className="overflow-hidden rounded-lg border border-line bg-white"
                     >
                       <div className={cn("relative flex aspect-[4/5] items-center justify-center", tones[v.tone])}>

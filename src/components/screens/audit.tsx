@@ -28,6 +28,7 @@ export function AuditScreen({ dir }: { dir: Dir }) {
   const value = answers[q.id] ?? "";
   const last = index === total - 1;
   const canNext = value.trim().length > 0;
+  const navy = dir === "b";
 
   function set(v: string) {
     setAnswers((a) => ({ ...a, [q.id]: v }));
@@ -53,12 +54,11 @@ export function AuditScreen({ dir }: { dir: Dir }) {
     set(v);
     if (!last) {
       const target = index + 1;
-      window.setTimeout(() => go(target), 220);
+      window.setTimeout(() => go(target), 320);
     }
   }
 
-  const slide = reduce ? 0 : 20;
-  const navy = dir === "b";
+  const slide = reduce ? 0 : 48;
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
@@ -84,7 +84,7 @@ export function AuditScreen({ dir }: { dir: Dir }) {
               initial={{ opacity: 0, x: slide * direction }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -slide * direction }}
-              transition={{ duration: reduce ? 0 : 0.24, ease }}
+              transition={{ duration: reduce ? 0 : 0.3, ease }}
             >
               <p className="num text-sm font-semibold">
                 Question {index + 1} of {total}
@@ -95,39 +95,51 @@ export function AuditScreen({ dir }: { dir: Dir }) {
               <div className="mt-8">
                 {q.type === "choice" ? (
                   <div role="radiogroup" aria-label={q.prompt} className="grid gap-2 sm:grid-cols-2">
-                    {q.options.map((o) => {
+                    {q.options.map((o, i) => {
                       const selected = value === o;
                       return (
-                        <Button
+                        <motion.div
                           key={o}
-                          variant="outline"
-                          role="radio"
-                          aria-checked={selected}
-                          onClick={() => choose(o)}
-                          className={cn(
-                            "h-auto justify-between px-4 py-3 text-base font-normal whitespace-normal",
-                            selected && "border-navy bg-navy text-white hover:bg-navy-tint hover:text-white",
-                          )}
+                          initial={reduce ? false : { opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, ease, delay: 0.1 + i * 0.06 }}
+                          whileTap={reduce ? undefined : { scale: 0.97 }}
                         >
-                          {o}
-                          {selected ? (
-                            <motion.span
-                              initial={reduce ? false : { scale: 0.5, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className="inline-flex"
-                            >
-                              <Check aria-hidden="true" />
-                            </motion.span>
-                          ) : null}
-                        </Button>
+                          <Button
+                            variant="outline"
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => choose(o)}
+                            className={cn(
+                              "h-auto w-full justify-between px-4 py-3 text-base font-normal whitespace-normal",
+                              selected && "border-navy bg-navy text-white hover:bg-navy-tint hover:text-white",
+                            )}
+                          >
+                            {o}
+                            {selected ? (
+                              <motion.span
+                                initial={reduce ? false : { scale: 0.4, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 26 }}
+                                className="inline-flex"
+                              >
+                                <Check aria-hidden="true" />
+                              </motion.span>
+                            ) : null}
+                          </Button>
+                        </motion.div>
                       );
                     })}
                   </div>
                 ) : null}
 
                 {q.type === "number" ? (
-                  <div className="flex h-14 items-center rounded-md border border-input bg-white px-4 focus-within:border-navy">
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease, delay: 0.1 }}
+                    className="flex h-14 items-center rounded-md border border-input bg-white px-4 focus-within:border-navy"
+                  >
                     {q.prefix ? <span className="text-muted-foreground">{q.prefix}</span> : null}
                     <Input
                       type="number"
@@ -142,19 +154,25 @@ export function AuditScreen({ dir }: { dir: Dir }) {
                       aria-label={q.prompt}
                     />
                     {q.suffix ? <span className="shrink-0 text-muted-foreground">{q.suffix}</span> : null}
-                  </div>
+                  </motion.div>
                 ) : null}
 
                 {q.type === "text" ? (
-                  <Textarea
-                    rows={4}
-                    autoFocus
-                    placeholder={q.placeholder}
-                    value={value}
-                    onChange={(e) => set(e.target.value)}
-                    className="min-h-32 p-4 md:text-base"
-                    aria-label={q.prompt}
-                  />
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease, delay: 0.1 }}
+                  >
+                    <Textarea
+                      rows={4}
+                      autoFocus
+                      placeholder={q.placeholder}
+                      value={value}
+                      onChange={(e) => set(e.target.value)}
+                      className="min-h-32 p-4 md:text-base"
+                      aria-label={q.prompt}
+                    />
+                  </motion.div>
                 ) : null}
               </div>
             </motion.div>

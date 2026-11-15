@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
+import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { MissedCallCalculator } from "./calculator";
@@ -20,17 +21,17 @@ export function LandingA({ dir }: { dir: Dir }) {
         <section>
           <Container className="pt-14 pb-10 sm:pt-20 sm:pb-12">
             <div className="max-w-3xl">
-              <Reveal immediate>
-                <h1 className="text-display font-semibold">Find the money your business is losing. Then get it back.</h1>
-              </Reveal>
-              <Reveal immediate delay={0.08}>
+              <h1 className="text-display font-semibold">
+                <SplitWords text="Find the money your business is losing. Then get it back." />
+              </h1>
+              <Reveal immediate delay={0.45}>
                 <p className="mt-6 max-w-xl">
                   2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
                   2fish do the work, from texting back missed calls to turning your phone clips into a week of
                   videos.
                 </p>
               </Reveal>
-              <Reveal immediate delay={0.16} className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Reveal immediate delay={0.6} className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 px-5 text-base">
                   <Link href={`/${dir}/audit`}>
                     Start your free audit
@@ -48,7 +49,7 @@ export function LandingA({ dir }: { dir: Dir }) {
         {/* Product shot */}
         <section aria-label="Sample dashboard">
           <Container>
-            <Reveal immediate delay={0.28} y={24} className="rounded-lg bg-surface p-3 sm:p-6 lg:p-8">
+            <Reveal immediate delay={0.75} y={48} duration={0.9} className="rounded-lg bg-surface p-3 sm:p-6 lg:p-8">
               <DashboardPreview />
             </Reveal>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -70,7 +71,7 @@ export function LandingA({ dir }: { dir: Dir }) {
             </Reveal>
             <ol className="space-y-14">
               {loop.map((step) => (
-                <Reveal as="li" key={step.n} className="grid gap-4 sm:grid-cols-[3.5rem_1fr]">
+                <Reveal as="li" key={step.n} y={40} className="grid gap-4 sm:grid-cols-[3.5rem_1fr]">
                   <span className="num text-sm font-semibold text-muted-foreground">0{step.n}</span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{step.name}</p>
@@ -99,7 +100,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                 caller waits for you instead.
               </p>
             </Reveal>
-            <Reveal delay={0.1}>
+            <Reveal delay={0.15} y={40}>
               <MissedCallCalculator dir={dir} />
             </Reveal>
           </Container>
@@ -118,7 +119,7 @@ export function LandingA({ dir }: { dir: Dir }) {
             </Reveal>
             <dl className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
               {features.map((f, i) => (
-                <Reveal key={f.title} delay={i * 0.06} className="bg-white p-6">
+                <Reveal key={f.title} delay={i * 0.1} className="bg-white p-6">
                   <dt className="font-semibold">{f.title}</dt>
                   <dd className="mt-2 text-sm">{f.body}</dd>
                   <dd className="mt-4 text-sm text-muted-foreground">{f.when}</dd>
@@ -137,7 +138,7 @@ export function LandingA({ dir }: { dir: Dir }) {
               <p className="mt-5 max-w-md">The audit and the plan cost nothing, ever. Pro is for the work.</p>
             </Reveal>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Reveal className="rounded-lg border border-line bg-white p-6">
+              <Reveal y={40} className="rounded-lg border border-line bg-white p-6">
                 <h3 className="font-semibold">Free</h3>
                 <p className="num mt-1">$0</p>
                 <ul className="mt-5 space-y-2 text-sm">
@@ -152,7 +153,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                   <Link href={`/${dir}/audit`}>Start the audit</Link>
                 </Button>
               </Reveal>
-              <Reveal delay={0.1} className="rounded-lg border border-navy bg-white p-6">
+              <Reveal delay={0.15} y={40} className="rounded-lg border border-navy bg-white p-6">
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="font-semibold">Pro</h3>
                   <span className="rounded-full border border-line px-2.5 py-0.5 text-sm text-muted-foreground">
@@ -191,7 +192,7 @@ export function LandingA({ dir }: { dir: Dir }) {
                 Five minutes of questions. A plan ranked by dollars. The work done for you.
               </p>
             </Reveal>
-            <Reveal delay={0.1} className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+            <Reveal delay={0.15} className="flex flex-col gap-3 sm:flex-row lg:justify-end">
               <Button asChild size="lg" className="h-12 bg-white px-5 text-base text-navy hover:bg-surface">
                 <Link href={`/${dir}/audit`}>Start your free audit</Link>
               </Button>

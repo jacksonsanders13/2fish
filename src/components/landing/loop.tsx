@@ -1,4 +1,7 @@
 import { Check, Play } from "lucide-react";
+import { AnimatedMoney } from "@/components/motion/animated-money";
+import { GrowBar } from "@/components/motion/grow-bar";
+import { Reveal } from "@/components/motion/reveal";
 import { Money } from "@/components/ui/money";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { money } from "@/lib/format";
@@ -34,6 +37,8 @@ export const loop = [
   },
 ] as const;
 
+// Each snippet is a tiny live piece of the product. They animate internally
+// when they scroll into view.
 export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: string }) {
   const frame = cn("min-w-0 rounded-lg border border-line bg-white p-4 text-sm", className);
 
@@ -45,22 +50,27 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
           <span className="font-semibold">Question 3 of 9</span>
           <span className="num text-muted-foreground">33%</span>
         </div>
-        <div className="mt-2 h-1 rounded-full bg-line">
-          <div className="h-1 w-1/3 rounded-full bg-navy" />
-        </div>
+        <GrowBar pct={33} delay={0.3} duration={0.7} className="mt-2 h-1" />
         <p className="mt-4 font-semibold">When you can&apos;t pick up, what happens?</p>
         <ul className="mt-3 space-y-2">
           {options.map((o, i) => (
-            <li
+            <Reveal
+              as="li"
               key={o}
+              delay={0.4 + i * 0.12}
+              y={10}
               className={cn(
                 "flex items-center justify-between rounded-md border px-3 py-2",
                 i === 0 ? "border-navy bg-navy text-white" : "border-line",
               )}
             >
               {o}
-              {i === 0 ? <Check size={14} /> : null}
-            </li>
+              {i === 0 ? (
+                <Reveal as="span" delay={0.9} y={0} duration={0.3} className="inline-flex">
+                  <Check size={14} />
+                </Reveal>
+              ) : null}
+            </Reveal>
           ))}
         </ul>
       </div>
@@ -75,13 +85,13 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
           <span className="text-muted-foreground">Biggest leak first</span>
         </div>
         <ol className="mt-2 divide-y divide-line">
-          {plan.slice(0, 3).map((s) => (
-            <li key={s.rank} className="flex items-center gap-3 py-2.5">
+          {plan.slice(0, 3).map((s, i) => (
+            <Reveal as="li" key={s.rank} delay={0.3 + i * 0.14} y={10} className="flex items-center gap-3 py-2.5">
               <span className="num text-muted-foreground">{s.rank}</span>
               <span className="min-w-0 flex-1 truncate font-medium">{s.title}</span>
               <StatusBadge status={s.status} className="hidden xl:inline-flex" />
               <Money amount={s.impact} per="/mo" sign="+" className="font-semibold" />
-            </li>
+            </Reveal>
           ))}
         </ol>
       </div>
@@ -94,14 +104,22 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
       <div className={frame} aria-hidden="true">
         <div className="flex items-center justify-between gap-3">
           <span className="font-semibold">7 videos ready from Tuesday&apos;s clips</span>
-          <span className="shrink-0 rounded-md bg-navy px-2.5 py-1 font-medium text-white">Approve all</span>
+          <Reveal as="span" delay={0.8} y={0} duration={0.4} className="shrink-0 rounded-md bg-navy px-2.5 py-1 font-medium text-white">
+            Approve all
+          </Reveal>
         </div>
         <ul className="mt-3 grid grid-cols-3 gap-2">
-          {videos.slice(0, 3).map((v) => (
-            <li key={v.id} className={cn("relative flex aspect-[4/5] items-center justify-center rounded-md", tones[v.tone])}>
+          {videos.slice(0, 3).map((v, i) => (
+            <Reveal
+              as="li"
+              key={v.id}
+              delay={0.3 + i * 0.14}
+              y={14}
+              className={cn("relative flex aspect-[4/5] items-center justify-center rounded-md", tones[v.tone])}
+            >
               <Play size={18} />
               <span className="num absolute right-1.5 bottom-1.5 opacity-80">{v.length}</span>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>
@@ -113,14 +131,12 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
     <div className={frame} aria-hidden="true">
       <p className="font-semibold">Recovered this month</p>
       <p className="mt-1 text-display font-semibold">
-        <Money amount={recovered.amount} />
+        <AnimatedMoney amount={recovered.amount} duration={1.4} delay={0.2} />
       </p>
       <p className="mt-2 text-muted-foreground">
         {recovered.jobs} jobs, {recovered.period}
       </p>
-      <div className="mt-3 h-1.5 rounded-full bg-line">
-        <div className="h-1.5 rounded-full bg-cash" style={{ width: `${pct}%` }} />
-      </div>
+      <GrowBar pct={pct} delay={0.4} duration={1} className="mt-3 h-1.5" barClassName="bg-cash" />
       <p className="num mt-2 text-muted-foreground">On pace for about {money(recovered.pace)}</p>
     </div>
   );

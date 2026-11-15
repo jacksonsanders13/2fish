@@ -69,14 +69,17 @@ Jackson's own mark: two fish whose bodies link into a 2. Single colour, so it ta
 
 ## Motion
 
-Added at Jackson's request on Nov 14. Built with the `motion` library, and every piece checks the viewer's reduce-motion setting and turns itself off.
+Added at Jackson's request on Nov 14, then made bolder the same day because the first pass read as too subtle. Built with the `motion` library. Under Reduce Motion everything still fades in, nothing moves.
 
-- **Entrance.** Above-the-fold content (hero headline, subhead, buttons, product shot) fades and rises in with an 80ms stagger. 550ms, ease-out.
-- **Reveal on scroll.** Sections fade and rise 14px the first time they enter the viewport, once. No parallax, no scroll-jacking, nothing tied to scroll position.
-- **Numbers.** Dollar figures count up the first time they're seen (about 1.2s) and tween between values in the calculator (0.6s). Progress bars fill from zero.
-- **Audit.** Questions slide 20px in the direction of travel over 240ms. Selected options get a small spring on the checkmark.
-- **Video step.** A sliding bar while clips are "cutting", cards stagger in by 70ms, the approved mark springs in, the scheduled notice expands.
-- **Text-back.** Chat bubbles appear one after another, 120ms apart, like a replay.
+- **Headline.** Words rise in one after another (50ms apart). Subhead and buttons follow at 0.45s and 0.6s.
+- **Hero dashboard.** Rises 48px into place, then assembles itself: the big number counts up, plan rows stagger in, activity lines slide in from the right.
+- **Screen changes.** Every navigation fades the new screen in (350ms).
+- **Reveal on scroll.** Sections rise 28 to 40px and fade in the first time they enter the viewport, once. Siblings stagger 0.1 to 0.12s. No parallax, no scroll-jacking.
+- **Numbers.** Dollar figures and stats count up (1 to 1.8s). Bars grow from zero (about 1s). The calculator's number tweens when you move the slider.
+- **Audit.** Questions slide 48px in the direction of travel. Options stagger in, shrink 3% on tap, and the checkmark springs in.
+- **Dashboard.** Rows and cards stagger in; the Live badge has a pulsing dot.
+- **Video step.** A sliding bar while clips are "cutting", cards stagger in by 100ms, the approved mark springs in, the scheduled notice expands.
+- **Text-back.** Chat bubbles slide in from their own side, 200ms apart, like a replay.
 - **Buttons.** 150ms colour transitions and a 2% press scale.
 
-Not allowed: looping decorative animation, cursor effects, parallax, anything longer than about a second.
+Not allowed: looping decoration (the Live pulse is the one exception, and it's a status), cursor effects, parallax, anything much longer than a second per element.
