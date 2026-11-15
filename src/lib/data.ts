@@ -81,7 +81,6 @@ export type PlanStep = {
   action: { label: string; href: string };
 };
 
-// hrefs are relative to the direction root, e.g. /a/videos.
 export const plan: PlanStep[] = [
   {
     rank: 1,
@@ -89,7 +88,7 @@ export const plan: PlanStep[] = [
     detail: "Live since Nov 3. 11 missed calls texted back, 4 turned into jobs.",
     status: "live",
     impact: 2980,
-    action: { label: "See conversations", href: "text-back" },
+    action: { label: "See conversations", href: "/dashboard/text-back" },
   },
   {
     rank: 2,
@@ -98,7 +97,7 @@ export const plan: PlanStep[] = [
       "310 customers from 2024 and 2025. The message is drafted. You approve it, 2fish sends 20 a day.",
     status: "needs-you",
     impact: 2310,
-    action: { label: "Review the message", href: "dashboard" },
+    action: { label: "Review the message", href: "/dashboard" },
   },
   {
     rank: 3,
@@ -106,7 +105,7 @@ export const plan: PlanStep[] = [
     detail: "Sent the morning after each job. 9 sent this week, 3 new reviews so far.",
     status: "in-progress",
     impact: 1150,
-    action: { label: "See requests", href: "dashboard" },
+    action: { label: "See requests", href: "/dashboard" },
   },
   {
     rank: 4,
@@ -114,7 +113,7 @@ export const plan: PlanStep[] = [
     detail: "Tuesday's clips are cut into 7 videos with captions. They need your okay.",
     status: "needs-you",
     impact: 620,
-    action: { label: "Approve videos", href: "videos" },
+    action: { label: "Approve videos", href: "/dashboard/videos" },
   },
   {
     rank: 5,
@@ -122,7 +121,7 @@ export const plan: PlanStep[] = [
     detail: "Weekend hours were wrong. Fixed Nov 2, plus 12 new job photos.",
     status: "done",
     impact: 180,
-    action: { label: "View listing", href: "dashboard" },
+    action: { label: "View listing", href: "/dashboard" },
   },
 ];
 

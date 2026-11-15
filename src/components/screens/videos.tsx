@@ -8,7 +8,6 @@ import { ease, Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { uploadedClips, videos } from "@/lib/data";
-import type { Dir } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const tones = {
@@ -16,7 +15,7 @@ const tones = {
   surface: "bg-surface text-ink",
 };
 
-export function VideosScreen({ dir }: { dir: Dir }) {
+export function VideosScreen() {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"upload" | "working" | "ready">("upload");
   const [approved, setApproved] = useState<number[]>([]);
@@ -32,7 +31,7 @@ export function VideosScreen({ dir }: { dir: Dir }) {
   }
 
   return (
-    <AppShell dir={dir} active="videos">
+    <AppShell active="videos">
       <PageBody>
         <Reveal immediate y={16}>
           <header className="max-w-2xl">

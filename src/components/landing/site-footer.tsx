@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
-import type { Dir } from "@/lib/format";
 
-export function SiteFooter({ dir }: { dir: Dir }) {
+export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-white">
       <Container className="grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
         <div>
-          <Link href={`/${dir}`} className="inline-block rounded-md">
+          <Link href="/" className="inline-block rounded-md">
             <Logo />
           </Link>
           <p className="mt-3 text-sm">Made in Raleigh, NC.</p>
@@ -20,7 +19,7 @@ export function SiteFooter({ dir }: { dir: Dir }) {
             </a>
           </li>
           <li>
-            <Link href={`/${dir}/audit`} className="hover:underline">
+            <Link href="/audit" className="hover:underline">
               Free audit
             </Link>
           </li>

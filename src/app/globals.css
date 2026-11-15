@@ -41,11 +41,6 @@
   --ring: var(--navy);
   --radius: 0.5rem;
 
-  /* Direction A is the default so the index page has something to wear. */
-  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
-}
-
-[data-dir="b"] {
   --font-sans: var(--font-bricolage), system-ui, sans-serif;
 }
 
@@ -104,8 +99,7 @@
   html {
     -webkit-text-size-adjust: 100%;
   }
-  body,
-  [data-dir] {
+  body {
     font-family: var(--font-sans);
   }
   body {

@@ -13,25 +13,30 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { auditQuestions } from "@/lib/data";
-import type { Dir } from "@/lib/format";
+import { readAnswers, saveAnswers } from "@/lib/plan/storage";
 import { cn } from "@/lib/utils";
 
-export function AuditScreen({ dir }: { dir: Dir }) {
+export function AuditScreen() {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>(() =>
+    typeof window === "undefined" ? {} : ((readAnswers() as Record<string, string> | null) ?? {}),
+  );
 
   const total = auditQuestions.length;
   const q = auditQuestions[index];
   const value = answers[q.id] ?? "";
   const last = index === total - 1;
   const canNext = value.trim().length > 0;
-  const navy = dir === "b";
 
   function set(v: string) {
-    setAnswers((a) => ({ ...a, [q.id]: v }));
+    setAnswers((a) => {
+      const next = { ...a, [q.id]: v };
+      saveAnswers(next);
+      return next;
+    });
   }
 
   function go(to: number) {
@@ -41,7 +46,7 @@ export function AuditScreen({ dir }: { dir: Dir }) {
 
   function next() {
     if (!canNext) return;
-    if (last) router.push(`/${dir}/results`);
+    if (last) router.push("/results");
     else go(index + 1);
   }
 
@@ -62,14 +67,14 @@ export function AuditScreen({ dir }: { dir: Dir }) {
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
-      <header className={cn("border-b", navy ? "on-navy border-on-navy-line bg-navy text-white" : "border-line bg-white")}>
+      <header className="on-navy border-b border-on-navy-line bg-navy text-white">
         <Container className="flex h-16 items-center justify-between gap-4">
-          <Link href={`/${dir}`} className="rounded-md">
+          <Link href="/" className="rounded-md">
             <Logo />
           </Link>
           <span className="text-sm font-semibold">Free audit</span>
-          <Link href={`/${dir}/results`} className={cn("text-sm underline underline-offset-2", navy && "text-white/85")}>
-            Skip to sample results
+          <Link href="/results" className="text-sm text-white/85 underline underline-offset-2">
+            See sample results
           </Link>
         </Container>
       </header>
@@ -192,7 +197,7 @@ export function AuditScreen({ dir }: { dir: Dir }) {
       </main>
 
       <footer>
-        <Container className="py-6 text-sm text-muted-foreground">Mockup. Your answers aren&apos;t saved yet.</Container>
+        <Container className="py-6 text-sm text-muted-foreground">Your answers stay on this device until you choose to save your plan.</Container>
       </footer>
     </div>
   );

@@ -1,10 +1,3 @@
-export const DIRS = ["a", "b"] as const;
-export type Dir = (typeof DIRS)[number];
-
-export function isDir(value: string): value is Dir {
-  return (DIRS as readonly string[]).includes(value);
-}
-
 export function money(amount: number) {
   return amount.toLocaleString("en-US", {
     style: "currency",

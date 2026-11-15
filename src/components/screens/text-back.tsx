@@ -2,23 +2,25 @@ import { CircleCheck, PhoneMissed, ShieldCheck } from "lucide-react";
 import { AppShell, PageBody } from "@/components/app/shell";
 import { Reveal } from "@/components/motion/reveal";
 import { Money } from "@/components/ui/money";
+import { SpeechBubbleBody, SpeechBubbleRoot, SpeechBubbleTail } from "@/components/ui/speech-bubble";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { conversation, textBackSetup } from "@/lib/data";
-import type { Dir } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export function TextBackScreen({ dir }: { dir: Dir }) {
+// Preview of the missed-call text-back step. The real version ships in Phase 4
+// with Twilio behind it; this shows the owner what they're turning on.
+export function TextBackScreen() {
   return (
-    <AppShell dir={dir} active="text-back">
+    <AppShell active="text-back">
       <PageBody>
         <Reveal immediate y={16}>
           <header className="max-w-2xl">
-            <p className="text-sm text-muted-foreground">Plan · Step 1</p>
+            <p className="text-sm text-muted-foreground">Plan · Preview</p>
             <h1 className="mt-1 text-display font-semibold">Text back every missed call</h1>
             <p className="mt-3">
               When you can&apos;t pick up, the caller gets a text in 10 seconds. You see the reply here and on your
-              phone, and 2fish drafts answers for you to approve.
+              phone, and 2fish drafts answers for you to approve. This step turns on in the next release.
             </p>
           </header>
         </Reveal>
@@ -31,7 +33,7 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
                   <h2 id="setup" className="font-semibold">
                     Setup
                   </h2>
-                  <p className="text-sm text-muted-foreground">Live since Nov 3</p>
+                  <p className="text-sm text-muted-foreground">Sample settings</p>
                 </div>
                 <label className="flex items-center gap-2 text-sm font-semibold">
                   <Switch defaultChecked aria-label="Text-back on" />
@@ -69,10 +71,10 @@ export function TextBackScreen({ dir }: { dir: Dir }) {
 
           <aside>
             <Reveal immediate delay={0.2}>
-              <h2 className="font-semibold">A conversation from Tuesday</h2>
-              <p className="text-sm text-muted-foreground">(919) 555-0142</p>
+              <h2 className="font-semibold">What a conversation looks like</h2>
+              <p className="text-sm text-muted-foreground">Sample, for a power washing company</p>
             </Reveal>
-            <ol className="mt-3 space-y-3 overflow-hidden rounded-lg border border-line bg-white p-4">
+            <ol className="mt-3 space-y-4 overflow-hidden rounded-lg border border-line bg-white p-4">
               {conversation.map((m, i) => (
                 <Bubble key={i} index={i} {...m} />
               ))}
@@ -96,7 +98,8 @@ function Row({ label, value, children }: { label: string; value: string; childre
   );
 }
 
-// Messages appear one after another, sliding in from their side, like a conversation replaying.
+// Messages appear one after another, sliding in from their side. Cult UI's
+// speech bubble draws the bubble and tail; we recolour it per speaker.
 function Bubble({ from, text, time, index }: { from: string; text: string; time?: string; index: number }) {
   const delay = 0.3 + index * 0.2;
 
@@ -125,16 +128,22 @@ function Bubble({ from, text, time, index }: { from: string; text: string; time?
   }
   const mine = from === "business";
   return (
-    <Reveal as="li" delay={delay} y={0} x={mine ? 32 : -32} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+    <Reveal as="li" delay={delay} y={0} x={mine ? 32 : -32} className={cn("flex", mine ? "justify-end pr-3" : "justify-start pl-3")}>
       <div className={cn("max-w-[85%]", mine ? "text-right" : "text-left")}>
-        <p
-          className={cn(
-            "inline-block rounded-lg px-3.5 py-2.5 text-left text-sm",
-            mine ? "bg-navy text-white" : "bg-surface text-ink",
-          )}
-        >
-          {text}
-        </p>
+        <SpeechBubbleRoot className={cn("m-0", mine ? "ml-auto" : "")}>
+          <SpeechBubbleBody
+            className={cn(
+              "rounded-lg px-3.5 py-2.5 text-left text-sm lg:px-3.5 lg:py-2.5",
+              mine ? "bg-navy text-white" : "bg-surface text-ink",
+            )}
+          >
+            <span>{text}</span>
+            <SpeechBubbleTail
+              className={cn("h-4 md:h-4", mine ? "right-[-8px] text-navy" : "right-auto left-[-8px] -scale-x-100 text-surface")}
+              fill="currentColor"
+            />
+          </SpeechBubbleBody>
+        </SpeechBubbleRoot>
         {time ? <p className="num mt-1 text-sm text-muted-foreground">{time}</p> : null}
       </div>
     </Reveal>

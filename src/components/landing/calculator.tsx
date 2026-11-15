@@ -6,13 +6,13 @@ import { ArrowRight } from "lucide-react";
 import { AnimatedMoney } from "@/components/motion/animated-money";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { roundTen, type Dir } from "@/lib/format";
+import { roundTen } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const WEEKS = 4.3;
 const BOOK_RATE = 0.3;
 
-export function MissedCallCalculator({ dir, className }: { dir: Dir; className?: string }) {
+export function MissedCallCalculator({ className }: { className?: string }) {
   const [missed, setMissed] = useState(6);
   const [job, setJob] = useState(385);
   const id = useId();
@@ -71,7 +71,7 @@ export function MissedCallCalculator({ dir, className }: { dir: Dir; className?:
       </div>
 
       <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
-        <Link href={`/${dir}/audit`}>
+        <Link href="/audit">
           Find the rest of the leaks
           <ArrowRight aria-hidden="true" />
         </Link>

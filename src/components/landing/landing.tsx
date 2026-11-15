@@ -1,29 +1,36 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
-import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
+import { BrowserWindow } from "@/components/ui/mock-browser-window";
+import { TextAnimate } from "@/components/ui/text-animate";
 import { MissedCallCalculator } from "./calculator";
 import { DashboardPreview } from "./dashboard-preview";
 import { features, loop, StepSnippet } from "./loop";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
-import type { Dir } from "@/lib/format";
 
-// Direction B, "Harbor". Navy hero, Bricolage Grotesque.
-export function LandingB({ dir }: { dir: Dir }) {
+// Landing page. Navy hero, Bricolage Grotesque.
+export function Landing() {
   return (
     <>
-      <SiteHeader dir={dir} tone="navy" />
+      <SiteHeader tone="navy" />
       <main>
         {/* Hero on navy, dashboard shot hanging over the edge */}
         <section className="on-navy bg-navy text-white">
           <Container className="pt-14 sm:pt-20">
             <div className="max-w-3xl">
-              <h1 className="text-display font-bold">
-                <SplitWords text="Find the money your business is losing. Then get it back." />
-              </h1>
+              {/* Cult UI's word mode wraps but hardcodes its own heading styles, so the wrapper overrides them. */}
+              <div
+                role="heading"
+                aria-level={1}
+                aria-label="Find the money your business is losing. Then get it back."
+                className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-bold [&>h2]:text-white"
+              >
+                <TextAnimate text="Find the money your business is losing. Then get it back." type="whipIn" />
+              </div>
               <Reveal immediate delay={0.45}>
                 <p className="mt-6 max-w-xl text-on-navy-muted">
                   2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
@@ -33,7 +40,7 @@ export function LandingB({ dir }: { dir: Dir }) {
               </Reveal>
               <Reveal immediate delay={0.6} className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 bg-white px-5 text-base text-navy hover:bg-surface">
-                  <Link href={`/${dir}/audit`}>
+                  <Link href="/audit">
                     Start your free audit
                     <ArrowRight aria-hidden="true" />
                   </Link>
@@ -44,12 +51,20 @@ export function LandingB({ dir }: { dir: Dir }) {
                   variant="outline"
                   className="h-12 border-white/40 bg-transparent px-5 text-base text-white hover:bg-white/10 hover:text-white"
                 >
-                  <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
+                  <Link href="/dashboard">See a sample plan</Link>
                 </Button>
               </Reveal>
             </div>
             <Reveal immediate delay={0.75} y={48} duration={0.9} className="mt-14 min-w-0 translate-y-12 sm:translate-y-16">
-              <DashboardPreview chrome="navy" />
+              <BrowserWindow
+                variant="generic"
+                headerStyle="minimal"
+                theme="light"
+                url="app.join2fish.com/dashboard"
+                className="h-auto! w-full max-w-none! rounded-lg! border-line mask-none! shadow-none!"
+              >
+                <DashboardPreview chrome="light" />
+              </BrowserWindow>
             </Reveal>
           </Container>
         </section>
@@ -97,7 +112,7 @@ export function LandingB({ dir }: { dir: Dir }) {
                 </p>
               </div>
               <Reveal delay={0.2}>
-                <MissedCallCalculator dir={dir} />
+                <MissedCallCalculator />
               </Reveal>
             </Reveal>
           </Container>
@@ -125,14 +140,14 @@ export function LandingB({ dir }: { dir: Dir }) {
             <Reveal delay={0.15} y={40}>
               <div id="pricing">
                 <h2 className="text-display font-bold">Free to find the leaks.</h2>
-                <div className="mt-8 overflow-hidden rounded-lg border border-line">
-                  <div className="p-5">
+                <MinimalCard className="mt-8 overflow-hidden rounded-lg bg-white p-0 shadow-none hover:bg-white">
+                  <MinimalCardContent className="p-5">
                     <div className="flex items-baseline justify-between">
                       <h3 className="font-bold">Free</h3>
                       <span className="num font-bold">$0</span>
                     </div>
                     <p className="mt-1 text-sm">The audit, your ranked plan, monthly updates.</p>
-                  </div>
+                  </MinimalCardContent>
                   <div className="on-navy border-t border-line bg-navy p-5 text-white">
                     <div className="flex items-baseline justify-between">
                       <h3 className="font-bold">Pro</h3>
@@ -153,10 +168,10 @@ export function LandingB({ dir }: { dir: Dir }) {
                       ))}
                     </ul>
                     <Button asChild className="mt-5 w-full bg-white text-navy hover:bg-surface">
-                      <Link href={`/${dir}/audit`}>Start with the free audit</Link>
+                      <Link href="/audit">Start with the free audit</Link>
                     </Button>
                   </div>
-                </div>
+                </MinimalCard>
               </div>
             </Reveal>
           </Container>
@@ -169,17 +184,17 @@ export function LandingB({ dir }: { dir: Dir }) {
               <h2 className="max-w-2xl text-display font-bold">Bring what you have. We&apos;ll multiply it.</h2>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 px-5 text-base">
-                  <Link href={`/${dir}/audit`}>Start your free audit</Link>
+                  <Link href="/audit">Start your free audit</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 bg-white px-5 text-base">
-                  <Link href={`/${dir}/dashboard`}>See a sample plan</Link>
+                  <Link href="/dashboard">See a sample plan</Link>
                 </Button>
               </div>
             </Reveal>
           </Container>
         </section>
       </main>
-      <SiteFooter dir={dir} />
+      <SiteFooter />
     </>
   );
 }
