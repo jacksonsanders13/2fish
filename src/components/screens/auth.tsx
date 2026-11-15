@@ -11,7 +11,7 @@ import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { TextAnimate } from "@/components/ui/text-animate";
-import { requestMagicLink, signInWithPassword, signUpWithPassword, stashAnswers } from "@/lib/plan/actions";
+import { signInWithPassword, signUpWithPassword, stashAnswers } from "@/lib/plan/actions";
 import { readAnswers } from "@/lib/plan/storage";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
   const [message, setMessage] = useState<string | null>(
     error === "expired" ? "That link expired. Ask for a new one." : error === "missing" ? "That link didn't work. Try again." : null,
   );
-  const [sent, setSent] = useState<"confirm" | "link" | null>(null);
+  const [sent, setSent] = useState(false);
   const [pending, start] = useTransition();
 
   const title = signup ? "Save your plan." : "Welcome back.";
@@ -52,18 +52,8 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
         ? await signUpWithPassword({ email, password, answers, next })
         : await signInWithPassword({ email, password, answers, next });
       if (!res.ok) return setMessage(res.message);
-      if ("confirm" in res && res.confirm) return setSent("confirm");
+      if ("confirm" in res && res.confirm) return setSent(true);
       router.push(res.next);
-    });
-  }
-
-  function magicLink() {
-    setMessage(null);
-    if (!email) return setMessage("Type your email first, then tap this again.");
-    start(async () => {
-      const res = await requestMagicLink({ email, answers: readAnswers() ?? undefined, next });
-      if (!res.ok) return setMessage(res.message);
-      setSent("link");
     });
   }
 
@@ -129,12 +119,10 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
                     <MailCheck size={28} aria-hidden="true" className="text-navy" />
                     <h2 className="mt-3 font-bold">Check your email.</h2>
                     <p className="mt-2 text-sm">
-                      {sent === "confirm"
-                        ? `We sent a confirmation link to ${email}. Tap it and your plan will be waiting on your dashboard.`
-                        : `We sent a sign-in link to ${email}. Open it on this phone or computer.`}
+                      We sent a confirmation link to {email}. Tap it and your plan will be waiting on your dashboard.
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">Nothing after a minute? Check spam, or try again.</p>
-                    <Button variant="outline" className="mt-5" onClick={() => setSent(null)}>
+                    <Button variant="outline" className="mt-5" onClick={() => setSent(false)}>
                       Back
                     </Button>
                   </div>
@@ -180,16 +168,9 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
                         />
                       </div>
                       <div>
-                        <div className="flex items-baseline justify-between">
-                          <label htmlFor="password" className="text-sm font-semibold">
-                            Password
-                          </label>
-                          {signup ? null : (
-                            <button type="button" onClick={magicLink} className="text-sm underline underline-offset-2">
-                              Forgot it? Email me a link
-                            </button>
-                          )}
-                        </div>
+                        <label htmlFor="password" className="text-sm font-semibold">
+                          Password
+                        </label>
                         <div className="relative mt-1.5">
                           <Input
                             id="password"
