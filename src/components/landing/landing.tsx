@@ -17,7 +17,7 @@ export function Landing() {
   return (
     <>
       <SiteHeader tone="navy" />
-      <main>
+      <main className="overflow-x-clip">
         {/* Hero on navy, dashboard shot hanging over the edge */}
         <section className="on-navy bg-navy text-white">
           <Container className="pt-14 sm:pt-20">

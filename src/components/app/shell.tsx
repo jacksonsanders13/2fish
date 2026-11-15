@@ -61,7 +61,7 @@ export function AppShell({ active, email, children }: { active: Section; email?:
           </form>
         </Container>
       </header>
-      <main>{children}</main>
+      <main className="overflow-x-clip">{children}</main>
       <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white md:hidden">
         <ul className="grid grid-cols-4">
           {nav
