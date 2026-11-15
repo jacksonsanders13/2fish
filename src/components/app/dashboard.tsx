@@ -70,7 +70,7 @@ export function Dashboard({
           intro={intro}
           userId={userId}
           suggestions={suggestions}
-          className={cn("h-[calc(100dvh-14rem)] min-h-[28rem] lg:h-[calc(100dvh-11rem)]", tab === "chat" ? "flex" : "hidden lg:flex")}
+          className={cn("h-[calc(100dvh-17.5rem)] min-h-[26rem] lg:h-[calc(100dvh-11rem)]", tab === "chat" ? "flex" : "hidden lg:flex")}
         />
 
         <aside className={cn("space-y-4", tab === "plan" ? "block" : "hidden lg:block")}>
