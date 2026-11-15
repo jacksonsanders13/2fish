@@ -15,7 +15,7 @@ const tones = {
   surface: "bg-surface text-ink",
 };
 
-export function VideosScreen() {
+export function VideosScreen({ email }: { email?: string }) {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"upload" | "working" | "ready">("upload");
   const [approved, setApproved] = useState<number[]>([]);
@@ -31,11 +31,11 @@ export function VideosScreen() {
   }
 
   return (
-    <AppShell active="videos">
+    <AppShell active="videos" email={email}>
       <PageBody>
         <Reveal immediate y={16}>
           <header className="max-w-2xl">
-            <p className="text-sm text-muted-foreground">Plan · Step 4</p>
+            <p className="text-sm text-muted-foreground">Plan · Preview</p>
             <h1 className="mt-1 text-display font-semibold">Post 7 short videos a week</h1>
             <p className="mt-3">
               Upload the clips you already shoot on jobs. 2fish cuts them into vertical videos with captions, one

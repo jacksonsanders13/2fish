@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, LogOut } from "lucide-react";
+import { ArrowRight, CircleCheck, MessageSquareText, PhoneMissed, Settings, Users } from "lucide-react";
 import { Reveal } from "@/components/motion/reveal";
 import { RollingMoney } from "@/components/motion/rolling-money";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,9 @@ import { Container } from "@/components/ui/container";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { Money } from "@/components/ui/money";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { signOut } from "@/lib/plan/actions";
-import type { SavedPlan, SavedStep } from "@/lib/plan/load";
+import type { DashboardData } from "@/lib/app/queries";
+import type { SavedStep } from "@/lib/plan/load";
+import { LogJobForm } from "./forms";
 import { AppShell, PageBody } from "./shell";
 
 function greeting() {
@@ -16,146 +17,150 @@ function greeting() {
   return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
 
-export function Dashboard({ email, plan }: { email: string; plan: SavedPlan | null }) {
-  const initials = email.slice(0, 2).toUpperCase();
-  const menu = (
-    <form action={signOut}>
-      <button
-        type="submit"
-        title={`Signed in as ${email}. Click to sign out.`}
-        className="flex items-center gap-2 rounded-md text-sm text-white/80 hover:text-white"
-      >
-        <span className="flex size-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-navy">
-          {initials}
-        </span>
-        <LogOut size={16} aria-hidden="true" />
-        <span className="sr-only">Sign out</span>
-      </button>
-    </form>
-  );
+const eventIcons: Record<string, typeof Users> = {
+  call: PhoneMissed,
+  message: MessageSquareText,
+  job: CircleCheck,
+  customer: Users,
+  setting: Settings,
+};
 
-  if (!plan) {
-    return (
-      <AppShell active="dashboard" menu={menu}>
-        <PageBody>
-          <Reveal immediate className="max-w-xl">
-            <p className="text-sm text-muted-foreground">{email}</p>
-            <h1 className="mt-1 text-display font-bold">No plan yet.</h1>
-            <p className="mt-4">
-              Nine questions, about five minutes. You&apos;ll get a ranked list of where money is leaking out and
-              what to fix first.
-            </p>
-            <Button asChild size="lg" className="mt-6 h-12 px-5 text-base">
-              <Link href="/audit">
-                Start the free audit
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
-          </Reveal>
-        </PageBody>
-      </AppShell>
-    );
-  }
-
-  const kind = plan.business.kind && plan.business.kind !== "Something else" ? plan.business.kind : "Your business";
-  const date = new Date(plan.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric" });
+export function Dashboard({ data }: { data: DashboardData }) {
+  const { email, business, plan, recovered, stats, events } = data;
+  const month = new Date().toLocaleDateString("en-US", { month: "long" });
+  const who = business.name || (business.kind && business.kind !== "Something else" ? business.kind : "Your business");
 
   return (
-    <AppShell active="dashboard" menu={menu}>
+    <AppShell active="dashboard" email={email}>
       <section className="on-navy bg-navy text-white">
         <Container className="py-8 sm:py-10">
           <Reveal immediate y={16}>
             <p className="text-sm text-on-navy-muted">
-              {kind} · Audit from {date}
+              {who} · {month}
             </p>
             <h1 className="mt-1 font-bold">{greeting()}.</h1>
           </Reveal>
           <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <Reveal immediate delay={0.1}>
-              <p className="text-sm font-semibold">Leaking each month</p>
+              <p className="text-sm font-semibold">Recovered this month</p>
               <p className="mt-1 text-display font-bold">
-                <RollingMoney amount={plan.totalMonthly} tone="white" />
+                <RollingMoney amount={recovered.month} tone="cash-bright" />
               </p>
-              <p className="mt-3 max-w-md text-sm text-on-navy-muted">{plan.summary}</p>
+              <p className="mt-3 max-w-md text-sm text-on-navy-muted">
+                {recovered.monthJobs === 0
+                  ? "Nothing logged yet this month. Every job you win from a step gets counted here."
+                  : `${recovered.monthJobs} ${recovered.monthJobs === 1 ? "job" : "jobs"} traced back to your plan this month. ${recovered.allTime > recovered.month ? `$${recovered.allTime.toLocaleString()} all time.` : ""}`}
+              </p>
             </Reveal>
             <Reveal immediate delay={0.3} x={24} y={0}>
               <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-on-navy-line bg-on-navy-line md:w-[440px]">
-                <div className="bg-navy p-3 sm:p-4">
-                  <dt className="text-sm text-on-navy-muted">Recovered</dt>
-                  <dd className="num mt-1 font-bold">
-                    <Money amount={0} tone="cash-bright" />
-                  </dd>
-                  <dd className="text-sm text-on-navy-muted">nothing live yet</dd>
-                </div>
-                <div className="bg-navy p-3 sm:p-4">
-                  <dt className="text-sm text-on-navy-muted">Steps</dt>
-                  <dd className="num mt-1 font-bold">{plan.steps.length}</dd>
-                  <dd className="text-sm text-on-navy-muted">ranked by dollars</dd>
-                </div>
-                <div className="bg-navy p-3 sm:p-4">
-                  <dt className="text-sm text-on-navy-muted">Biggest leak</dt>
-                  <dd className="num mt-1 font-bold">
-                    <Money amount={plan.leaks[0]?.perMonth ?? 0} tone="white" />
-                  </dd>
-                  <dd className="truncate text-sm text-on-navy-muted">{plan.leaks[0]?.title}</dd>
-                </div>
+                <Stat label="Texts sent" value={stats.textedBack} sub="to missed callers" />
+                <Stat label="Chats" value={stats.conversations} sub="in your inbox" />
+                <Stat label="Customers" value={stats.customers} sub="on your list" />
               </dl>
             </Reveal>
           </div>
         </Container>
       </section>
 
-      <PageBody className="grid gap-8 lg:grid-cols-[1fr_340px]">
+      <PageBody className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <section aria-labelledby="plan" className="min-w-0">
           <Reveal className="flex items-baseline justify-between">
             <h2 id="plan" className="font-bold">
               Your plan
             </h2>
-            <p className="text-sm text-muted-foreground">Biggest leak first</p>
+            <p className="text-sm text-muted-foreground">{plan ? "Biggest leak first" : ""}</p>
           </Reveal>
-          <ol className="mt-4 space-y-3">
-            {plan.steps.map((step, i) => (
-              <PlanCard key={step.id} step={step} delay={0.1 + i * 0.1} />
-            ))}
-          </ol>
+          {plan ? (
+            <ol className="mt-4 space-y-3">
+              {plan.steps.map((step, i) => (
+                <PlanCard key={step.id} step={step} delay={0.1 + i * 0.1} />
+              ))}
+            </ol>
+          ) : (
+            <Reveal className="mt-4">
+              <MinimalCard className="rounded-lg bg-white p-0 shadow-none hover:bg-white">
+                <MinimalCardContent className="p-5">
+                  <h3 className="font-bold">No plan yet.</h3>
+                  <p className="mt-1 text-sm">Nine questions, about five minutes. You get a ranked list of where money leaks out and what to fix first.</p>
+                  <Button asChild className="mt-4">
+                    <Link href="/audit">
+                      Start the free audit
+                      <ArrowRight aria-hidden="true" />
+                    </Link>
+                  </Button>
+                </MinimalCardContent>
+              </MinimalCard>
+            </Reveal>
+          )}
         </section>
-        <Reveal as="div" delay={0.25} x={24} y={0}>
-          <aside>
-            <h2 className="font-bold">Where the money goes</h2>
-            <MinimalCard className="mt-4 rounded-lg bg-white p-0 shadow-none hover:bg-white">
+
+        <div className="min-w-0 space-y-8">
+          <Reveal as="div" delay={0.2} x={24} y={0}>
+            <h2 className="font-bold">Log a job you won</h2>
+            <p className="mt-1 text-sm text-muted-foreground">This is how the number at the top goes up.</p>
+            <MinimalCard className="mt-3 rounded-lg bg-white p-0 shadow-none hover:bg-white">
               <MinimalCardContent className="p-4">
-                <ol className="divide-y divide-line">
-                  {plan.leaks.map((leak, i) => (
-                    <li key={leak.id} className="flex items-center gap-3 py-3 text-sm first:pt-0 last:pb-0">
-                      <span className="num w-4 text-muted-foreground">{i + 1}</span>
-                      <span className="min-w-0 flex-1 font-semibold">{leak.title}</span>
-                      <Money amount={leak.perMonth} per="/mo" tone="ink" className="font-semibold" />
-                    </li>
-                  ))}
-                </ol>
-                <Button asChild variant="outline" size="sm" className="mt-4 w-full">
-                  <Link href="/results">See the full results</Link>
-                </Button>
+                <LogJobForm compact />
               </MinimalCardContent>
             </MinimalCard>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Signed in as {email}. Retake the audit any time from the{" "}
-              <Link href="/audit" className="underline underline-offset-2">
-                audit page
-              </Link>
-              .
-            </p>
-          </aside>
-        </Reveal>
+          </Reveal>
+
+          <Reveal as="div" delay={0.3} x={24} y={0}>
+            <h2 className="font-bold">Activity</h2>
+            <MinimalCard className="mt-3 rounded-lg bg-white p-0 shadow-none hover:bg-white">
+              <MinimalCardContent className="p-4">
+                {events.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Nothing yet. Turn on text-back, add a customer, or log a job and it shows up here.
+                  </p>
+                ) : (
+                  <ul className="divide-y divide-line">
+                    {events.map((e) => {
+                      const Icon = eventIcons[e.kind] ?? CircleCheck;
+                      return (
+                        <li key={e.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
+                          <Icon size={16} className="mt-1 shrink-0" aria-hidden="true" />
+                          <div className="min-w-0">
+                            <p className="text-sm">{e.text}</p>
+                            <p className="num mt-0.5 text-sm text-muted-foreground">{when(e.createdAt)}</p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </MinimalCardContent>
+            </MinimalCard>
+          </Reveal>
+        </div>
       </PageBody>
     </AppShell>
   );
 }
 
-function PlanCard({ step, delay }: { step: SavedStep; delay: number }) {
-  const needsYou = step.status === "needs-you" || step.status === "not-started";
+function Stat({ label, value, sub }: { label: string; value: number; sub: string }) {
   return (
-    <Reveal as="li" delay={delay} y={32}>
+    <div className="min-w-0 bg-navy p-3 sm:p-4">
+      <dt className="text-sm text-on-navy-muted">{label}</dt>
+      <dd className="num mt-1 font-bold">{value}</dd>
+      <dd className="text-sm text-on-navy-muted">{sub}</dd>
+    </div>
+  );
+}
+
+function when(iso: string) {
+  const d = new Date(iso);
+  const today = new Date().toDateString() === d.toDateString();
+  return today
+    ? d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+    : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function PlanCard({ step, delay }: { step: SavedStep; delay: number }) {
+  const live = step.status === "live" || step.status === "done";
+  return (
+    <Reveal as="li" delay={delay} y={24}>
       <MinimalCard className="rounded-lg bg-white p-0 shadow-none transition-colors hover:border-navy/40 hover:bg-white">
         <MinimalCardContent className="p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3">
@@ -171,8 +176,8 @@ function PlanCard({ step, delay }: { step: SavedStep; delay: number }) {
               <p className="text-sm text-muted-foreground">Worth about</p>
               <Money amount={step.impact} per="/mo" sign="+" className="font-bold" />
             </div>
-            <Button asChild size="sm" variant={needsYou ? "default" : "outline"}>
-              <Link href={step.href}>{needsYou ? "Do it for me" : "Open"}</Link>
+            <Button asChild size="sm" variant={live ? "outline" : "default"}>
+              <Link href={step.href}>{live ? "Open" : step.key === "text-back" ? "Set it up" : "Preview"}</Link>
             </Button>
           </div>
         </MinimalCardContent>

@@ -138,15 +138,18 @@ export async function savePlan(input: Answers) {
   const est = estimate(answers);
   const words = await narrate(est, answers);
 
-  let { data: business } = await supabase.from("businesses").select("id").eq("owner_id", user.id).maybeSingle();
+  let { data: business } = await supabase.from("businesses").select("id").eq("owner_id", user.id).order("created_at").limit(1).maybeSingle();
   if (!business) {
-    const created = await supabase
-      .from("businesses")
-      .insert({ owner_id: user.id, kind: answers.type })
-      .select("id")
-      .single();
-    if (created.error) throw created.error;
-    business = created.data;
+    const created = await supabase.from("businesses").insert({ owner_id: user.id, kind: answers.type }).select("id").single();
+    if (created.data) business = created.data;
+    else {
+      const again = await supabase.from("businesses").select("id").eq("owner_id", user.id).order("created_at").limit(1).single();
+      if (again.error) throw again.error;
+      business = again.data;
+    }
+  } else {
+    // A business made before the audit has no type yet. Fill it in.
+    await supabase.from("businesses").update({ kind: answers.type }).eq("id", business.id).eq("kind", "Something else");
   }
 
   const audit = await supabase
