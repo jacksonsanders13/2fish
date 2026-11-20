@@ -13,14 +13,14 @@
   --line: #dce6e6;
   --ink: #0f1f20;
   --muted: #556667;
-  --night: #0e3b3c;
-  --night-tint: #175152;
-  --night-deep: #082829;
+  --night: #176b69;
+  --night-tint: #135a58;
+  --night-deep: #0e4746;
   --signal: #c8402f;
   --signal-tint: #a8321f;
   --cash: #047857;
   --cash-bright: #6ee7b7;
-  --on-night-muted: #a8c3c3;
+  --on-night-muted: #d3e8e7;
   --on-night-line: rgba(255, 255, 255, 0.16);
 
   /* shadcn tokens, mapped onto the palette above */

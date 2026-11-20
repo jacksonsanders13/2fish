@@ -54,7 +54,7 @@ export function Landing() {
                 <FunnelMap className="mt-10" />
               </Reveal>
             </div>
-            <Reveal immediate delay={0.75} y={48} duration={0.9} className="min-w-0">
+            <Reveal immediate delay={0.75} y={48} duration={0.9} className="min-w-0 rounded-md bg-night p-3 sm:p-6">
               <BrowserWindow
                 variant="generic"
                 headerStyle="minimal"
@@ -64,7 +64,7 @@ export function Landing() {
               >
                 <DashboardPreview chrome="light" />
               </BrowserWindow>
-              <p className="mt-2 text-sm text-muted-foreground">Sample business: Oak &amp; Ash Exterior Cleaning, Raleigh.</p>
+              <p className="mt-3 text-sm text-on-night-muted">Sample business: Oak &amp; Ash Exterior Cleaning, Raleigh.</p>
             </Reveal>
           </Container>
         </section>
@@ -100,8 +100,8 @@ export function Landing() {
           </div>
           <ol className="mt-10 grid gap-10 md:grid-cols-2 lg:gap-x-12">
             {loop.map((step, i) => (
-              <Reveal as="li" key={step.n} delay={i * 0.1} y={32} className="min-w-0 border-t border-ink pt-4">
-                <p className="num text-sm font-semibold text-muted-foreground">
+              <Reveal as="li" key={step.n} delay={i * 0.1} y={32} className="min-w-0 border-t-2 border-night pt-4">
+                <p className="num text-sm font-semibold text-night">
                   {step.n}. {step.name}
                 </p>
                 <h3 className="mt-1 font-semibold">{step.title}</h3>
@@ -141,19 +141,19 @@ export function Landing() {
                   </div>
                   <p className="mt-1 text-sm">The audit, your ranked plan, and chat with your consultant.</p>
                 </div>
-                <div className="border-t border-line bg-surface p-5">
+                <div className="on-night rounded-b-md bg-night p-5 text-white">
                   <div className="flex items-baseline justify-between gap-4">
                     <h3 className="font-semibold">Pro</h3>
                     <span className="num font-semibold">$79 a month</span>
                   </div>
-                  <p className="mt-1 text-sm">Text-back, review requests, weekly videos, reminders.</p>
-                  <p className="mt-3 inline-block rounded-full border border-line bg-white px-2.5 py-0.5 text-sm text-muted-foreground">
+                  <p className="mt-1 text-sm text-on-night-muted">Text-back, review requests, weekly videos, reminders.</p>
+                  <p className="mt-3 inline-block rounded-full border border-on-night-line px-2.5 py-0.5 text-sm text-on-night-muted">
                     Placeholder price
                   </p>
                   <ul className="mt-4 space-y-1.5 text-sm">
                     {["Everything 2fish does for you", "Cancel any month"].map((x) => (
                       <li key={x} className="flex gap-2">
-                        <Check size={16} className="mt-0.5 shrink-0 text-cash" aria-hidden="true" />
+                        <Check size={16} className="mt-0.5 shrink-0 text-cash-bright" aria-hidden="true" />
                         {x}
                       </li>
                     ))}
@@ -192,11 +192,11 @@ const steps = ["Find the leak", "Get the plan", "Let 2fish do it"];
 function FunnelMap({ className }: { className?: string }) {
   const ids = ["cost", "how", "pricing"];
   return (
-    <ol className={cn("grid grid-cols-3 border-t border-line text-sm", className)}>
+    <ol className={cn("grid grid-cols-3 border-t-2 border-night text-sm", className)}>
       {steps.map((s, i) => (
         <li key={s} className="min-w-0">
           <a href={`#${ids[i]}`} className="block py-3 pr-2 hover:underline">
-            <span className="num block font-semibold">0{i + 1}</span>
+            <span className="num block font-semibold text-night">0{i + 1}</span>
             <span className="block text-muted-foreground">{s}</span>
           </a>
         </li>
@@ -212,8 +212,8 @@ function Step({ id, n, label, children }: { id: string; n: number; label: string
       <Container className="grid gap-6 py-16 lg:grid-cols-[180px_1fr] lg:gap-12 lg:py-24">
         <div>
           <div className="lg:sticky lg:top-24">
-            <p className="num text-display leading-none">0{n}</p>
-            <p className="mt-2 text-sm font-semibold">{label}</p>
+            <p className="num text-display leading-none text-night">0{n}</p>
+            <p className="mt-2 text-sm font-semibold text-night">{label}</p>
           </div>
         </div>
         <Reveal y={32} className="min-w-0">
@@ -230,7 +230,7 @@ function StepLink({ href, className, children }: { href: string; className?: str
     <Link
       href={href}
       className={cn(
-        "inline-flex min-h-11 items-center gap-2 font-semibold underline decoration-line decoration-2 underline-offset-4 hover:decoration-ink",
+        "inline-flex min-h-11 items-center gap-2 font-semibold text-night underline decoration-night/30 decoration-2 underline-offset-4 hover:decoration-night",
         className,
       )}
     >
