@@ -36,7 +36,8 @@ shadcn's tokens (`--primary`, `--ring`, `--radius`, etc.) are mapped onto this p
 ## Layout habits
 
 - Left-aligned text. Asymmetric two-column sections. No three-identical-cards rows.
-- The dashboard is the hero image.
+- The dashboard is the hero image, beside the headline on desktop, under it on phones.
+- The landing page is a funnel (the skill's "3-step conversion" pattern): hero, then 01 Find the leak (calculator), 02 Get the plan (the loop), 03 Let 2fish do it (features + pricing), each with a small text link as its call to action, the step number pinned in a left column on desktop. One night band at the very end holds the main ask. Orange is only on the "Start your free audit" buttons.
 - Mobile first. Every screen checked at 375px. Dashboard gets a bottom tab bar on phones.
 - Placeholders are labelled. No fake logos, testimonials or made-up stats.
 
