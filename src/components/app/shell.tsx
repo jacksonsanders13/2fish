@@ -20,12 +20,12 @@ export function PageBody({ className, children }: { className?: string; children
   return <Container className={cn("py-6 sm:py-8 lg:py-10", className)}>{children}</Container>;
 }
 
-// Navy top bar, bottom tabs on phones.
+// Night top bar, bottom tabs on phones.
 export function AppShell({ active, email, children }: { active: Section; email?: string; children: React.ReactNode }) {
   const initials = (email ?? "2f").slice(0, 2).toUpperCase();
   return (
     <div className="min-h-dvh bg-surface pb-20 md:pb-0">
-      <header className="on-navy bg-navy text-white">
+      <header className="on-night bg-night text-white">
         <Container className="flex h-16 items-center justify-between gap-4">
           <Link href="/dashboard" className="rounded-md">
             <Logo />
@@ -44,14 +44,14 @@ export function AppShell({ active, email, children }: { active: Section; email?:
                   >
                     <item.icon size={15} aria-hidden="true" />
                     {item.label}
-                    {item.soon ? <span className="rounded-full border border-on-navy-line px-1.5 text-[11px] leading-4 text-on-navy-muted">preview</span> : null}
+                    {item.soon ? <span className="rounded-full border border-on-night-line px-1.5 text-[11px] leading-4 text-on-night-muted">preview</span> : null}
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
           <form action={signOut} className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-navy" title={email}>
+            <span className="flex size-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-night" title={email}>
               {initials}
             </span>
             <button type="submit" className="flex items-center gap-1.5 rounded-md text-sm text-white/80 hover:text-white">
@@ -73,7 +73,7 @@ export function AppShell({ active, email, children }: { active: Section; email?:
                   aria-current={item.key === active ? "page" : undefined}
                   className={cn(
                     "flex flex-col items-center gap-1 py-2.5 text-sm",
-                    item.key === active ? "font-semibold text-navy" : "text-muted-foreground",
+                    item.key === active ? "font-semibold text-night" : "text-muted-foreground",
                   )}
                 >
                   <item.icon size={20} aria-hidden="true" />

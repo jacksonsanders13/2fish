@@ -61,7 +61,7 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
               y={10}
               className={cn(
                 "flex items-center justify-between rounded-md border px-3 py-2",
-                i === 0 ? "border-navy bg-navy text-white" : "border-line",
+                i === 0 ? "border-night bg-night text-white" : "border-line",
               )}
             >
               {o}
@@ -99,12 +99,12 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
   }
 
   if (n === 3) {
-    const tones = { navy: "bg-navy text-white", surface: "bg-surface text-ink" };
+    const tones = { night: "bg-night text-white", surface: "bg-surface text-ink" };
     return (
       <div className={frame} aria-hidden="true">
         <div className="flex items-center justify-between gap-3">
           <span className="font-semibold">7 videos ready from Tuesday&apos;s clips</span>
-          <Reveal as="span" delay={0.8} y={0} duration={0.4} className="shrink-0 rounded-md bg-navy px-2.5 py-1 font-medium text-white">
+          <Reveal as="span" delay={0.8} y={0} duration={0.4} className="shrink-0 rounded-md bg-night px-2.5 py-1 font-medium text-white">
             Approve all
           </Reveal>
         </div>

@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader({ tone = "light" }: { tone?: "light" | "navy" }) {
-  const navy = tone === "navy";
-  const link = cn("text-sm hover:underline", navy ? "text-white/85" : "text-ink");
+export function SiteHeader({ tone = "light" }: { tone?: "light" | "night" }) {
+  const night = tone === "night";
+  const link = cn("text-sm hover:underline", night ? "text-white/85" : "text-ink");
   return (
-    <header className="on-navy border-b border-on-navy-line bg-navy text-white">
+    <header className="on-night border-b border-on-night-line bg-night text-white">
       <Container className="flex h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" className="rounded-md">
           <Logo />
@@ -26,11 +26,11 @@ export function SiteHeader({ tone = "light" }: { tone?: "light" | "navy" }) {
             asChild
             size="sm"
             variant="outline"
-            className={navy ? "border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" : undefined}
+            className={night ? "border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" : undefined}
           >
             <Link href="/login">Sign in</Link>
           </Button>
-          <Button asChild size="sm" className={navy ? "bg-white text-navy hover:bg-surface" : undefined}>
+          <Button asChild size="sm" variant="signal">
             <Link href="/audit">
               <span className="sm:hidden">Free audit</span>
               <span className="hidden sm:inline">Start your free audit</span>

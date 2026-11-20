@@ -67,7 +67,7 @@ export function AuditScreen() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
-      <header className="on-navy border-b border-on-navy-line bg-navy text-white">
+      <header className="on-night border-b border-on-night-line bg-night text-white">
         <Container className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="rounded-md">
             <Logo />
@@ -117,7 +117,7 @@ export function AuditScreen() {
                             onClick={() => choose(o)}
                             className={cn(
                               "h-auto w-full justify-between px-4 py-3 text-base font-normal whitespace-normal",
-                              selected && "border-navy bg-navy text-white hover:bg-navy-tint hover:text-white",
+                              selected && "border-night bg-night text-white hover:bg-night-tint hover:text-white",
                             )}
                           >
                             {o}
@@ -143,7 +143,7 @@ export function AuditScreen() {
                     initial={reduce ? false : { opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease, delay: 0.1 }}
-                    className="flex h-14 items-center rounded-md border border-input bg-white px-4 focus-within:border-navy"
+                    className="flex h-14 items-center rounded-md border border-input bg-white px-4 focus-within:border-night"
                   >
                     {q.prefix ? <span className="text-muted-foreground">{q.prefix}</span> : null}
                     <Input

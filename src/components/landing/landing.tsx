@@ -12,14 +12,14 @@ import { features, loop, StepSnippet } from "./loop";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
-// Landing page. Navy hero, Bricolage Grotesque.
+// Landing page. Night hero, Bricolage Grotesque.
 export function Landing() {
   return (
     <>
-      <SiteHeader tone="navy" />
+      <SiteHeader tone="night" />
       <main className="overflow-x-clip">
-        {/* Hero on navy, dashboard shot hanging over the edge */}
-        <section className="on-navy bg-navy text-white">
+        {/* Hero on night, dashboard shot hanging over the edge */}
+        <section className="on-night bg-night text-white">
           <Container className="pt-14 sm:pt-20">
             <div className="max-w-3xl">
               {/* Cult UI's word mode wraps but hardcodes its own heading styles, so the wrapper overrides them. */}
@@ -27,19 +27,19 @@ export function Landing() {
                 role="heading"
                 aria-level={1}
                 aria-label="Find the money your business is losing. Then get it back."
-                className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-bold [&>h2]:text-white"
+                className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-display [&>h2]:font-normal [&>h2]:text-white"
               >
                 <TextAnimate text="Find the money your business is losing. Then get it back." type="whipIn" />
               </div>
               <Reveal immediate delay={0.45}>
-                <p className="mt-6 max-w-xl text-on-navy-muted">
+                <p className="mt-6 max-w-xl text-on-night-muted">
                   2fish is an AI growth consultant for local businesses. Take a 5-minute audit, get a plan, and let
                   2fish do the work, from texting back missed calls to turning your phone clips into a week of
                   videos.
                 </p>
               </Reveal>
               <Reveal immediate delay={0.6} className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="h-12 bg-white px-5 text-base text-navy hover:bg-surface">
+                <Button asChild size="lg" variant="signal" className="h-12 px-5 text-base">
                   <Link href="/audit">
                     Start your free audit
                     <ArrowRight aria-hidden="true" />
@@ -82,7 +82,7 @@ export function Landing() {
             </Reveal>
             <ol className="mt-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
               {loop.map((step, i) => (
-                <Reveal as="li" key={step.n} delay={i * 0.12} y={40} className="min-w-0 border-t-2 border-navy pt-5">
+                <Reveal as="li" key={step.n} delay={i * 0.12} y={40} className="min-w-0 border-t-2 border-night pt-5">
                   <p className="num text-sm font-semibold">
                     0{step.n} · {step.name}
                   </p>
@@ -148,15 +148,15 @@ export function Landing() {
                     </div>
                     <p className="mt-1 text-sm">The audit, your ranked plan, monthly updates.</p>
                   </MinimalCardContent>
-                  <div className="on-navy border-t border-line bg-navy p-5 text-white">
+                  <div className="on-night border-t border-line bg-night p-5 text-white">
                     <div className="flex items-baseline justify-between">
                       <h3 className="font-bold">Pro</h3>
                       <span className="num font-bold">$79 a month</span>
                     </div>
-                    <p className="mt-1 text-sm text-on-navy-muted">
+                    <p className="mt-1 text-sm text-on-night-muted">
                       Text-back, review requests, weekly videos, reminders.
                     </p>
-                    <p className="mt-3 inline-block rounded-full border border-on-navy-line px-2.5 py-0.5 text-sm text-on-navy-muted">
+                    <p className="mt-3 inline-block rounded-full border border-on-night-line px-2.5 py-0.5 text-sm text-on-night-muted">
                       Placeholder price
                     </p>
                     <ul className="mt-4 space-y-1.5 text-sm">
@@ -167,7 +167,7 @@ export function Landing() {
                         </li>
                       ))}
                     </ul>
-                    <Button asChild className="mt-5 w-full bg-white text-navy hover:bg-surface">
+                    <Button asChild variant="signal" className="mt-5 w-full">
                       <Link href="/audit">Start with the free audit</Link>
                     </Button>
                   </div>
@@ -183,7 +183,7 @@ export function Landing() {
             <Reveal y={40}>
               <h2 className="max-w-2xl text-display font-bold">Bring what you have. We&apos;ll multiply it.</h2>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg" className="h-12 px-5 text-base">
+                <Button asChild size="lg" variant="signal" className="h-12 px-5 text-base">
                   <Link href="/audit">Start your free audit</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 bg-white px-5 text-base">

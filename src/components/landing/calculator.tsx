@@ -44,7 +44,7 @@ export function MissedCallCalculator({ className }: { className?: string }) {
           <label htmlFor={`${id}-job`} className="text-sm font-semibold">
             Average job value
           </label>
-          <div className="mt-2 flex h-11 items-center rounded-md border border-input bg-white pl-3 focus-within:border-navy">
+          <div className="mt-2 flex h-11 items-center rounded-md border border-input bg-white pl-3 focus-within:border-night">
             <span className="text-muted-foreground">$</span>
             <Input
               id={`${id}-job`}

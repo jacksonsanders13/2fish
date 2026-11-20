@@ -53,7 +53,7 @@ export function ResultsScreen() {
 
   return (
     <div className="min-h-dvh bg-white">
-      <header className="on-navy border-b border-on-navy-line bg-navy text-white">
+      <header className="on-night border-b border-on-night-line bg-night text-white">
         <Container className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="rounded-md">
             <Logo />

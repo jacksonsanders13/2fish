@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { LOGO_PATH, LOGO_VIEWBOX } from "./logo-path";
 
 // Jackson's mark: two fish whose bodies link into a 2. One color, so it takes
-// whatever `color` is set on the parent (navy on white, white on navy).
+// whatever `color` is set on the parent (night on white, white on night).
 export function LogoMark({ className, size = 28 }: { className?: string; size?: number }) {
   const [, , w, h] = LOGO_VIEWBOX.split(" ").map(Number);
   return (

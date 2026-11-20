@@ -3,13 +3,15 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// shadcn/ui button, re-themed: no shadows, navy primary, taller tap targets.
+// shadcn/ui button, re-themed: no shadows, near-black primary, square-ish corners, taller tap targets.
 const buttonVariants = cva(
   "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap outline-none transition-[color,background-color,border-color,transform] duration-150 active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-navy-tint active:bg-navy-deep",
+        default: "bg-primary text-primary-foreground hover:bg-night-tint active:bg-night-deep",
+        // The orange one. Only for the main action on a screen.
+        signal: "bg-signal text-white hover:bg-signal-tint",
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline: "border bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",

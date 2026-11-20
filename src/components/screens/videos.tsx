@@ -11,7 +11,7 @@ import { uploadedClips, videos } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 const tones = {
-  navy: "bg-navy text-white",
+  night: "bg-night text-white",
   surface: "bg-surface text-ink",
 };
 
@@ -82,7 +82,7 @@ export function VideosScreen({ email }: { email?: string }) {
                 {phase === "working" ? (
                   <div className="mt-3 h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
                     <motion.div
-                      className="h-full w-1/3 rounded-full bg-navy"
+                      className="h-full w-1/3 rounded-full bg-night"
                       initial={{ x: "-100%" }}
                       animate={{ x: "300%" }}
                       transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
@@ -125,7 +125,7 @@ export function VideosScreen({ email }: { email?: string }) {
                     initial={{ opacity: 0, height: 0, marginTop: 0 }}
                     animate={{ opacity: 1, height: "auto", marginTop: 12 }}
                     transition={{ duration: 0.3, ease }}
-                    className="overflow-hidden rounded-lg border border-navy bg-white px-4 py-3 text-sm"
+                    className="overflow-hidden rounded-lg border border-night bg-white px-4 py-3 text-sm"
                   >
                     Scheduled. The first one posts Monday at 7:30 AM to Facebook and Instagram. You&apos;ll get a
                     text each morning when one goes up.
@@ -145,7 +145,7 @@ export function VideosScreen({ email }: { email?: string }) {
                       className="overflow-hidden rounded-lg border border-line bg-white"
                     >
                       <div className={cn("relative flex aspect-[4/5] items-center justify-center", tones[v.tone])}>
-                        <span className="flex size-12 items-center justify-center rounded-full bg-white text-navy transition-transform hover:scale-105">
+                        <span className="flex size-12 items-center justify-center rounded-full bg-white text-night transition-transform hover:scale-105">
                           <Play size={20} aria-hidden="true" />
                           <span className="sr-only">Play preview</span>
                         </span>
@@ -155,7 +155,7 @@ export function VideosScreen({ email }: { email?: string }) {
                         >
                           Placeholder thumbnail
                         </Badge>
-                        <span className="num absolute right-3 bottom-3 rounded-md bg-navy px-1.5 py-0.5 text-sm text-white">
+                        <span className="num absolute right-3 bottom-3 rounded-md bg-night px-1.5 py-0.5 text-sm text-white">
                           {v.length}
                         </span>
                       </div>
@@ -169,7 +169,7 @@ export function VideosScreen({ email }: { email?: string }) {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.6 }}
                                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                className="flex items-center gap-1 font-semibold text-navy"
+                                className="flex items-center gap-1 font-semibold text-night"
                               >
                                 <Check size={14} aria-hidden="true" />
                                 Approved

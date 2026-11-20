@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils";
 
 // A small, real-looking render of the dashboard. This is the hero image on
 // both landing pages. It assembles itself row by row when it comes into view.
-export function DashboardPreview({ chrome = "light", className }: { chrome?: "light" | "navy"; className?: string }) {
+export function DashboardPreview({ chrome = "light", className }: { chrome?: "light" | "night"; className?: string }) {
   return (
     <div className={cn("overflow-hidden rounded-lg border border-line bg-white text-left text-sm text-ink", className)}>
       <h3 className="sr-only">Sample dashboard for {business.name}</h3>
       <div
         className={cn(
           "flex items-center justify-between gap-3 border-b px-4 py-2.5",
-          chrome === "navy" ? "border-on-navy-line bg-navy text-white" : "border-line bg-white",
+          chrome === "night" ? "border-on-night-line bg-night text-white" : "border-line bg-white",
         )}
       >
         <Logo size={16} />

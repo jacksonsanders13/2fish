@@ -81,7 +81,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface">
-      <header className="on-navy border-b border-on-navy-line bg-navy text-white">
+      <header className="on-night border-b border-on-night-line bg-night text-white">
         <Container className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="rounded-md">
             <Logo />
@@ -99,7 +99,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
             role="heading"
             aria-level={1}
             aria-label={title}
-            className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-bold [&>h2]:text-ink"
+            className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-display [&>h2]:font-normal [&>h2]:text-ink"
           >
             <TextAnimate text={title} type="whipIn" />
           </div>
@@ -116,7 +116,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
               <MinimalCardContent className="p-5 sm:p-6">
                 {sent ? (
                   <div>
-                    <MailCheck size={28} aria-hidden="true" className="text-navy" />
+                    <MailCheck size={28} aria-hidden="true" className="text-night" />
                     <h2 className="mt-3 font-bold">Check your email.</h2>
                     <p className="mt-2 text-sm">
                       We sent a confirmation link to {email}. Tap it and your plan will be waiting on your dashboard.

@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Calistoga, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
+// Calistoga for headlines, IBM Plex Sans for everything else.
+const calistoga = Calistoga({
   subsets: ["latin"],
-  variable: "--font-bricolage",
+  weight: "400",
+  variable: "--font-calistoga",
+  display: "swap",
+});
+
+const plex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex",
   display: "swap",
 });
 
@@ -16,14 +25,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c2340",
+  themeColor: "#16201b",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={bricolage.variable}>
+    <html lang="en" className={`${calistoga.variable} ${plex.variable}`}>
       <body className="min-h-dvh bg-background font-sans text-foreground antialiased">{children}</body>
     </html>
   );

@@ -22,7 +22,7 @@ export function GrowBar({
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-line", className)} aria-hidden="true">
       <motion.div
-        className={cn("h-full rounded-full bg-navy", barClassName)}
+        className={cn("h-full rounded-full bg-night", barClassName)}
         initial={{ width: reduce ? `${pct}%` : 0 }}
         whileInView={{ width: `${pct}%` }}
         viewport={{ once: true }}

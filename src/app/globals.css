@@ -3,22 +3,25 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  One neutral base (zinc) + one accent (navy). Green is reserved for dollar
-  figures. No gradients, no shadows except things that float. See DESIGN.md.
+  Swiss and plain. White paper, ink type, one dark band colour (night), one
+  orange signal for the main action and focus, and green only for dollars the
+  owner gets back. No gradients, no shadows. See DESIGN.md.
 */
 :root {
   --white: #ffffff;
-  --surface: #f4f4f5;
-  --line: #e4e4e7;
-  --ink: #18181b;
-  --muted: #71717a;
-  --navy: #0c2340;
-  --navy-tint: #1a3a66;
-  --navy-deep: #071a33;
-  --cash: #157347;
-  --cash-bright: #6ad49c;
-  --on-navy-muted: #a7b5ca;
-  --on-navy-line: rgba(255, 255, 255, 0.16);
+  --surface: #f3f5f4;
+  --line: #dfe4e1;
+  --ink: #111814;
+  --muted: #5b6660;
+  --night: #16201b;
+  --night-tint: #26332c;
+  --night-deep: #0b110e;
+  --signal: #c2410c;
+  --signal-tint: #9a3412;
+  --cash: #047857;
+  --cash-bright: #6ee7b7;
+  --on-night-muted: #a9b5ae;
+  --on-night-line: rgba(255, 255, 255, 0.16);
 
   /* shadcn tokens, mapped onto the palette above */
   --background: var(--white);
@@ -27,21 +30,22 @@
   --card-foreground: var(--ink);
   --popover: var(--white);
   --popover-foreground: var(--ink);
-  --primary: var(--navy);
+  --primary: var(--night);
   --primary-foreground: var(--white);
   --secondary: var(--surface);
   --secondary-foreground: var(--ink);
   --muted: var(--surface);
-  --muted-foreground: #71717a;
+  --muted-foreground: #5b6660;
   --accent: var(--surface);
   --accent-foreground: var(--ink);
-  --destructive: #b42318;
+  --destructive: #b91c1c;
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--navy);
-  --radius: 0.5rem;
+  --ring: var(--signal);
+  --radius: 0.25rem;
 
-  --font-sans: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-plex), system-ui, sans-serif;
+  --font-display: var(--font-calistoga), Georgia, serif;
 }
 
 @theme inline {
@@ -67,15 +71,18 @@
   --color-surface: var(--surface);
   --color-line: var(--line);
   --color-ink: var(--ink);
-  --color-navy: var(--navy);
-  --color-navy-tint: var(--navy-tint);
-  --color-navy-deep: var(--navy-deep);
+  --color-night: var(--night);
+  --color-night-tint: var(--night-tint);
+  --color-night-deep: var(--night-deep);
+  --color-signal: var(--signal);
+  --color-signal-tint: var(--signal-tint);
   --color-cash: var(--cash);
   --color-cash-bright: var(--cash-bright);
-  --color-on-navy-muted: var(--on-navy-muted);
-  --color-on-navy-line: var(--on-navy-line);
+  --color-on-night-muted: var(--on-night-muted);
+  --color-on-night-line: var(--on-night-line);
 
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
@@ -107,11 +114,23 @@
   }
 }
 
-.on-navy :focus-visible {
+.on-night :focus-visible {
   outline-color: var(--white);
 }
 
-/* Dollar figures always line up. */
+/* Headlines get Calistoga. It ships one weight, so never fake-bold it. */
+.text-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+/* Dollar figures always line up. Big ones stay in Plex, which has real tabular digits. */
+.num.text-display,
+.text-display .num {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
 .num {
   font-variant-numeric: tabular-nums;
 }
@@ -131,17 +150,17 @@ input[type="range"]::-webkit-slider-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--navy);
+  background: var(--night);
   border: 3px solid var(--white);
-  box-shadow: 0 0 0 1px var(--navy);
+  box-shadow: 0 0 0 1px var(--night);
   cursor: pointer;
 }
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--navy);
+  background: var(--night);
   border: 3px solid var(--white);
-  box-shadow: 0 0 0 1px var(--navy);
+  box-shadow: 0 0 0 1px var(--night);
   cursor: pointer;
 }

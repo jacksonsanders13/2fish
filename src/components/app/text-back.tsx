@@ -329,9 +329,9 @@ function Bubble({ direction, body, status, at }: { direction: string; body: stri
     <li className={cn("flex", mine ? "justify-end pr-3" : "justify-start pl-3")}>
       <div className={cn("max-w-[85%]", mine ? "text-right" : "text-left")}>
         <SpeechBubbleRoot className={cn("m-0", mine ? "ml-auto" : "")}>
-          <SpeechBubbleBody className={cn("rounded-lg px-3.5 py-2.5 text-left text-sm lg:px-3.5 lg:py-2.5", mine ? "bg-navy text-white" : "bg-surface text-ink")}>
+          <SpeechBubbleBody className={cn("rounded-lg px-3.5 py-2.5 text-left text-sm lg:px-3.5 lg:py-2.5", mine ? "bg-night text-white" : "bg-surface text-ink")}>
             <span>{body}</span>
-            <SpeechBubbleTail className={cn("h-4 md:h-4", mine ? "right-[-8px] text-navy" : "right-auto left-[-8px] -scale-x-100 text-surface")} fill="currentColor" />
+            <SpeechBubbleTail className={cn("h-4 md:h-4", mine ? "right-[-8px] text-night" : "right-auto left-[-8px] -scale-x-100 text-surface")} fill="currentColor" />
           </SpeechBubbleBody>
         </SpeechBubbleRoot>
         <p className="num mt-1 text-sm text-muted-foreground">

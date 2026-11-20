@@ -54,7 +54,7 @@ export function Dashboard({
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={cn("rounded-[6px] px-3 py-1.5 text-sm", tab === t ? "bg-navy font-semibold text-white" : "text-ink")}
+              className={cn("rounded-[6px] px-3 py-1.5 text-sm", tab === t ? "bg-night font-semibold text-white" : "text-ink")}
             >
               {t === "chat" ? "Consultant" : "Plan"}
             </button>

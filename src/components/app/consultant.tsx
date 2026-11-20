@@ -117,7 +117,7 @@ export function Consultant({
     <div className={cn("flex min-h-0 flex-col rounded-lg border border-line bg-white", className)}>
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-full bg-navy text-white">
+          <span className="flex size-8 items-center justify-center rounded-full bg-night text-white">
             <MessageSquareText size={16} aria-hidden="true" />
           </span>
           <div>
@@ -137,7 +137,7 @@ export function Consultant({
         {messages.map((m) =>
           m.role === "tool" ? (
             <div key={m.id} className="flex items-start gap-2 pl-1 text-sm text-muted-foreground">
-              <Check size={14} className="mt-1 shrink-0 text-navy" aria-hidden="true" />
+              <Check size={14} className="mt-1 shrink-0 text-night" aria-hidden="true" />
               <span>{m.content}</span>
             </div>
           ) : (
@@ -145,7 +145,7 @@ export function Consultant({
               <div
                 className={cn(
                   "max-w-[88%] rounded-lg px-3.5 py-2.5 text-sm whitespace-pre-wrap",
-                  m.role === "user" ? "bg-navy text-white" : "bg-surface text-ink",
+                  m.role === "user" ? "bg-night text-white" : "bg-surface text-ink",
                 )}
               >
                 {m.content || (m.pending ? <span className="inline-block animate-pulse">Thinking…</span> : "")}
@@ -174,7 +174,7 @@ export function Consultant({
         {messages.length <= 2 && !busy ? (
           <div className="mb-2 flex flex-wrap gap-2">
             {suggestions.map((s) => (
-              <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-line px-3 py-1 text-sm hover:border-navy">
+              <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-line px-3 py-1 text-sm hover:border-night">
                 {s}
               </button>
             ))}

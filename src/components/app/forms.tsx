@@ -40,7 +40,7 @@ export function Notice({ tone = "info", children }: { tone?: "info" | "error" | 
       role={tone === "error" ? "alert" : "status"}
       className={cn(
         "rounded-md border px-3 py-2 text-sm",
-        tone === "error" ? "border-destructive/40 text-destructive" : tone === "success" ? "border-navy text-ink" : "border-line bg-surface",
+        tone === "error" ? "border-destructive/40 text-destructive" : tone === "success" ? "border-night text-ink" : "border-line bg-surface",
       )}
     >
       {children}
@@ -91,7 +91,7 @@ export function LogJobForm({
     <form onSubmit={submit} className="space-y-3">
       <div className={cn("grid gap-3", compact ? "" : "sm:grid-cols-2")}>
         <Field label="Job value" htmlFor="job-value">
-          <div className="flex h-10 items-center rounded-md border border-input bg-background pl-3 focus-within:border-navy">
+          <div className="flex h-10 items-center rounded-md border border-input bg-background pl-3 focus-within:border-night">
             <span className="text-muted-foreground">$</span>
             <Input
               id="job-value"
