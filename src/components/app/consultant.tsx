@@ -114,14 +114,14 @@ export function Consultant({
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
   return (
-    <div className={cn("flex min-h-0 flex-col rounded-lg border border-line bg-white", className)}>
-      <div className="flex items-center justify-between border-b border-line px-4 py-3">
+    <div className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border border-line border-t-4 border-t-night bg-white", className)}>
+      <div className="flex items-center justify-between border-b border-line bg-night/[0.06] px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-full bg-night text-white">
             <MessageSquareText size={16} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-bold">Your consultant</p>
+            <p className="text-sm font-bold text-night">Your consultant</p>
             <p className="text-sm text-muted-foreground">{agentReady ? "Explains the plan. Does the work when you say go." : "Waiting on the Claude key"}</p>
           </div>
         </div>
@@ -174,7 +174,7 @@ export function Consultant({
         {messages.length <= 2 && !busy ? (
           <div className="mb-2 flex flex-wrap gap-2">
             {suggestions.map((s) => (
-              <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-line px-3 py-1 text-sm hover:border-night">
+              <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-night/30 px-3 py-1 text-sm text-night transition-colors hover:bg-night hover:text-white">
                 {s}
               </button>
             ))}

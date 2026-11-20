@@ -72,8 +72,8 @@ export function AppShell({ active, email, children }: { active: Section; email?:
                   href={item.href}
                   aria-current={item.key === active ? "page" : undefined}
                   className={cn(
-                    "flex flex-col items-center gap-1 py-2.5 text-sm",
-                    item.key === active ? "font-semibold text-night" : "text-muted-foreground",
+                    "-mt-px flex flex-col items-center gap-1 border-t-2 py-2.5 text-sm",
+                    item.key === active ? "border-night bg-night/[0.06] font-semibold text-night" : "border-transparent text-muted-foreground",
                   )}
                 >
                   <item.icon size={20} aria-hidden="true" />

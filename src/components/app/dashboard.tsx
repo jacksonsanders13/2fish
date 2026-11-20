@@ -41,20 +41,21 @@ export function Dashboard({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">{who}</p>
+      {/* Teal stat strip: the one number the owner cares about */}
+      <div className="on-night flex items-center justify-between gap-3 rounded-lg bg-night px-4 py-3.5 text-white sm:px-5">
+        <div className="min-w-0">
+          <p className="truncate text-sm text-on-night-muted">{who}</p>
           <h1 className="font-bold">
-            Recovered this month: <RollingMoney amount={recovered.month} />
+            Recovered this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
           </h1>
         </div>
-        <div className="flex rounded-md border border-line bg-white p-0.5 lg:hidden">
+        <div className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
           {(["chat", "plan"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={cn("rounded-[6px] px-3 py-1.5 text-sm", tab === t ? "bg-night font-semibold text-white" : "text-ink")}
+              className={cn("rounded-[6px] px-3 py-1.5 text-sm", tab === t ? "bg-white font-semibold text-night" : "text-white")}
             >
               {t === "chat" ? "Consultant" : "Plan"}
             </button>
@@ -70,12 +71,12 @@ export function Dashboard({
           intro={intro}
           userId={userId}
           suggestions={suggestions}
-          className={cn("h-[calc(100dvh-17.5rem)] min-h-[26rem] lg:h-[calc(100dvh-11rem)]", tab === "chat" ? "flex" : "hidden lg:flex")}
+          className={cn("h-[calc(100dvh-19rem)] min-h-[26rem] lg:h-[calc(100dvh-12.5rem)]", tab === "chat" ? "flex" : "hidden lg:flex")}
         />
 
         <aside className={cn("space-y-4", tab === "plan" ? "block" : "hidden lg:block")}>
-          <section className="rounded-lg border border-line bg-white p-4">
-            <h2 className="text-sm font-semibold">The plan</h2>
+          <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
+            <h2 className="text-sm font-semibold text-night">The plan</h2>
             {plan ? (
               <>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -86,14 +87,14 @@ export function Dashboard({
                     <li key={s.id} className="py-3 first:pt-0 last:pb-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className="min-w-0 truncate text-sm font-semibold">
-                          <span className="num mr-1.5 text-muted-foreground">{s.rank}</span>
+                          <span className="num mr-1.5 text-night">{s.rank}</span>
                           {s.title}
                         </p>
                         <StatusBadge status={s.status} />
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2 text-sm">
                         <Money amount={s.impact} per="/mo" sign="+" className="font-semibold" />
-                        <Link href={s.href} className="text-muted-foreground underline underline-offset-2">
+                        <Link href={s.href} className="font-semibold text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
                           Open
                         </Link>
                       </div>
@@ -115,12 +116,12 @@ export function Dashboard({
           </section>
 
           {working.length ? (
-            <section className="rounded-lg border border-line bg-white p-4">
-              <h2 className="text-sm font-semibold">In progress</h2>
+            <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
+              <h2 className="text-sm font-semibold text-night">In progress</h2>
               <ul className="mt-2 space-y-2">
                 {working.map((t) => (
                   <li key={t.id} className="flex items-start gap-2 text-sm">
-                    <Clock size={14} className="mt-1 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <Clock size={14} className="mt-1 shrink-0 text-night" aria-hidden="true" />
                     <div>
                       <p className="font-semibold">{t.title}</p>
                       {typeof t.result.note === "string" ? <p className="text-muted-foreground">{t.result.note}</p> : null}
@@ -131,21 +132,21 @@ export function Dashboard({
             </section>
           ) : null}
 
-          <section className="rounded-lg border border-line bg-white p-4">
-            <h2 className="text-sm font-semibold">Hands-on tools</h2>
+          <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
+            <h2 className="text-sm font-semibold text-night">Hands-on tools</h2>
             <ul className="mt-2 space-y-1 text-sm">
               <li>
-                <Link href="/dashboard/text-back" className="underline underline-offset-2">
+                <Link href="/dashboard/text-back" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
                   Text-back inbox and settings
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/customers" className="underline underline-offset-2">
+                <Link href="/dashboard/customers" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
                   Customers and logged jobs
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/settings" className="underline underline-offset-2">
+                <Link href="/dashboard/settings" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
                   Business and account settings
                 </Link>
               </li>
