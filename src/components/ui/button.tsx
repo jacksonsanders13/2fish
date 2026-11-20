@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-night-tint active:bg-night-deep",
-        // The orange one. Only for the main action on a screen.
+        // The coral one. Only for the main action on a screen.
         signal: "bg-signal text-white hover:bg-signal-tint",
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline: "border bg-background hover:bg-accent hover:text-accent-foreground",

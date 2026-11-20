@@ -12,15 +12,17 @@ Harbor (navy + Bricolage Grotesque) was retired on Nov 20, 2026. The current sys
 
 ## Palette
 
+Deep teal and coral, chosen by Jackson on Nov 20, 2026 (replaced a near-black and orange first pass).
+
 | Token | Hex | Role |
 | --- | --- | --- |
 | `white` | `#FFFFFF` | Page and card background. |
-| `surface` | `#F3F5F4` | Panel background. |
-| `line` | `#DFE4E1` | 1px borders. |
-| `ink` | `#111814` | Text. |
-| `muted` | `#5B6660` | Timestamps, help text, captions only. |
-| `night` | `#16201B` | Primary buttons, the hero band, app header, stat strip. `night-tint` `#26332C` hover, `night-deep` `#0B110E` pressed. |
-| `signal` | `#C2410C` | The one bright colour. Only the main action on a screen (`<Button variant="signal">`) and focus rings. Hover `signal-tint` `#9A3412`. |
+| `surface` | `#F1F6F6` | Panel background. |
+| `line` | `#DCE6E6` | 1px borders. |
+| `ink` | `#0F1F20` | Text. |
+| `muted` | `#556667` | Timestamps, help text, captions only. |
+| `night` | `#0E3B3C` | Deep teal. Primary buttons, the closing band, app header, stat strip. `night-tint` `#175152` hover, `night-deep` `#082829` pressed. |
+| `signal` | `#C8402F` | Coral, the one bright colour (4.96:1 with white text; the brighter `#DC4B3E` fails). Only the main action on a screen (`<Button variant="signal">`) and focus rings. Hover `signal-tint` `#A8321F`. |
 | `cash` | `#047857` | Dollars the owner gains or recovers. On night it becomes `cash-bright` `#6EE7B7`. Nothing else is green. |
 
 Losses are shown in ink, not green or orange. Every dollar figure uses tabular numerals (`.num`).
@@ -37,7 +39,7 @@ shadcn's tokens (`--primary`, `--ring`, `--radius`, etc.) are mapped onto this p
 
 - Left-aligned text. Asymmetric two-column sections. No three-identical-cards rows.
 - The dashboard is the hero image, beside the headline on desktop, under it on phones.
-- The landing page is a funnel (the skill's "3-step conversion" pattern): hero, then 01 Find the leak (calculator), 02 Get the plan (the loop), 03 Let 2fish do it (features + pricing), each with a small text link as its call to action, the step number pinned in a left column on desktop. One night band at the very end holds the main ask. Orange is only on the "Start your free audit" buttons.
+- The landing page is a funnel (the skill's "3-step conversion" pattern): hero, then 01 Find the leak (calculator), 02 Get the plan (the loop), 03 Let 2fish do it (features + pricing), each with a small text link as its call to action, the step number pinned in a left column on desktop. One night band at the very end holds the main ask. Coral is only on the "Start your free audit" buttons.
 - Mobile first. Every screen checked at 375px. Dashboard gets a bottom tab bar on phones.
 - Placeholders are labelled. No fake logos, testimonials or made-up stats.
 
