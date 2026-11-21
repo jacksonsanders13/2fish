@@ -126,10 +126,10 @@ export const plan: PlanStep[] = [
 ];
 
 export const recovered = {
-  amount: 2310,
+  amount: 2140,
   jobs: 6,
   period: "Nov 1 to 14",
-  pace: 4900,
+  pace: 4600,
 };
 
 export const stats = [
@@ -145,7 +145,7 @@ export type Activity = {
 };
 
 export const activity: Activity[] = [
-  { when: "2:14 PM", text: "Missed call from (919) 555-0142. Texted back in 8 seconds.", kind: "call" },
+  { when: "2:14 PM", text: "Missed call from (919) 555-0142. Texted back in 10 seconds.", kind: "call" },
   { when: "11:30 AM", text: "7 videos ready to post from Tuesday's clips.", kind: "video" },
   { when: "Yesterday", text: "Review requests sent to 3 customers after their jobs closed.", kind: "review" },
   { when: "Yesterday", text: "New 5-star review from Priya N. \"Deck looks brand new.\"", kind: "review" },

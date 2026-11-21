@@ -92,7 +92,7 @@
   /* Three sizes per screen: display, base, small. */
   --text-display: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
   --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.025em;
+  --text-display--letter-spacing: 0;
   --text-base: 1rem;
   --text-base--line-height: 1.55;
   --text-sm: 0.875rem;
@@ -129,10 +129,35 @@
 .text-display .num {
   font-family: var(--font-sans);
   font-weight: 600;
-  letter-spacing: -0.03em;
 }
 .num {
   font-variant-numeric: tabular-nums;
+}
+
+/* The one entrance on the landing page. Plain CSS, so the hero shows up even
+   before JavaScript loads. --rise-delay staggers the pieces. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+.rise {
+  animation: rise 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation-delay: var(--rise-delay, 0s);
+}
+@keyframes screen-in {
+  from {
+    opacity: 0;
+  }
+}
+.screen-in {
+  animation: screen-in 0.35s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
 }
 
 /* Range input, styled once. */

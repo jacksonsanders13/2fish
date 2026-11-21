@@ -1,16 +1,14 @@
 import { Logo } from "@/components/brand/logo";
 import { AnimatedMoney } from "@/components/motion/animated-money";
-import { Reveal } from "@/components/motion/reveal";
 import { Money } from "@/components/ui/money";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { activity, business, plan, recovered } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-// A small, real-looking render of the dashboard. This is the hero image on
-// both landing pages. It assembles itself row by row when it comes into view.
+// A small, real-looking render of the dashboard, used as the landing page's hero image.
+// Only the dollar figure moves: it counts up once. Step names wrap rather than get cut off.
 export function DashboardPreview({ chrome = "light", className }: { chrome?: "light" | "night"; className?: string }) {
   return (
-    <div className={cn("overflow-hidden rounded-lg border border-line bg-white text-left text-sm text-ink", className)}>
+    <div className={cn("overflow-hidden rounded-lg bg-white text-left text-sm text-ink", className)}>
       <h3 className="sr-only">Sample dashboard for {business.name}</h3>
       <div
         className={cn(
@@ -31,25 +29,24 @@ export function DashboardPreview({ chrome = "light", className }: { chrome?: "li
           <p className="mt-2 text-muted-foreground">
             {recovered.jobs} jobs traced to your plan, {recovered.period}
           </p>
-          <ol className="mt-4 divide-y divide-line border-t border-line">
-            {plan.slice(0, 4).map((step, i) => (
-              <Reveal as="li" key={step.rank} delay={0.5 + i * 0.12} y={10} className="flex items-center gap-3 py-2">
-                <span className="num w-4 text-muted-foreground">{step.rank}</span>
-                <span className="min-w-0 flex-1 truncate font-medium">{step.title}</span>
-                <StatusBadge status={step.status} className="hidden sm:inline-flex" />
-                <Money amount={step.impact} per="/mo" className="font-semibold" />
-              </Reveal>
+          <ol className="mt-4">
+            {plan.slice(0, 4).map((step) => (
+              <li key={step.rank} className="flex items-start gap-3 py-2">
+                <span className="num w-4 shrink-0 text-muted-foreground">{step.rank}</span>
+                <span className="min-w-0 flex-1 font-medium">{step.title}</span>
+                <Money amount={step.impact} per="/mo" className="shrink-0 font-semibold" />
+              </li>
             ))}
           </ol>
         </div>
         <div className="min-w-0 p-4 sm:p-5">
           <p className="font-semibold">Today</p>
           <ul className="mt-2 space-y-2.5">
-            {activity.slice(0, 4).map((a, i) => (
-              <Reveal as="li" key={a.text} delay={0.7 + i * 0.14} y={0} x={16} className="flex gap-2">
+            {activity.slice(0, 4).map((a) => (
+              <li key={a.text} className="flex gap-2">
                 <span className="num w-16 shrink-0 whitespace-nowrap text-muted-foreground">{a.when}</span>
                 <span>{a.text}</span>
-              </Reveal>
+              </li>
             ))}
           </ul>
         </div>

@@ -7,7 +7,6 @@ import { AnimatedMoney } from "@/components/motion/animated-money";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { roundTen } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 const WEEKS = 4.3;
 const BOOK_RATE = 0.3;
@@ -21,7 +20,7 @@ export function MissedCallCalculator({ className }: { className?: string }) {
   const yearly = monthly * 12;
 
   return (
-    <div className={cn("rounded-lg border border-line bg-white p-5 sm:p-6", className)}>
+    <div className={className}>
       <div className="space-y-5">
         <div>
           <div className="flex items-baseline justify-between">
@@ -59,7 +58,7 @@ export function MissedCallCalculator({ className }: { className?: string }) {
         </div>
       </div>
 
-      <div className="mt-6 border-t border-line pt-5">
+      <div className="mt-8">
         <p className="text-sm font-semibold">Walking out the door each month</p>
         <p className="mt-1 text-display font-semibold">
           <AnimatedMoney amount={monthly} tone="ink" duration={0.6} />
