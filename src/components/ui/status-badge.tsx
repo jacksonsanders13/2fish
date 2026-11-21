@@ -14,7 +14,7 @@ const styles: Record<StepStatus, { label: string; cls: string }> = {
 export function StatusBadge({ status, className }: { status: StepStatus; className?: string }) {
   const s = styles[status];
   return (
-    <Badge variant="outline" className={cn("rounded-full px-2.5 py-0.5 text-sm font-medium", s.cls, className)}>
+    <Badge variant="outline" className={cn("rounded-full px-2.5 py-0.5 text-sm font-normal", s.cls, className)}>
       {status === "live" ? (
         <span className="relative mr-0.5 flex size-1.5" aria-hidden="true">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-70 motion-reduce:animate-none" />

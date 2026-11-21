@@ -102,7 +102,7 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
               className={cn("relative flex aspect-[4/5] items-center justify-center rounded-md", tones[v.tone])}
             >
               <Play size={18} />
-              <span className="num absolute right-1.5 bottom-1.5 opacity-80">{v.length}</span>
+              <span className="num absolute right-1.5 bottom-1.5">{v.length}</span>
             </li>
           ))}
         </ul>
@@ -135,12 +135,12 @@ export const features = [
   {
     title: "Review requests",
     body: "The morning after a job, the customer gets a text with your Google link. One tap for them.",
-    when: "In the first release",
+    when: "Coming after launch",
   },
   {
     title: "Videos from your clips",
     body: "Five phone clips in. Seven captioned vertical videos out, scheduled for the week.",
-    when: "In the first release",
+    when: "Coming after launch",
   },
   {
     title: "Past-customer reminders",

@@ -2,18 +2,11 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { cn } from "@/lib/utils";
 
-export function SiteHeader({ tone = "light" }: { tone?: "light" | "night" }) {
-  const night = tone === "night";
-  const link = cn("text-sm hover:underline", night ? "text-white/85" : "text-ink");
+export function SiteHeader() {
+  const link = "text-sm text-ink hover:underline";
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-30 border-b",
-        night ? "on-night border-on-night-line bg-night text-white" : "border-line bg-white text-ink",
-      )}
-    >
+    <header className="sticky top-0 z-30 border-b border-line bg-white text-ink">
       <Container className="flex h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" className="rounded-md">
           <Logo />
@@ -30,12 +23,7 @@ export function SiteHeader({ tone = "light" }: { tone?: "light" | "night" }) {
           </a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button
-            asChild
-            size="sm"
-            variant="outline"
-            className={night ? "border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white" : undefined}
-          >
+          <Button asChild size="sm" variant="outline">
             <Link href="/login">Sign in</Link>
           </Button>
           <Button asChild size="sm" variant="signal">

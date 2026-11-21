@@ -14,7 +14,7 @@ import { SiteHeader } from "./site-header";
 export function Landing() {
   return (
     <>
-      <SiteHeader tone="light" />
+      <SiteHeader />
       <main className="overflow-x-clip">
         {/* Hero: copy on the left, the product on the right */}
         <section className="border-b border-line">
@@ -165,7 +165,7 @@ function StepLink({ href, className, children }: { href: string; className?: str
     <Link
       href={href}
       className={cn(
-        "inline-flex min-h-11 items-center gap-2 font-semibold text-night underline decoration-night/30 decoration-2 underline-offset-4 hover:decoration-night",
+        "inline-flex min-h-11 items-center gap-2 font-semibold text-night underline decoration-2 underline-offset-4 hover:text-night-tint",
         className,
       )}
     >

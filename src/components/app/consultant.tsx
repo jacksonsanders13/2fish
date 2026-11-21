@@ -121,7 +121,7 @@ export function Consultant({
             <MessageSquareText size={16} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-bold text-night">Your consultant</p>
+            <p className="text-sm font-semibold text-night">Your consultant</p>
             <p className="text-sm text-muted-foreground">{agentReady ? "Ask about your plan, or tell it what to do" : "Chat isn't switched on yet"}</p>
           </div>
         </div>

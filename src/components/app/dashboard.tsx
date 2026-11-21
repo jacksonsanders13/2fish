@@ -45,7 +45,7 @@ export function Dashboard({
       <div className="on-night flex items-center justify-between gap-3 rounded-lg bg-night px-4 py-3.5 text-white sm:px-5">
         <div className="min-w-0">
           <p className="truncate text-sm text-on-night-muted">{who}</p>
-          <h1 className="font-bold">
+          <h1 className="font-semibold">
             Recovered this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
           </h1>
         </div>
