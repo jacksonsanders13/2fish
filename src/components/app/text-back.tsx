@@ -214,7 +214,7 @@ function SettingsForm({ business, settings, onSaved }: { business: Business; set
         </Field>
       </div>
       {error ? <Notice tone="error">{error}</Notice> : null}
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" variant="signal" disabled={pending}>
         {pending ? "Saving…" : "Save settings"}
       </Button>
     </form>
