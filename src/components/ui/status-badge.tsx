@@ -2,11 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import type { StepStatus } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-// Green is reserved for dollar figures, so status is night, outline, or neutral.
+// Green is reserved for dollar figures. Coral marks the one status the owner has to act on.
 const styles: Record<StepStatus, { label: string; cls: string }> = {
   live: { label: "Live", cls: "border-night bg-night text-white" },
   "in-progress": { label: "In progress", cls: "border-night bg-white text-night" },
-  "needs-you": { label: "Needs you", cls: "border-line bg-surface text-ink" },
+  "needs-you": { label: "Needs you", cls: "border-signal bg-white text-signal" },
   done: { label: "Done", cls: "border-line bg-white text-muted-foreground" },
   "not-started": { label: "Not started", cls: "border-line bg-white text-muted-foreground" },
 };

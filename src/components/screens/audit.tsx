@@ -79,7 +79,11 @@ export function AuditScreen() {
         </Container>
       </header>
 
-      <Progress value={((index + 1) / total) * 100} aria-label="Audit progress" className="h-1 rounded-none bg-line" />
+      <Progress
+        value={((index + 1) / total) * 100}
+        aria-label="Audit progress"
+        className="h-1 rounded-none bg-line [&>[data-slot=progress-indicator]]:bg-signal"
+      />
 
       <main className="flex-1 overflow-x-hidden">
         <Container className="max-w-2xl py-10 sm:py-16">
@@ -91,7 +95,7 @@ export function AuditScreen() {
               exit={{ opacity: 0, x: -slide * direction }}
               transition={{ duration: reduce ? 0 : 0.3, ease }}
             >
-              <p className="num text-sm font-semibold">
+              <p className="num text-sm font-semibold text-signal">
                 Question {index + 1} of {total}
               </p>
               <h1 className="mt-3 text-display font-semibold">{q.prompt}</h1>
@@ -188,7 +192,7 @@ export function AuditScreen() {
               <ArrowLeft aria-hidden="true" />
               Back
             </Button>
-            <Button onClick={next} disabled={!canNext}>
+            <Button variant="signal" onClick={next} disabled={!canNext}>
               {last ? "See my results" : "Next"}
               <ArrowRight aria-hidden="true" />
             </Button>

@@ -22,7 +22,7 @@ Teal and coral, chosen by Jackson on Nov 20, 2026, then lightened (from `#0E3B3C
 | `ink` | `#0F1F20` | Text. |
 | `muted` | `#556667` | Timestamps, help text, captions only. |
 | `night` | `#176B69` | Teal, the brand colour, used generously: primary buttons, the panel behind the hero product shot, step numbers and labels, step links, the Pro price tier, the closing band, app header, stat strip. 6.3:1 with white. `night-tint` `#135A58` hover, `night-deep` `#0E4746` pressed. Text on teal that isn't white uses `on-night-muted` `#D3E8E7`. |
-| `signal` | `#C8402F` | Coral, the one bright colour (4.96:1 with white text; the brighter `#DC4B3E` fails). Only the main action on a screen (`<Button variant="signal">`) and focus rings. Hover `signal-tint` `#A8321F`. |
+| `signal` | `#C8402F` | Coral, the one bright colour (4.96:1 with white text; the brighter `#DC4B3E` fails). It means "do this" or "this is waiting on you": the main action on a screen (`<Button variant="signal">`, including the audit's Next, the chat's Send and Approve), the audit's progress bar and question count, the "Needs you" status and heading (Nov 21, 2026, at Jackson's request), and focus rings. Never decoration. Hover `signal-tint` `#A8321F`. |
 | `cash` | `#047857` | Dollars the owner gains or recovers. On night it becomes `cash-bright` `#6EE7B7`. Nothing else is green. |
 
 Losses are shown in ink, not green or orange. Every dollar figure uses tabular numerals (`.num`).

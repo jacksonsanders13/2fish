@@ -105,7 +105,7 @@ export function Dashboard({
             ) : (
               <>
                 <p className="mt-1 text-sm">Nine questions, five minutes, then your consultant has something to work with.</p>
-                <Button asChild size="sm" className="mt-3">
+                <Button asChild size="sm" variant="signal" className="mt-3">
                   <Link href="/audit">
                     Start the free audit
                     <ArrowRight aria-hidden="true" />

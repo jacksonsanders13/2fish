@@ -163,7 +163,7 @@ export function Consultant({
 
       {open.length ? (
         <div className="space-y-2 border-t border-line bg-surface px-4 py-3">
-          <p className="text-sm font-semibold">Needs you</p>
+          <p className="text-sm font-semibold text-signal">Needs you</p>
           {open.map((t) => (
             <TaskCard key={t.id} task={t} userId={userId} onDone={(note) => send(note)} />
           ))}
@@ -202,7 +202,7 @@ export function Consultant({
             className="max-h-40 min-h-11 resize-none py-2.5 text-sm"
             aria-label="Message your consultant"
           />
-          <Button type="submit" size="icon" disabled={busy || !draft.trim() || !agentReady} aria-label="Send">
+          <Button type="submit" size="icon" variant="signal" disabled={busy || !draft.trim() || !agentReady} aria-label="Send">
             <ArrowUp aria-hidden="true" />
           </Button>
         </form>
@@ -236,6 +236,7 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
         <div className="mt-2 flex gap-2">
           <Button
             size="sm"
+            variant="signal"
             disabled={pending}
             onClick={() =>
               start(async () => {
@@ -291,7 +292,7 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
         <input ref={fileRef} type="file" accept="video/*" multiple className="hidden" onChange={onFiles} />
         {msg ? <p className="mt-2 text-sm text-muted-foreground">{msg}</p> : null}
         <div className="mt-2 flex gap-2">
-          <Button size="sm" disabled={pending} onClick={() => fileRef.current?.click()}>
+          <Button size="sm" variant="signal" disabled={pending} onClick={() => fileRef.current?.click()}>
             <Upload aria-hidden="true" />
             Choose clips
           </Button>
