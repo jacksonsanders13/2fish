@@ -114,15 +114,15 @@ export function Consultant({
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
   return (
-    <div className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border border-line border-t-4 border-t-night bg-white", className)}>
-      <div className="flex items-center justify-between border-b border-line bg-night/[0.06] px-4 py-3">
+    <div className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border-t-4 border-night bg-white", className)}>
+      <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-full bg-night text-white">
             <MessageSquareText size={16} aria-hidden="true" />
           </span>
           <div>
             <p className="text-sm font-bold text-night">Your consultant</p>
-            <p className="text-sm text-muted-foreground">{agentReady ? "Explains the plan. Does the work when you say go." : "Waiting on the Claude key"}</p>
+            <p className="text-sm text-muted-foreground">{agentReady ? "Ask about your plan, or tell it what to do" : "Chat isn't switched on yet"}</p>
           </div>
         </div>
         {working.length ? (
@@ -148,7 +148,7 @@ export function Consultant({
                   m.role === "user" ? "bg-night text-white" : "bg-surface text-ink",
                 )}
               >
-                {m.content || (m.pending ? <span className="inline-block animate-pulse">Thinking…</span> : "")}
+                {m.content || (m.pending ? <span className="inline-block motion-safe:animate-pulse">Thinking…</span> : "")}
               </div>
             </div>
           ),
@@ -174,7 +174,12 @@ export function Consultant({
         {messages.length <= 2 && !busy ? (
           <div className="mb-2 flex flex-wrap gap-2">
             {suggestions.map((s) => (
-              <button key={s} type="button" onClick={() => send(s)} className="rounded-full border border-night/30 px-3 py-1 text-sm text-night transition-colors hover:bg-night hover:text-white">
+              <button
+                key={s}
+                type="button"
+                onClick={() => send(s)}
+                className="rounded-full border border-night px-3 py-1 text-sm text-night transition-colors hover:bg-night hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal active:bg-night-tint active:text-white"
+              >
                 {s}
               </button>
             ))}
@@ -197,7 +202,7 @@ export function Consultant({
               }
             }}
             rows={1}
-            placeholder={agentReady ? "Tell your consultant what's going on…" : "Chat turns on once the Claude key is added"}
+            placeholder={agentReady ? "Tell your consultant what's going on…" : "Chat isn't on yet. Your plan already works."}
             disabled={busy || !agentReady}
             className="max-h-40 min-h-11 resize-none py-2.5 text-sm"
             aria-label="Message your consultant"

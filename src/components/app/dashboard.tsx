@@ -49,13 +49,17 @@ export function Dashboard({
             Recovered this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
           </h1>
         </div>
-        <div className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
+        <div role="group" aria-label="Show" className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
           {(["chat", "plan"] as const).map((t) => (
             <button
               key={t}
               type="button"
+              aria-pressed={tab === t}
               onClick={() => setTab(t)}
-              className={cn("rounded-[6px] px-3 py-1.5 text-sm", tab === t ? "bg-white font-semibold text-night" : "text-white")}
+              className={cn(
+                "rounded-[6px] px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-night-deep",
+                tab === t ? "bg-white font-semibold text-night active:bg-white" : "text-white",
+              )}
             >
               {t === "chat" ? "Consultant" : "Plan"}
             </button>
@@ -75,7 +79,7 @@ export function Dashboard({
         />
 
         <aside className={cn("space-y-4", tab === "plan" ? "block" : "hidden lg:block")}>
-          <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
+          <section className="rounded-lg border-t-4 border-night bg-white p-4">
             <h2 className="text-sm font-semibold text-night">The plan</h2>
             {plan ? (
               <>
@@ -85,16 +89,16 @@ export function Dashboard({
                 <ol className="mt-3 divide-y divide-line">
                   {plan.steps.map((s) => (
                     <li key={s.id} className="py-3 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="min-w-0 truncate text-sm font-semibold">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 text-sm font-semibold">
                           <span className="num mr-1.5 text-night">{s.rank}</span>
                           {s.title}
                         </p>
-                        <StatusBadge status={s.status} />
+                        <StatusBadge status={s.status} className="shrink-0" />
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2 text-sm">
                         <Money amount={s.impact} per="/mo" sign="+" className="font-semibold" />
-                        <Link href={s.href} className="font-semibold text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
+                        <Link href={s.href} className="font-semibold text-night underline underline-offset-2 hover:text-night-tint">
                           Open
                         </Link>
                       </div>
@@ -116,7 +120,7 @@ export function Dashboard({
           </section>
 
           {working.length ? (
-            <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
+            <section className="rounded-lg border-t-4 border-night bg-white p-4">
               <h2 className="text-sm font-semibold text-night">In progress</h2>
               <ul className="mt-2 space-y-2">
                 {working.map((t) => (
@@ -131,27 +135,6 @@ export function Dashboard({
               </ul>
             </section>
           ) : null}
-
-          <section className="rounded-lg border border-line border-t-4 border-t-night bg-white p-4">
-            <h2 className="text-sm font-semibold text-night">Hands-on tools</h2>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li>
-                <Link href="/dashboard/text-back" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
-                  Text-back inbox and settings
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard/customers" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
-                  Customers and logged jobs
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard/settings" className="text-night underline decoration-night/30 underline-offset-2 hover:decoration-night">
-                  Business and account settings
-                </Link>
-              </li>
-            </ul>
-          </section>
         </aside>
       </div>
     </div>

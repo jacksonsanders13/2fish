@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 
 export type Section = "dashboard" | "text-back" | "customers" | "videos" | "settings";
 
-const nav: { key: Section; label: string; icon: typeof LayoutDashboard; href: string; soon?: boolean }[] = [
+const nav: { key: Section; label: string; icon: typeof LayoutDashboard; href: string }[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { key: "text-back", label: "Text-back", icon: MessageSquareText, href: "/dashboard/text-back" },
   { key: "customers", label: "Customers", icon: Users, href: "/dashboard/customers" },
-  { key: "videos", label: "Videos", icon: Video, href: "/dashboard/videos", soon: true },
+  { key: "videos", label: "Videos", icon: Video, href: "/dashboard/videos" },
   { key: "settings", label: "Settings", icon: Settings, href: "/dashboard/settings" },
 ];
 
@@ -39,12 +39,11 @@ export function AppShell({ active, email, children }: { active: Section; email?:
                     aria-current={item.key === active ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm",
-                      item.key === active ? "bg-white/12 font-semibold" : "text-white/80 hover:text-white",
+                      item.key === active ? "bg-night-deep font-semibold" : "text-on-night-muted hover:text-white",
                     )}
                   >
                     <item.icon size={15} aria-hidden="true" />
                     {item.label}
-                    {item.soon ? <span className="rounded-full border border-on-night-line px-1.5 text-[11px] leading-4 text-on-night-muted">preview</span> : null}
                   </Link>
                 </li>
               ))}
@@ -54,7 +53,7 @@ export function AppShell({ active, email, children }: { active: Section; email?:
             <span className="flex size-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-night" title={email}>
               {initials}
             </span>
-            <button type="submit" className="flex items-center gap-1.5 rounded-md text-sm text-white/80 hover:text-white">
+            <button type="submit" className="flex items-center gap-1.5 rounded-md text-sm text-on-night-muted hover:text-white">
               <LogOut size={16} aria-hidden="true" />
               <span className="sr-only md:not-sr-only">Sign out</span>
             </button>
@@ -73,7 +72,7 @@ export function AppShell({ active, email, children }: { active: Section; email?:
                   aria-current={item.key === active ? "page" : undefined}
                   className={cn(
                     "-mt-px flex flex-col items-center gap-1 border-t-2 py-2.5 text-sm",
-                    item.key === active ? "border-night bg-night/[0.06] font-semibold text-night" : "border-transparent text-muted-foreground",
+                    item.key === active ? "border-night bg-surface font-semibold text-night" : "border-transparent text-muted-foreground",
                   )}
                 >
                   <item.icon size={20} aria-hidden="true" />

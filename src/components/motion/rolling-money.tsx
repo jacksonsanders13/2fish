@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { useInView } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { RollingNumber } from "@/components/ui/rolling-number";
 import { money } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -14,17 +13,14 @@ const tones: Record<Tone, string> = {
   white: "text-white",
 };
 
-// A dollar figure that rolls up on a spring the first time it's seen.
-// Cult UI's RollingNumber does the rolling; this just adds the money format,
-// the tone rules (green only for gains) and the "start when visible" part.
+// A dollar figure that rolls when it changes, say after a job gets logged.
+// It shows the real amount from the first paint (never a $0 placeholder while
+// JavaScript loads) and doesn't roll at all under Reduce Motion.
 export function RollingMoney({ amount, tone = "cash", className }: { amount: number; tone?: Tone; className?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-10% 0px" });
-  const value = inView ? amount : 0;
-
+  const reduce = useReducedMotion();
   return (
-    <span ref={ref} className={cn("num inline-block", tones[tone], className)}>
-      <RollingNumber value={value} format={money} />
+    <span className={cn("num inline-block", tones[tone], className)}>
+      {reduce ? money(amount) : <RollingNumber value={amount} format={money} />}
     </span>
   );
 }
