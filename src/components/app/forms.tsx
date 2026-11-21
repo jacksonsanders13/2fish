@@ -39,8 +39,12 @@ export function Notice({ tone = "info", children }: { tone?: "info" | "error" | 
     <p
       role={tone === "error" ? "alert" : "status"}
       className={cn(
-        "rounded-md border px-3 py-2 text-sm",
-        tone === "error" ? "border-destructive/40 text-destructive" : tone === "success" ? "border-night text-ink" : "border-line bg-surface",
+        "text-sm",
+        tone === "error"
+          ? "border-l-4 border-destructive py-1 pl-3 text-destructive"
+          : tone === "success"
+            ? "border-l-4 border-night py-1 pl-3 text-ink"
+            : "rounded-md bg-surface px-3 py-2",
       )}
     >
       {children}

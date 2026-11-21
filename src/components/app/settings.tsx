@@ -16,7 +16,7 @@ export function SettingsView({ email, business }: { email: string; business: Bus
     <>
       <Reveal immediate y={16}>
         <h1 className="text-display font-bold">Settings</h1>
-        <p className="mt-2">Your business, your account, your data.</p>
+        <p className="mt-2">Change your business details or password, download what 2fish knows, or close your account.</p>
       </Reveal>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -34,17 +34,17 @@ export function SettingsView({ email, business }: { email: string; business: Bus
 
         <Reveal delay={0.2}>
           <Card title="Plan" sub="Free while we build. Pro turns on the steps that do the work.">
-            <dl className="divide-y divide-line text-sm">
-              <div className="flex items-center justify-between py-3">
+            <dl className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
                 <dt className="font-semibold">Current plan</dt>
                 <dd>Free</dd>
               </div>
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between">
                 <dt className="font-semibold">Pro</dt>
                 <dd className="text-muted-foreground">Coming soon</dd>
               </div>
             </dl>
-            <p className="mt-2 text-sm text-muted-foreground">Billing opens when the first paid step is ready. Nothing to do now.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Billing opens when the first paid step is ready. Nothing to do now.</p>
           </Card>
         </Reveal>
 

@@ -35,11 +35,14 @@ export function VideosScreen({ email }: { email?: string }) {
       <PageBody>
         <Reveal immediate y={16}>
           <header className="max-w-2xl">
-            <p className="text-sm text-muted-foreground">Plan · Preview</p>
-            <h1 className="mt-1 text-display font-semibold">Post 7 short videos a week</h1>
+            <h1 className="text-display font-semibold">Post 7 short videos a week</h1>
             <p className="mt-3">
               Upload the clips you already shoot on jobs. 2fish cuts them into vertical videos with captions, one
               for each day, and posts them on a schedule.
+            </p>
+            <p className="mt-4 rounded-md bg-night px-4 py-3 text-sm text-white">
+              <strong>Coming soon.</strong> This is what it will look like, using sample clips from a made-up power
+              washing company. Nothing here touches your account yet.
             </p>
           </header>
         </Reveal>
@@ -63,8 +66,8 @@ export function VideosScreen({ email }: { email?: string }) {
                 </Button>
               </div>
               <aside className="rounded-lg border border-line bg-white p-5">
-                <h2 className="font-semibold">Tuesday&apos;s clips</h2>
-                <p className="text-sm text-muted-foreground">Uploaded from your phone at 4:52 PM</p>
+                <h2 className="font-semibold">Sample clips</h2>
+                <p className="text-sm text-muted-foreground">What a Tuesday upload from your phone looks like</p>
                 <ul className="mt-3 divide-y divide-line">
                   {uploadedClips.map((c, i) => (
                     <Reveal as="li" key={c.name} delay={i * 0.05} y={6} className="flex items-center justify-between py-2 text-sm">

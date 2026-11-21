@@ -103,26 +103,30 @@ export function CustomersView({ customers, jobs }: { customers: Customer[]; jobs
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-semibold">{c.name || "No name"}</p>
-                        <p className="num text-sm text-muted-foreground">
-                          {c.phone ? formatPhone(c.phone) : "No phone"}
-                          {c.email ? ` · ${c.email}` : ""}
-                        </p>
+                        <p className="num text-sm text-muted-foreground">{c.phone ? formatPhone(c.phone) : "No phone"}</p>
+                        {c.email ? <p className="text-sm text-muted-foreground">{c.email}</p> : null}
                         <p className="text-sm text-muted-foreground">
-                          {c.lastJobAt ? `Last job ${new Date(c.lastJobAt + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : "No job logged"}
+                          {c.lastJobAt
+                            ? `Last job ${new Date(c.lastJobAt + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                            : "No job logged"}
                           {c.lastJobValue ? (
                             <>
-                              {" · "}
+                              {" for "}
                               <Money amount={c.lastJobValue} tone="ink" />
                             </>
                           ) : null}
-                          {jobsByCustomer.get(c.id) ? (
-                            <>
-                              {" · "}
-                              <Money amount={jobsByCustomer.get(c.id)!} /> won
-                            </>
-                          ) : null}
-                          {c.smsConsent ? " · OK to text" : ""}
                         </p>
+                        {jobsByCustomer.get(c.id) || c.smsConsent ? (
+                          <p className="text-sm text-muted-foreground">
+                            {jobsByCustomer.get(c.id) ? (
+                              <>
+                                <Money amount={jobsByCustomer.get(c.id)!} /> won through 2fish
+                                {c.smsConsent ? ". " : ""}
+                              </>
+                            ) : null}
+                            {c.smsConsent ? "OK to text" : ""}
+                          </p>
+                        ) : null}
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => setLogFor(logFor === c.id ? null : c.id)}>
@@ -134,7 +138,7 @@ export function CustomersView({ customers, jobs }: { customers: Customer[]; jobs
                       </div>
                     </div>
                     {logFor === c.id ? (
-                      <div className="mt-4 rounded-md border border-line bg-surface p-4">
+                      <div className="mt-4">
                         <LogJobForm customers={[c]} defaultCustomerId={c.id} defaultSource="other" onDone={() => setLogFor(null)} />
                       </div>
                     ) : null}

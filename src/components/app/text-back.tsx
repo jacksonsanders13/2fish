@@ -52,8 +52,7 @@ export function TextBackView({
     <>
       <Reveal immediate y={16}>
         <header className="max-w-2xl">
-          <p className="text-sm text-muted-foreground">Your plan</p>
-          <h1 className="mt-1 text-display font-bold">Text back every missed call</h1>
+          <h1 className="text-display font-bold">Text back every missed call</h1>
           <p className="mt-3">
             When you can&apos;t pick up, the caller gets a text within seconds. Replies land here. Log the jobs you
             win from it and they count toward recovered.
@@ -66,8 +65,8 @@ export function TextBackView({
           <Notice tone="success">Texting is connected. Messages go out for real within your texting hours.</Notice>
         ) : (
           <Notice>
-            Texting isn&apos;t connected to a phone line yet. Everything here works, but texts are saved as
-            &quot;queued&quot; instead of sent. Connecting Twilio turns them on.
+            Texting isn&apos;t connected to a phone line yet. You can set everything up now. Texts wait here
+            and start going out once your line is connected.
           </Notice>
         )}
       </Reveal>
@@ -77,7 +76,7 @@ export function TextBackView({
           <Reveal immediate delay={0.15}>
             <MinimalCard className="rounded-lg bg-white p-0 shadow-none hover:bg-white">
               <MinimalCardContent className="p-0">
-                <div className="flex items-center justify-between gap-4 border-b border-line p-5">
+                <div className="flex items-center justify-between gap-4 p-5 pb-0">
                   <div>
                     <h2 className="font-bold">Setup</h2>
                     <p className="text-sm text-muted-foreground">{enabled ? "On. Missed calls get a text." : "Off. Nothing is sent."}</p>
@@ -90,7 +89,7 @@ export function TextBackView({
                 <div className="p-5">
                   <SettingsForm business={business} settings={settings} onSaved={(t) => setNotice({ tone: "success", text: t })} />
                 </div>
-                <p className="flex gap-2 border-t border-line p-5 text-sm">
+                <p className="flex gap-2 px-5 pb-5 text-sm text-muted-foreground">
                   <ShieldCheck size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
                   Only people who called you get a text. Replies to STOP and HELP are handled automatically once texting is connected.
                 </p>
@@ -299,7 +298,7 @@ function Thread({ conversation }: { conversation: Conversation }) {
         </Button>
       </div>
       {showJob ? (
-        <div className="mt-3 rounded-md border border-line bg-surface p-3">
+        <div className="mt-3">
           <LogJobForm
             compact
             customers={conversation.customerId ? [{ id: conversation.customerId, name: conversation.customerName ?? "", phone: conversation.phone }] : []}
@@ -334,7 +333,7 @@ function Bubble({ direction, body, status, at }: { direction: string; body: stri
     return (
       <li className="flex items-center justify-center gap-1.5 py-1 text-sm text-muted-foreground">
         <PhoneMissed size={14} aria-hidden="true" />
-        Missed call <span className="num">· {short(at)}</span>
+        Missed call at <span className="num">{short(at)}</span>
       </li>
     );
   }
@@ -350,11 +349,19 @@ function Bubble({ direction, body, status, at }: { direction: string; body: stri
         </SpeechBubbleRoot>
         <p className="num mt-1 text-sm text-muted-foreground">
           {short(at)}
-          {mine && status !== "sent" && status !== "delivered" ? ` · ${status}` : ""}
+          {mine && status !== "sent" && status !== "delivered" ? `, ${statusLabel(status)}` : ""}
         </p>
       </div>
     </li>
   );
+}
+
+// Owners see plain words, not the texting service's status codes.
+function statusLabel(status: string) {
+  // Queued covers both "no phone line yet" and "outside texting hours".
+  if (status === "queued") return "waiting to send";
+  if (status === "failed") return "didn't go through";
+  return status;
 }
 
 function short(iso: string) {

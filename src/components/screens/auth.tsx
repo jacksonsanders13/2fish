@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
-import { TextAnimate } from "@/components/ui/text-animate";
 import { signInWithPassword, signUpWithPassword, stashAnswers } from "@/lib/plan/actions";
 import { readAnswers } from "@/lib/plan/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -40,7 +39,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
   const [sent, setSent] = useState(false);
   const [pending, start] = useTransition();
 
-  const title = signup ? "Save your plan." : "Welcome back.";
+  const title = signup ? "Save your plan" : "Welcome back";
   const passwordOk = password.length >= 8 && /\d/.test(password);
 
   function submit(e: React.FormEvent) {
@@ -95,14 +94,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
 
       <main className="flex-1">
         <Container className="max-w-md py-10 sm:py-16">
-          <div
-            role="heading"
-            aria-level={1}
-            aria-label={title}
-            className="[&>h2]:m-0 [&>h2]:p-0 [&>h2]:text-display [&>h2]:font-display [&>h2]:font-normal [&>h2]:text-ink"
-          >
-            <TextAnimate text={title} type="whipIn" />
-          </div>
+          <h1 className="rise text-display text-ink">{title}</h1>
           <Reveal immediate delay={0.3}>
             <p className="mt-4">
               {signup
