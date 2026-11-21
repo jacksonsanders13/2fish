@@ -116,7 +116,7 @@ function BusinessForm({ business }: { business: Business }) {
         <Input id="b-phone" type="tel" inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
       </Field>
       {msg ? <Notice tone={msg.tone}>{msg.text}</Notice> : null}
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" variant="signal" disabled={pending}>
         {pending ? "Saving…" : "Save"}
       </Button>
     </form>
@@ -172,7 +172,13 @@ function DeleteForm() {
       <p className="text-sm text-muted-foreground">Removes your account, plan, customers, jobs and messages for good. Type DELETE to confirm.</p>
       <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="DELETE" aria-label="Type DELETE to confirm" className="max-w-xs" />
       {error ? <Notice tone="error">{error}</Notice> : null}
-      <Button type="submit" variant="destructive" disabled={pending || confirm !== "DELETE"}>
+      {/* Outlined, so a solid coral button always means "go" and never gets mistaken for this one. */}
+      <Button
+        type="submit"
+        variant="outline"
+        disabled={pending || confirm !== "DELETE"}
+        className="border-destructive text-destructive hover:bg-destructive hover:text-white"
+      >
         {pending ? "Deleting…" : "Delete my account"}
       </Button>
     </form>

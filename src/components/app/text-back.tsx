@@ -33,6 +33,8 @@ export function TextBackView({
   const [pending, start] = useTransition();
   const [notice, setNotice] = useState<{ tone: "error" | "success" | "info"; text: string } | null>(null);
   const selected = conversations.find((c) => c.phone === selectedPhone) ?? conversations[0] ?? null;
+  // A conversation whose last message came from the customer is waiting on the owner.
+  const waiting = conversations.filter((c) => c.last.direction === "in").length;
 
   function toggle(v: boolean) {
     setEnabled(v);
@@ -113,7 +115,10 @@ export function TextBackView({
 
         <Reveal immediate delay={0.25} x={24} y={0} className="min-w-0">
           <h2 className="font-bold">Inbox</h2>
-          <p className="text-sm text-muted-foreground">{conversations.length === 0 ? "No conversations yet." : `${conversations.length} ${conversations.length === 1 ? "conversation" : "conversations"}`}</p>
+          <p className="text-sm text-muted-foreground">
+            {conversations.length === 0 ? "No conversations yet." : `${conversations.length} ${conversations.length === 1 ? "conversation" : "conversations"}`}
+            {waiting > 0 ? <span className="font-semibold text-signal">{`, ${waiting} waiting on your reply`}</span> : null}
+          </p>
           <MinimalCard className="mt-3 rounded-lg bg-white p-0 shadow-none hover:bg-white">
             <MinimalCardContent className="p-0">
               {conversations.length > 0 ? (
@@ -129,7 +134,10 @@ export function TextBackView({
                           <span className="block font-semibold">{c.customerName || formatPhone(c.phone)}</span>
                           <span className="block truncate text-muted-foreground">{c.last.direction === "missed-call" ? "Missed call" : c.last.body}</span>
                         </span>
-                        <span className="num shrink-0 text-muted-foreground">{short(c.last.createdAt)}</span>
+                        <span className="shrink-0 text-right">
+                          <span className="num block text-muted-foreground">{short(c.last.createdAt)}</span>
+                          {c.last.direction === "in" ? <span className="block font-semibold text-signal">Your turn</span> : null}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -241,7 +249,7 @@ function MissedCallForm({ onDone }: { onDone: (t: string) => void }) {
       <Field label="Name, if you know it" htmlFor="mc-name">
         <Input id="mc-name" value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" variant="signal" disabled={pending}>
         <PhoneMissed aria-hidden="true" />
         {pending ? "Logging…" : "Log it"}
       </Button>
@@ -279,7 +287,13 @@ function Thread({ conversation }: { conversation: Conversation }) {
           <p className="font-semibold">{conversation.customerName || "Unknown caller"}</p>
           <p className="num text-sm text-muted-foreground">{formatPhone(conversation.phone)}</p>
         </div>
-        <Button size="sm" variant="outline" onClick={() => setShowJob((v) => !v)}>
+        <Button
+          size="sm"
+          variant="outline"
+          aria-expanded={showJob}
+          onClick={() => setShowJob((v) => !v)}
+          className="border-signal text-signal hover:bg-signal hover:text-white"
+        >
           <CircleCheck aria-hidden="true" />
           Won the job
         </Button>
@@ -302,7 +316,7 @@ function Thread({ conversation }: { conversation: Conversation }) {
       </ol>
       <form onSubmit={submit} className="mt-4 flex gap-2">
         <Input value={body} onChange={(e) => setBody(e.target.value)} placeholder="Reply…" maxLength={640} aria-label="Reply" />
-        <Button type="submit" disabled={pending || !body.trim()} aria-label="Send">
+        <Button type="submit" variant="signal" disabled={pending || !body.trim()} aria-label="Send">
           <Send aria-hidden="true" />
         </Button>
       </form>

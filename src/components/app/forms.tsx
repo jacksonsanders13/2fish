@@ -132,7 +132,7 @@ export function LogJobForm({
         <Input id="job-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} />
       </Field>
       {msg ? <Notice tone={msg.tone}>{msg.text}</Notice> : null}
-      <Button type="submit" disabled={pending} className={compact ? "w-full" : undefined}>
+      <Button type="submit" variant="signal" disabled={pending} className={compact ? "w-full" : undefined}>
         {pending ? "Saving…" : "Log this job"}
       </Button>
     </form>

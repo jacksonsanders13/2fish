@@ -64,7 +64,7 @@ export function CustomersView({ customers, jobs }: { customers: Customer[]; jobs
             <Upload aria-hidden="true" />
             Import CSV
           </Button>
-          <Button onClick={() => setShowAdd((v) => !v)}>
+          <Button variant="signal" aria-expanded={showAdd} onClick={() => setShowAdd((v) => !v)}>
             <Plus aria-hidden="true" />
             Add customer
           </Button>
@@ -198,7 +198,7 @@ function AddCustomerForm({ onDone }: { onDone: () => void }) {
       </div>
       {error ? <Notice tone="error">{error}</Notice> : null}
       <div className="flex gap-2">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" variant="signal" disabled={pending}>
           {pending ? "Saving…" : "Save customer"}
         </Button>
         <Button type="button" variant="ghost" onClick={onDone}>
