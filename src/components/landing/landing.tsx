@@ -54,13 +54,15 @@ export function Landing() {
                 <FunnelMap className="mt-10" />
               </Reveal>
             </div>
+            {/* The Cult UI window sets its content row to h-0 for fixed-height use. We size it to the
+                dashboard instead, so that row has to grow too or it spills over the next section on phones. */}
             <Reveal immediate delay={0.75} y={48} duration={0.9} className="min-w-0 rounded-md bg-night p-3 sm:p-6">
               <BrowserWindow
                 variant="generic"
                 headerStyle="minimal"
                 theme="light"
                 url="app.join2fish.com/dashboard"
-                className="h-auto! w-full max-w-none! rounded-md! border-line mask-none! shadow-none!"
+                className="h-auto! w-full max-w-none! rounded-md! border-line mask-none! shadow-none! [&>div:last-child]:h-auto"
               >
                 <DashboardPreview chrome="light" />
               </BrowserWindow>
