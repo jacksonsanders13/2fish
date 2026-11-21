@@ -9,7 +9,6 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
-import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { signInWithPassword, signUpWithPassword, stashAnswers } from "@/lib/plan/actions";
 import { readAnswers } from "@/lib/plan/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -86,7 +85,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
             <Logo />
           </Link>
           <span className="text-sm font-semibold">{signup ? "Create account" : "Sign in"}</span>
-          <Link href={signup ? "/results" : "/audit"} className="text-sm text-white/85 underline underline-offset-2">
+          <Link href={signup ? "/results" : "/audit"} className="text-sm text-white underline underline-offset-2">
             {signup ? "Results" : "Free audit"}
           </Link>
         </Container>
@@ -104,12 +103,11 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
           </Reveal>
 
           <Reveal immediate delay={0.45} y={24}>
-            <MinimalCard className="mt-8 rounded-lg bg-white p-0 shadow-none hover:bg-white">
-              <MinimalCardContent className="p-5 sm:p-6">
+            <div className="mt-8 rounded-lg bg-white p-5 sm:p-6">
                 {sent ? (
                   <div>
                     <MailCheck size={28} aria-hidden="true" className="text-night" />
-                    <h2 className="mt-3 font-bold">Check your email.</h2>
+                    <h2 className="mt-3 font-semibold">Check your email</h2>
                     <p className="mt-2 text-sm">
                       We sent a confirmation link to {email}. Tap it and your plan will be waiting on your dashboard.
                     </p>
@@ -126,7 +124,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
                           key={p.id}
                           type="button"
                           variant="outline"
-                          className="h-11 justify-start gap-3 text-base font-medium"
+                          className="h-11 justify-start gap-3 text-base font-normal"
                           disabled={pending}
                           onClick={() => social(p.id)}
                         >
@@ -196,15 +194,14 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
                         </p>
                       ) : null}
 
-                      <Button type="submit" size="lg" className="h-12 w-full" disabled={pending || (signup && !passwordOk)}>
+                      <Button type="submit" size="lg" variant="signal" className="h-12 w-full" disabled={pending || (signup && !passwordOk)}>
                         {pending ? "One moment…" : signup ? "Create account and save my plan" : "Sign in"}
                         <ArrowRight aria-hidden="true" />
                       </Button>
                     </form>
                   </>
                 )}
-              </MinimalCardContent>
-            </MinimalCard>
+            </div>
           </Reveal>
 
           <Reveal immediate delay={0.6}>

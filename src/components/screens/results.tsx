@@ -10,7 +10,6 @@ import { Reveal } from "@/components/motion/reveal";
 import { RollingMoney } from "@/components/motion/rolling-money";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { Money } from "@/components/ui/money";
 import { sampleAnswers } from "@/lib/data";
 import { savePlan } from "@/lib/plan/actions";
@@ -43,7 +42,12 @@ export function ResultsScreen() {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const est = useMemo(() => (answers ? estimate(answers) : null), [answers]);
-  if (!answers || !est) return <div className="min-h-dvh bg-white" aria-busy="true" />;
+  if (!answers || !est)
+    return (
+      <div className="min-h-dvh bg-white" aria-busy="true">
+        <Container className="py-16 text-muted-foreground">Working out your numbers…</Container>
+      </div>
+    );
 
   const biggest = est.leaks[0].perMonth;
   const saved = () => {
@@ -59,7 +63,7 @@ export function ResultsScreen() {
             <Logo />
           </Link>
           <span className="text-sm font-semibold">Your results</span>
-          <Link href="/audit" className="text-sm text-white/85 underline underline-offset-2">
+          <Link href="/audit" className="text-sm text-white underline underline-offset-2">
             Change answers
           </Link>
         </Container>
@@ -70,11 +74,8 @@ export function ResultsScreen() {
           <Container className="py-12 sm:py-16">
             <div className="max-w-3xl">
               <Reveal immediate y={16}>
-                <p className="text-sm font-semibold">
-                  {sample ? "Sample results for a Raleigh power washing company" : `Audit results · ${est.facts.kind}`}
-                </p>
-                <h1 className="mt-3 text-display font-semibold">
-                  You&apos;re losing about <RollingMoney amount={est.totalMonthly} tone="ink" /> a month.
+                <h1 className="text-display font-semibold">
+                  You&apos;re losing about <RollingMoney amount={est.totalMonthly} tone="ink" /> a month
                 </h1>
               </Reveal>
               <Reveal immediate delay={0.2}>
@@ -83,6 +84,12 @@ export function ResultsScreen() {
                   year. Here&apos;s where it goes, biggest leak first. These are estimates from your answers, not
                   promises.
                 </p>
+                {sample ? (
+                  <p className="mt-3 max-w-xl text-sm text-muted-foreground">
+                    You haven&apos;t taken the audit yet, so these are sample results for a Raleigh power washing
+                    company.
+                  </p>
+                ) : null}
               </Reveal>
               <Reveal immediate delay={0.35} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} />
@@ -137,11 +144,10 @@ export function ResultsScreen() {
 
             <aside>
               <Reveal delay={0.15} y={40} className="lg:sticky lg:top-6">
-                <MinimalCard className="rounded-lg bg-white p-0 shadow-none hover:bg-white">
-                  <MinimalCardContent className="p-5 sm:p-6">
+                <div className="rounded-lg bg-surface p-5 sm:p-6">
                     <h2 className="font-semibold">The plan to get it back</h2>
-                    <p className="mt-1 text-sm">Ranked by dollars. 2fish does each step. You approve.</p>
-                    <ol className="mt-5 divide-y divide-line">
+                    <p className="mt-1 text-sm">Ranked by dollars. 2fish does each step after you approve it.</p>
+                    <ol className="mt-4">
                       {est.steps.map((step, i) => (
                         <Reveal
                           as="li"
@@ -159,8 +165,7 @@ export function ResultsScreen() {
                     <div className="mt-5">
                       <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} full />
                     </div>
-                  </MinimalCardContent>
-                </MinimalCard>
+                </div>
               </Reveal>
             </aside>
           </Container>
@@ -171,7 +176,7 @@ export function ResultsScreen() {
 }
 
 // "Save this plan". Signed in: saves straight away. Signed out: go to the
-// sign-up page, which emails a magic link and finishes the save on return.
+// sign-up page, which creates the account and saves the plan in one go.
 function SavePlan({
   answers,
   signedIn,
@@ -190,6 +195,7 @@ function SavePlan({
     return (
       <Button
         size="lg"
+        variant="signal"
         className={size}
         disabled={pending}
         onClick={() =>
@@ -206,7 +212,7 @@ function SavePlan({
   }
 
   return (
-    <Button asChild size="lg" className={size}>
+    <Button asChild size="lg" variant="signal" className={size}>
       <Link href="/signup">
         Save this plan
         <ArrowRight aria-hidden="true" />

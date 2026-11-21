@@ -73,7 +73,7 @@ export function AuditScreen() {
             <Logo />
           </Link>
           <span className="text-sm font-semibold">Free audit</span>
-          <Link href="/results" className="text-sm text-white/85 underline underline-offset-2">
+          <Link href="/results" className="text-sm text-white underline underline-offset-2">
             See sample results
           </Link>
         </Container>
