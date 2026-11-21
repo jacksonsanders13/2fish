@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const nextParam = url.searchParams.get("next") ?? "/dashboard";
-  const next = nextParam.startsWith("/") ? nextParam : "/dashboard";
+  // Only same-site paths. "//evil.com" or "/\evil.com" would bounce people to another site.
+  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") && !nextParam.startsWith("/\\") ? nextParam : "/dashboard";
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=missing", url.origin));

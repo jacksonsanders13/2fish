@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { limitMessage, takeQuota } from "@/lib/app/limits";
 import { ensureBusiness } from "@/lib/app/queries";
 import { getOrCreateConversation } from "@/lib/agent/store";
 import { runAgentTurn, type StreamEvent } from "@/lib/agent/run";
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Sign in first." }, { status: 401 });
   }
   const { supabase, user, business } = ctx;
+  if (!(await takeQuota(supabase, "chat"))) return NextResponse.json({ error: limitMessage.chat }, { status: 429 });
   const { conversationId, history } = await getOrCreateConversation(supabase, user.id, business.id);
 
   const encoder = new TextEncoder();

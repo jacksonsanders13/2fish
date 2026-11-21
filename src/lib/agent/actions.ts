@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { limitMessage, takeQuota } from "@/lib/app/limits";
 import { ensureBusiness } from "@/lib/app/queries";
 import { sendSms } from "@/lib/integrations/sms";
 
@@ -14,6 +15,8 @@ export async function approveText(taskId: string): Promise<Result> {
   if (!task || task.status !== "waiting_on_owner") return { ok: false, message: "That draft is gone or already handled." };
   const p = task.payload as { phone: string; body: string; name?: string; purpose?: string };
 
+  // Checked before sending; the draft stays waiting so it can go out tomorrow.
+  if (!(await takeQuota(supabase, "text"))) return { ok: false, message: limitMessage.text };
   const result = await sendSms(p.phone, p.body);
   await supabase.from("messages").insert({
     business_id: business.id,

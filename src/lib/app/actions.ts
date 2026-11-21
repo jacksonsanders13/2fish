@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sendSms, smsConfigured, withinHours } from "@/lib/integrations/sms";
 import { passwordSchema } from "@/lib/plan/schema";
+import { limitMessage, takeQuota } from "./limits";
 import { ensureBusiness } from "./queries";
 import { BUSINESS_KINDS, defaultTemplate, normalizePhone } from "./types";
 
@@ -224,6 +225,12 @@ export async function logMissedCall(input: { phone: string; name?: string }): Pr
       return { ok: true, message: "Logged. Turn text-back on to send the first message automatically." };
     }
 
+    if (!(await takeQuota(supabase, "text"))) {
+      await logEvent(business.id, user.id, "call", `Missed call from ${phone} logged. Daily text limit reached, so nothing was sent.`);
+      refresh();
+      return { ok: true, message: `Logged. ${limitMessage.text}` };
+    }
+
     const body = s.data.template || defaultTemplate(business.name);
     const inHours = withinHours(s.data.hours_start, s.data.hours_end, business.timezone);
     const result = inHours ? await sendSms(phone, body) : { status: "queued" as const };
@@ -251,6 +258,7 @@ export async function sendReply(input: { phone: string; body: string }): Promise
     const phone = normalizePhone(z.string().min(7).parse(input.phone));
     const body = z.string().trim().min(1, "Type a message.").max(640).parse(input.body);
     const { supabase, user, business } = await ensureBusiness();
+    if (!(await takeQuota(supabase, "text"))) return { ok: false, message: limitMessage.text };
     const result = await sendSms(phone, body);
     const { error } = await supabase.from("messages").insert({
       business_id: business.id,
