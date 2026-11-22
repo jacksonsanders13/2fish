@@ -144,7 +144,7 @@ export const features = [
   },
   {
     title: "Posting for you",
-    body: "Approved posts go up on their own at the best time. Until then, you post them with one tap from your phone.",
+    body: "Approved posts go up on their own at the best time. Until then, each post comes ready to share from your phone.",
     when: "Coming after launch",
   },
   {

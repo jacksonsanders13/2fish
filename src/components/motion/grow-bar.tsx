@@ -1,14 +1,10 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { ease } from "./reveal";
 
-// A bar that grows to its width the first time it scrolls into view.
+// A simple bar filled to pct. It used to grow in with JavaScript, which left it
+// empty on slow phones until the page loaded, so now it's just drawn full.
+// delay and duration are still accepted so old callers don't break.
 export function GrowBar({
   pct,
-  delay = 0.2,
-  duration = 0.9,
   className,
   barClassName,
 }: {
@@ -18,16 +14,9 @@ export function GrowBar({
   className?: string;
   barClassName?: string;
 }) {
-  const reduce = useReducedMotion();
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-line", className)} aria-hidden="true">
-      <motion.div
-        className={cn("h-full rounded-full bg-night", barClassName)}
-        initial={{ width: reduce ? `${pct}%` : 0 }}
-        whileInView={{ width: `${pct}%` }}
-        viewport={{ once: true }}
-        transition={{ duration: reduce ? 0 : duration, ease, delay }}
-      />
+      <div className={cn("h-full rounded-full bg-night", barClassName)} style={{ width: `${pct}%` }} />
     </div>
   );
 }

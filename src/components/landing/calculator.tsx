@@ -71,7 +71,7 @@ export function PostsCalculator({ className }: { className?: string }) {
         </p>
       </div>
 
-      <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
+      <Button asChild size="lg" variant="signal" className="mt-5 w-full sm:w-auto">
         <Link href="/audit">
           Grade my store free
           <ArrowRight aria-hidden="true" />

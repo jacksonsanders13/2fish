@@ -179,7 +179,12 @@ const plans = [
     name: "Growth",
     price: 149,
     who: "The one we'd pick for most stores",
-    items: ["Everything in Starter", "Weekly posts on your Google profile", "A drafted reply to every review", "Weekly report on what sold"],
+    items: [
+      "Everything in Starter",
+      "Weekly report on what sold",
+      "Weekly posts on your Google profile (after launch)",
+      "A drafted reply to every review (after launch)",
+    ],
     pick: true,
   },
   {
