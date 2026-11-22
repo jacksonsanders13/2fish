@@ -92,7 +92,8 @@ export function AuditScreen() {
               key={q.id}
               initial={{ opacity: 0, x: slide * direction }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -slide * direction }}
+              // exits run 20% shorter than entrances
+              exit={{ opacity: 0, x: -slide * direction, transition: { duration: reduce ? 0 : 0.24, ease } }}
               transition={{ duration: reduce ? 0 : 0.3, ease }}
             >
               <p className="num text-sm font-semibold text-signal">
@@ -111,7 +112,7 @@ export function AuditScreen() {
                           key={o}
                           initial={reduce ? false : { opacity: 0, y: 16 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, ease, delay: 0.1 + i * 0.06 }}
+                          transition={{ duration: 0.3, ease, delay: 0.1 + i * 0.03 }}
                           whileTap={reduce ? undefined : { scale: 0.97 }}
                         >
                           <Button
@@ -127,9 +128,9 @@ export function AuditScreen() {
                             {o}
                             {selected ? (
                               <motion.span
-                                initial={reduce ? false : { scale: 0.4, opacity: 0 }}
+                                initial={reduce ? false : { scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 500, damping: 26 }}
+                                transition={{ duration: 0.15, ease }}
                                 className="inline-flex"
                               >
                                 <Check aria-hidden="true" />

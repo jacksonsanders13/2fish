@@ -17,7 +17,7 @@ export function CheckoutView({ checkouts, posts }: { checkouts: Checkout[]; post
   const [source, setSource] = useState<SourceId | null>(null);
   const [amount, setAmount] = useState("");
   const [postId, setPostId] = useState("");
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string; at: number } | null>(null);
 
   const fromPosts = checkouts.filter((c) => c.source === "post");
   const postTotal = fromPosts.reduce((s, c) => s + c.amount, 0);
@@ -25,10 +25,10 @@ export function CheckoutView({ checkouts, posts }: { checkouts: Checkout[]; post
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!source) return setMsg({ ok: false, text: "Tap how they heard about you first." });
+    if (!source) return setMsg({ ok: false, text: "Tap how they heard about you first.", at: Date.now() });
     start(async () => {
       const r = await logCheckout({ source, amount, postId: source === "post" && postId ? postId : null });
-      setMsg({ ok: r.ok, text: r.message ?? "" });
+      setMsg({ ok: r.ok, text: r.message ?? "", at: Date.now() });
       if (r.ok) {
         setSource(null);
         setAmount("");
@@ -108,8 +108,11 @@ export function CheckoutView({ checkouts, posts }: { checkouts: Checkout[]; post
           {pending ? "Saving…" : "Log this sale"}
         </Button>
         {msg ? (
-          <p role="status" className={cn("mt-3 text-sm", msg.ok ? "text-night" : "font-semibold text-destructive")}>
-            {msg.text}
+          <p role="status" className={cn("mt-3 text-sm", msg.ok ? "font-semibold text-night" : "font-semibold text-destructive")}>
+            {/* new key each save so the pulse replays */}
+            <span key={msg.at} className={msg.ok ? "confirm" : undefined}>
+              {msg.text}
+            </span>
           </p>
         ) : null}
       </form>
@@ -151,7 +154,7 @@ function CheckoutRow({ c }: { c: Checkout }) {
             router.refresh();
           })
         }
-        className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-ink focus-visible:outline-2 focus-visible:outline-signal"
+        className="flex size-10 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-ink focus-visible:outline-2 focus-visible:outline-signal"
       >
         <X size={14} aria-hidden="true" />
         <span className="sr-only">Remove this sale</span>

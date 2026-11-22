@@ -154,8 +154,19 @@
 .screen-in {
   animation: screen-in 0.35s ease-out both;
 }
+/* One small pulse to confirm something saved. Ease-out, no bounce. */
+@keyframes confirm {
+  40% {
+    transform: scale(1.04);
+  }
+}
+.confirm {
+  display: inline-block;
+  animation: confirm 0.3s ease-out;
+}
 @media (prefers-reduced-motion: reduce) {
-  .rise {
+  .rise,
+  .confirm {
     animation: none;
   }
 }

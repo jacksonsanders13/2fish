@@ -63,3 +63,34 @@ Added at Jackson's request on Nov 14, then made bolder the same day because the 
 - **Buttons.** 150ms colour transitions and a 2% press scale.
 
 Not allowed: looping decoration (the Live pulse is the one exception, and it's a status), cursor effects, parallax, anything much longer than a second per element.
+
+## UX laws (Jackson, Nov 22 2026)
+Check every screen against these. How they apply to 2fish:
+- **Hick's law:** few choices per screen. The checkout has 6 big buttons, no more.
+- **Fitts's law / minimize target distance:** tap targets 40px or bigger on phones. The main action sits near the thumb.
+- **Jakob's law:** use patterns owners already know (bottom tabs, Copy, Approve).
+- **Proximity, similarity, common region, uniform connectedness, Pragnanz:** group related things, keep look-alike things the same, keep layouts simple.
+- **Miller's law:** chunk lists (7 posts, 3 fixes, 3 setup steps).
+- **Doherty threshold:** answer every tap within 400ms ("Saving…", "Writing your posts…").
+- **Von Restorff:** one coral button per screen. Everything else is outline or ghost.
+- **Serial position:** the most-used items go first or last in lists and tabs.
+- **Peak-end rule:** make the moment of success clear (saved pulse, report ending).
+- **Zeigarnik effect:** show what's unfinished (Get set up, "3 of 7 approved").
+- **Tesler's law:** the agent takes the complexity (Square sync), not the owner.
+- **Postel's law:** accept messy input, give clean output.
+- **Parkinson's law:** keep tasks short (2-minute grader, one-tap approve).
+- **Occam's razor / Pareto:** cut anything that isn't doing work. Build the 20% that delivers 80%.
+
+## Motion rules (Jackson, Nov 22 2026)
+1. Ease-out for entrances. Ease-in-out for things moving on screen.
+2. Dropdowns and popovers: 150 to 250ms. Popovers start at scale 0.95.
+3. Stagger list rows by 30ms, as details settle.
+4. Buttons scale to 0.97 on press (in `button.tsx`). Don't tween while held.
+5. Make exits 20% shorter than entrances.
+6. No bounce or springs on everyday UI.
+7. Enter from the trigger, exit back to it.
+8. One small pulse to confirm success (`.confirm` in globals.css).
+9. Crossfade icon swaps. Overlap old and new states instead of a blank gap.
+10. When something expands, animate the same object (shared layout), not a disconnected replacement.
+11. Masks for reveals, arcs for objects that travel, a light stretch on dragged knobs, rubber band past scroll bounds. Use only when the screen calls for it.
+12. Everything has a reduced-motion fallback.

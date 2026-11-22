@@ -51,6 +51,7 @@ export type DashboardData = {
   stats: { textedBack: number; customers: number; conversations: number };
   events: AppEvent[];
   smsConfigured: boolean;
+  setup: { square: boolean; posts: boolean };
 };
 
 export async function getDashboard(smsConfigured: boolean): Promise<DashboardData> {
@@ -58,7 +59,7 @@ export async function getDashboard(smsConfigured: boolean): Promise<DashboardDat
   const planData = await loadLatestPlan();
   const since = monthStart();
 
-  const [jobsRes, allJobsRes, textedRes, customersRes, convRes, eventsRes] = await Promise.all([
+  const [jobsRes, allJobsRes, textedRes, customersRes, convRes, eventsRes, sqRes, postsRes] = await Promise.all([
     // Tracked sales = checkouts where the shopper said they saw a post.
     supabase.from("checkouts").select("value:amount").eq("business_id", business.id).eq("source", "post").gte("sold_on", since),
     supabase.from("checkouts").select("value:amount").eq("business_id", business.id).eq("source", "post"),
@@ -66,6 +67,8 @@ export async function getDashboard(smsConfigured: boolean): Promise<DashboardDat
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", business.id),
     supabase.from("messages").select("phone").eq("business_id", business.id),
     supabase.from("events").select("id, kind, text, created_at").eq("business_id", business.id).order("created_at", { ascending: false }).limit(8),
+    supabase.from("businesses").select("square_connected_at").eq("id", business.id).single(),
+    supabase.from("posts").select("id", { count: "exact", head: true }).eq("business_id", business.id).neq("status", "draft"),
   ]);
 
   const monthJobs = jobsRes.data ?? [];
@@ -85,6 +88,7 @@ export async function getDashboard(smsConfigured: boolean): Promise<DashboardDat
     },
     events: (eventsRes.data ?? []).map((e) => ({ id: e.id, kind: e.kind, text: e.text, createdAt: e.created_at })),
     smsConfigured,
+    setup: { square: Boolean(sqRes.data?.square_connected_at), posts: (postsRes.count ?? 0) > 0 },
   };
 }
 

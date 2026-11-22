@@ -110,7 +110,7 @@ export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; 
               className="mt-3 text-sm"
               placeholder={"Green wrap dress\nFall knit sweaters\nGold hoop earrings\nCandles, the fig one"}
             />
-            <Button variant="signal" className="mt-4 w-full" disabled={pending || Boolean(uploading)} onClick={make}>
+            <Button variant={posts.length ? "outline" : "signal"} className="mt-4 w-full" disabled={pending || Boolean(uploading)} onClick={make}>
               {pending ? "Writing your posts…" : posts.length ? "Write them again" : "Make my 7 posts"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
@@ -185,7 +185,7 @@ function RemoveUpload({ path }: { path: string }) {
           router.refresh();
         })
       }
-      className="absolute top-1 right-1 flex size-7 items-center justify-center rounded-full bg-white text-ink focus-visible:outline-2 focus-visible:outline-signal"
+      className="absolute top-1 right-1 flex size-9 items-center justify-center rounded-full bg-white text-ink focus-visible:outline-2 focus-visible:outline-signal"
     >
       <X size={14} aria-hidden="true" />
       <span className="sr-only">Remove</span>
@@ -237,7 +237,7 @@ function PostCard({ post }: { post: Post }) {
             {post.day} · {post.kind}
           </span>
           {post.status !== "draft" ? (
-            <span className="flex items-center gap-1 font-semibold text-night">
+            <span className="confirm flex items-center gap-1 font-semibold text-night">
               <Check size={14} aria-hidden="true" />
               {post.status === "posted" ? "Posted" : "Approved"}
             </span>
@@ -270,32 +270,32 @@ function PostCard({ post }: { post: Post }) {
         <div className="mt-auto flex flex-wrap gap-2 pt-4">
           {editing ? (
             <>
-              <Button size="sm" disabled={pending} onClick={save}>
+              <Button disabled={pending} onClick={save}>
                 Save
               </Button>
-              <Button size="sm" variant="ghost" disabled={pending} onClick={() => setEditing(false)}>
+              <Button variant="ghost" disabled={pending} onClick={() => setEditing(false)}>
                 Cancel
               </Button>
             </>
           ) : post.status === "draft" ? (
             <>
-              <Button size="sm" disabled={pending} onClick={() => status("approved")}>
+              <Button disabled={pending} onClick={() => status("approved")}>
                 <Check aria-hidden="true" />
                 Approve
               </Button>
-              <Button size="sm" variant="ghost" disabled={pending} onClick={() => setEditing(true)}>
+              <Button variant="ghost" disabled={pending} onClick={() => setEditing(true)}>
                 <Pencil aria-hidden="true" />
                 Edit
               </Button>
             </>
           ) : (
             <>
-              <Button size="sm" variant="outline" onClick={copy}>
+              <Button variant="outline" onClick={copy}>
                 <Copy aria-hidden="true" />
                 Copy caption
               </Button>
               {post.mediaUrl ? (
-                <Button size="sm" variant="outline" asChild>
+                <Button variant="outline" asChild>
                   <a href={post.mediaUrl} target="_blank" rel="noreferrer">
                     <Download aria-hidden="true" />
                     Save {post.isImage ? "photo" : "clip"}
@@ -303,11 +303,11 @@ function PostCard({ post }: { post: Post }) {
                 </Button>
               ) : null}
               {post.status === "approved" ? (
-                <Button size="sm" variant="ghost" disabled={pending} onClick={() => status("posted")}>
+                <Button variant="ghost" disabled={pending} onClick={() => status("posted")}>
                   Mark posted
                 </Button>
               ) : (
-                <Button size="sm" variant="ghost" disabled={pending} onClick={() => status("approved")}>
+                <Button variant="ghost" disabled={pending} onClick={() => status("approved")}>
                   Undo posted
                 </Button>
               )}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Check, Clock } from "lucide-react";
 import { RollingMoney } from "@/components/motion/rolling-money";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/ui/money";
@@ -34,6 +34,13 @@ export function Dashboard({
   const { business, plan, recovered } = data;
   const who = business.name || (business.kind && business.kind !== "Something else" ? business.kind : "Your business");
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
+
+  const setup = [
+    { label: "Grade your store", done: Boolean(plan), href: "/audit" },
+    { label: "Connect Square", done: data.setup.square, href: "/dashboard/settings" },
+    { label: "Approve your first week of posts", done: data.setup.posts, href: "/dashboard/videos" },
+  ];
+  const setupLeft = setup.filter((s) => !s.done);
 
   const suggestions = plan
     ? ["Walk me through my fixes", "Make this week's posts", "A shopper said they saw a post", "What's selling best?"]
@@ -79,6 +86,29 @@ export function Dashboard({
         />
 
         <aside className={cn("space-y-4", tab === "plan" ? "block" : "hidden lg:block")}>
+          {setupLeft.length ? (
+            <section className="rounded-lg border-t-4 border-signal bg-white p-4">
+              <h2 className="text-sm font-semibold text-night">
+                Get set up <span className="num font-normal text-muted-foreground">({3 - setupLeft.length} of 3 done)</span>
+              </h2>
+              <ol className="mt-2 space-y-1">
+                {setup.map((s) => (
+                  <li key={s.label} className="flex items-center gap-2 py-1 text-sm">
+                    {s.done ? <Check size={16} className="shrink-0 text-cash" aria-hidden="true" /> : <span className="size-4 shrink-0 rounded-full border-2 border-line" aria-hidden="true" />}
+                    {s.done ? (
+                      <span className="text-muted-foreground line-through">{s.label}</span>
+                    ) : (
+                      <Link href={s.href} className="font-semibold text-night underline underline-offset-2">
+                        {s.label}
+                      </Link>
+                    )}
+                    <span className="sr-only">{s.done ? "(done)" : "(to do)"}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+
           <section className="rounded-lg border-t-4 border-night bg-white p-4">
             <h2 className="text-sm font-semibold text-night">Your fixes</h2>
             {plan ? (
