@@ -59,8 +59,9 @@ export async function getDashboard(smsConfigured: boolean): Promise<DashboardDat
   const since = monthStart();
 
   const [jobsRes, allJobsRes, textedRes, customersRes, convRes, eventsRes] = await Promise.all([
-    supabase.from("jobs").select("value").eq("business_id", business.id).gte("won_at", since),
-    supabase.from("jobs").select("value").eq("business_id", business.id),
+    // Tracked sales = checkouts where the shopper said they saw a post.
+    supabase.from("checkouts").select("value:amount").eq("business_id", business.id).eq("source", "post").gte("sold_on", since),
+    supabase.from("checkouts").select("value:amount").eq("business_id", business.id).eq("source", "post"),
     supabase.from("messages").select("id", { count: "exact", head: true }).eq("business_id", business.id).eq("direction", "out"),
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", business.id),
     supabase.from("messages").select("phone").eq("business_id", business.id),

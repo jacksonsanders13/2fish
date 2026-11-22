@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // Daily caps so a fake account can't run up the Claude or Twilio bill.
 // The real numbers live in the use_quota() database function (50 chats, 30 texts);
 // these are only for the messages owners see.
-export const DAILY_LIMITS = { chat: 50, text: 30 } as const;
+export const DAILY_LIMITS = { chat: 50, text: 30, pack: 5 } as const;
 
 /** Counts one use and says whether the owner is still under today's cap. Fails closed. */
 export async function takeQuota(supabase: SupabaseClient, kind: keyof typeof DAILY_LIMITS): Promise<boolean> {
@@ -14,4 +14,5 @@ export async function takeQuota(supabase: SupabaseClient, kind: keyof typeof DAI
 export const limitMessage = {
   chat: `That's ${DAILY_LIMITS.chat} messages today, the daily limit. Your consultant is back tomorrow.`,
   text: `That's ${DAILY_LIMITS.text} texts today, the daily limit. Sending opens again tomorrow.`,
+  pack: `That's ${DAILY_LIMITS.pack} weekly packs made today, the daily limit. Try again tomorrow.`,
 };

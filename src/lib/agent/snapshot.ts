@@ -47,7 +47,7 @@ export async function buildSnapshot(
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase.from("jobs").select("value").eq("business_id", business.id).gte("won_at", monthStart),
+    supabase.from("checkouts").select("value:amount").eq("business_id", business.id).eq("source", "post").gte("sold_on", monthStart),
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", business.id),
     supabase.from("textback_settings").select("*").eq("business_id", business.id).maybeSingle(),
     supabase
@@ -126,7 +126,7 @@ export function describeSnapshot(s: Snapshot) {
     lines.push("Plan: none yet. The owner has not finished the Store Grader.");
   }
   if (s.audit) lines.push(`Store Grader answers: ${Object.entries(s.audit).map(([k, v]) => `${k}=${v}`).join(", ")}.`);
-  lines.push(`Tracked sales this month: $${s.recovered.month.toLocaleString()} from ${s.recovered.monthJobs} logged sales. Customers on file: ${s.customers}.`);
+  lines.push(`Tracked sales this month: $${s.recovered.month.toLocaleString()} from ${s.recovered.monthJobs} shoppers who said they saw a post. Customers on file: ${s.customers}.`);
   lines.push(
     s.textback
       ? `Text-back: ${s.textback.enabled ? "ON" : "OFF"}, hours ${s.textback.hoursStart}:00 to ${s.textback.hoursEnd}:00, first message: "${s.textback.template}".`

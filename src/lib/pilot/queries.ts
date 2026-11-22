@@ -1,0 +1,140 @@
+import { ensureBusiness } from "@/lib/app/queries";
+import { addDays, mondayOf, packWeek, todayIn } from "./dates";
+import { looksLikeImage, type Checkout, type ItemSale, type Post, type SourceId, type Upload, type WeekSales } from "./types";
+
+type Supa = Awaited<ReturnType<typeof ensureBusiness>>["supabase"];
+
+export function uploadFolder(ownerId: string, weekOf: string) {
+  return `${ownerId}/pack/${weekOf}`;
+}
+
+async function signed(supabase: Supa, paths: string[]) {
+  const map = new Map<string, string>();
+  if (!paths.length) return map;
+  const { data } = await supabase.storage.from("clips").createSignedUrls(paths, 60 * 60);
+  for (const row of data ?? []) if (row.path && row.signedUrl) map.set(row.path, row.signedUrl);
+  return map;
+}
+
+function mapPost(r: Record<string, unknown>, urls: Map<string, string>): Post {
+  const path = (r.media_path as string | null) ?? null;
+  return {
+    id: String(r.id),
+    weekOf: String(r.week_of),
+    position: Number(r.position),
+    day: String(r.day ?? ""),
+    kind: String(r.kind ?? ""),
+    title: String(r.title ?? ""),
+    hook: String(r.hook ?? ""),
+    caption: String(r.caption ?? ""),
+    items: (r.items as string[]) ?? [],
+    mediaPath: path,
+    mediaUrl: path ? urls.get(path) ?? null : null,
+    isImage: path ? looksLikeImage(path) : false,
+    status: r.status as Post["status"],
+  };
+}
+
+export async function listUploads(supabase: Supa, ownerId: string, weekOf: string): Promise<Upload[]> {
+  const folder = uploadFolder(ownerId, weekOf);
+  const { data } = await supabase.storage.from("clips").list(folder, { limit: 40, sortBy: { column: "created_at", order: "asc" } });
+  const files = (data ?? []).filter((f) => f.id);
+  const paths = files.map((f) => `${folder}/${f.name}`);
+  const urls = await signed(supabase, paths);
+  return files.map((f, i) => ({
+    path: paths[i],
+    name: f.name.replace(/^\d+-/, ""),
+    url: urls.get(paths[i]) ?? null,
+    isImage: looksLikeImage(f.name),
+  }));
+}
+
+export async function getPostsPage(week?: string) {
+  const { supabase, user, business } = await ensureBusiness();
+  const today = todayIn(business.timezone);
+  const weekOf = week ?? packWeek(today);
+  const [postsRes, uploads] = await Promise.all([
+    supabase.from("posts").select("*").eq("business_id", business.id).eq("week_of", weekOf).order("position"),
+    listUploads(supabase, user.id, weekOf),
+  ]);
+  const rows = postsRes.data ?? [];
+  const urls = await signed(supabase, rows.map((r) => r.media_path).filter(Boolean));
+  return { userId: user.id, business, weekOf, today, uploads, posts: rows.map((r) => mapPost(r, urls)) };
+}
+
+export async function getCheckoutPage() {
+  const { supabase, business } = await ensureBusiness();
+  const today = todayIn(business.timezone);
+  const since = addDays(mondayOf(today), -7);
+  const [c, p] = await Promise.all([
+    supabase.from("checkouts").select("*").eq("business_id", business.id).eq("sold_on", today).order("created_at", { ascending: false }),
+    supabase.from("posts").select("id, week_of, day, title, status").eq("business_id", business.id).gte("week_of", since).lte("week_of", today).in("status", ["approved", "posted"]).order("week_of", { ascending: false }).order("position"),
+  ]);
+  return {
+    today,
+    checkouts: (c.data ?? []).map(mapCheckout),
+    posts: (p.data ?? []).map((r) => ({ id: r.id as string, label: `${r.day} · ${r.title}` })),
+  };
+}
+
+function mapCheckout(r: Record<string, unknown>): Checkout {
+  return {
+    id: String(r.id),
+    source: r.source as SourceId,
+    amount: Number(r.amount),
+    postId: (r.post_id as string | null) ?? null,
+    soldOn: String(r.sold_on),
+    createdAt: String(r.created_at),
+  };
+}
+
+/** Everything the monthly proof report needs. `month` is "YYYY-MM". */
+export async function getReport(month?: string) {
+  const { supabase, business } = await ensureBusiness();
+  const today = todayIn(business.timezone);
+  const ym = month && /^\d{4}-\d{2}$/.test(month) ? month : today.slice(0, 7);
+  const start = `${ym}-01`;
+  const next = new Date(`${start}T12:00:00Z`);
+  next.setUTCMonth(next.getUTCMonth() + 1);
+  const end = next.toISOString().slice(0, 10);
+  const firstWeek = mondayOf(start);
+
+  const [biz, c, ws, items, posts, firstPack] = await Promise.all([
+    supabase.from("businesses").select("plan_price").eq("id", business.id).single(),
+    supabase.from("checkouts").select("*").eq("business_id", business.id).gte("sold_on", start).lt("sold_on", end),
+    supabase.from("weekly_sales").select("week_of, amount").eq("business_id", business.id).order("week_of", { ascending: false }).limit(30),
+    supabase.from("item_sales").select("week_of, item, sold, sold_before").eq("business_id", business.id).gte("week_of", firstWeek).lt("week_of", end),
+    supabase.from("posts").select("id, week_of, day, title, items, status").eq("business_id", business.id).gte("week_of", addDays(firstWeek, -7)).lt("week_of", end).order("week_of").order("position"),
+    supabase.from("posts").select("week_of").eq("business_id", business.id).in("status", ["approved", "posted"]).order("week_of").limit(1).maybeSingle(),
+  ]);
+
+  const weekly: WeekSales[] = (ws.data ?? []).map((r) => ({ weekOf: r.week_of, amount: r.amount }));
+  const itemSales: ItemSale[] = (items.data ?? []).map((r) => ({ weekOf: r.week_of, item: r.item, sold: r.sold, soldBefore: r.sold_before }));
+
+  // Weeks with a Monday inside the month, up to this week, for the entry forms.
+  const weeks: string[] = [];
+  for (let w = mondayOf(start) < start ? addDays(mondayOf(start), 7) : mondayOf(start); w < end && w <= today; w = addDays(w, 7)) weeks.push(w);
+
+  return {
+    business,
+    today,
+    month: ym,
+    planPrice: (biz.data?.plan_price as number | null) ?? null,
+    checkouts: (c.data ?? []).map(mapCheckout),
+    weekly,
+    itemSales,
+    weeks,
+    startedWeek: (firstPack.data?.week_of as string | undefined) ?? null,
+    posts: (posts.data ?? []).map((r) => ({ id: r.id as string, weekOf: r.week_of as string, label: `${r.day} · ${r.title}`, items: (r.items as string[]) ?? [], live: r.status !== "draft" })),
+  };
+}
+
+export type ReportData = Awaited<ReturnType<typeof getReport>>;
+
+/** Dollars from shoppers who said they saw a post, this month. Used on the dashboard and by the helper. */
+export async function postSalesThisMonth(supabase: Supa, businessId: string, tz: string) {
+  const start = `${todayIn(tz).slice(0, 7)}-01`;
+  const { data } = await supabase.from("checkouts").select("amount").eq("business_id", businessId).eq("source", "post").gte("sold_on", start);
+  const rows = data ?? [];
+  return { amount: rows.reduce((s, r) => s + r.amount, 0), count: rows.length };
+}

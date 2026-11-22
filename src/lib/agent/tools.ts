@@ -97,15 +97,15 @@ export const toolDefinitions: Anthropic.Tool[] = [
   },
   {
     name: "log_job",
-    description: "Record a job the owner won, so it counts toward recovered money.",
+    description: "Log a sale at checkout the owner tells you about, with how the shopper heard about the store. Sales where heard_from is 'post' count as tracked sales.",
     input_schema: {
       type: "object",
       properties: {
-        value: { type: "integer", minimum: 1 },
-        source_step: { type: "string", description: "posts, proof, reviews, instagram, or other." },
+        value: { type: "integer", minimum: 1, description: "Sale total in dollars." },
+        heard_from: { type: "string", enum: ["post", "google", "walked-by", "friend", "regular", "other"] },
         note: { type: "string" },
       },
-      required: ["value"],
+      required: ["value", "heard_from"],
     },
   },
   {
@@ -257,12 +257,14 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
 
     case "log_job": {
       const value = Math.round(Number(input.value) || 0);
-      if (value <= 0) return { summary: "Need a job value above zero." };
-      const source = typeof input.source_step === "string" && input.source_step !== "other" ? input.source_step : null;
-      const { error } = await supabase.from("jobs").insert({ business_id: business.id, owner_id: ownerId, value, source_step: source, note: String(input.note ?? "") });
-      if (error) return { summary: `Could not log the job: ${error.message}` };
-      await event("job", `Job won${source ? ` from ${source.replace("-", " ")}` : ""}: $${value.toLocaleString()}.`);
-      return { summary: `Logged a $${value.toLocaleString()} job${source ? ` from ${source}` : ""}. Recovered this month is now $${(snapshot.recovered.month + value).toLocaleString()}.` };
+      if (value <= 0) return { summary: "Need a sale amount above zero." };
+      const sources = ["post", "google", "walked-by", "friend", "regular", "other"];
+      const source = sources.includes(String(input.heard_from)) ? String(input.heard_from) : "other";
+      const { error } = await supabase.from("checkouts").insert({ business_id: business.id, owner_id: ownerId, source, amount: value });
+      if (error) return { summary: `Could not log the sale: ${error.message}` };
+      await event("job", `Sale logged: $${value.toLocaleString()}, heard from ${source.replace("-", " ")}.`);
+      const total = snapshot.recovered.month + (source === "post" ? value : 0);
+      return { summary: `Logged a $${value.toLocaleString()} sale (${source.replace("-", " ")}). Sales from posts this month: $${total.toLocaleString()}.` };
     }
 
     case "add_customer": {
