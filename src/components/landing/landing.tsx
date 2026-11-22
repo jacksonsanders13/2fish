@@ -103,41 +103,50 @@ export function Landing() {
                 ))}
               </dl>
             </div>
-            <div className="self-start overflow-hidden rounded-md">
-              <div className="bg-surface p-5">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-semibold">Store Grader</h3>
-                  <span className="num font-semibold">Free</span>
-                </div>
-                <p className="mt-1 text-sm">Your score out of 100 and three fixes for your store.</p>
+            <div className="self-start rounded-md bg-surface p-5">
+              <div className="flex items-baseline justify-between gap-4">
+                <h3 className="font-semibold">Store Grader</h3>
+                <span className="num font-semibold">Free</span>
               </div>
-              <div className="on-night bg-night p-5 text-white">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-semibold">Plans</h3>
-                  <span className="num font-semibold">From $79 a month</span>
-                </div>
-                <p className="mt-1 text-sm text-on-night-muted">
-                  Starter $79: 7 posts a week, codes, the monthly proof report. Growth $149: adds Google profile
-                  posts and review replies. Done-with-you $299: adds a monthly call and a person checking every
-                  post.
+              <p className="mt-1 text-sm">Your score out of 100 and three fixes for your store. No card, no account.</p>
+            </div>
+          </div>
+
+          {/* The three plans, each on its own. Growth is the one most stores should pick, so it's the dark one. */}
+          <ul className="mt-12 grid gap-4 md:grid-cols-3">
+            {plans.map((p) => (
+              <li
+                key={p.name}
+                className={cn(
+                  "flex flex-col rounded-md p-5",
+                  p.pick ? "on-night bg-night text-white" : "bg-surface",
+                )}
+              >
+                <h3 className="font-semibold">{p.name}</h3>
+                <p className="mt-2">
+                  <span className="num text-display font-semibold">${p.price}</span>
+                  <span className={cn("text-sm", p.pick ? "text-on-night-muted" : "text-muted-foreground")}> a month</span>
                 </p>
-                <p className="mt-2 text-sm text-on-night-muted">
-                  First 10 Raleigh-area stores: $49 a month for life.
-                </p>
+                <p className={cn("mt-1 text-sm", p.pick ? "text-on-night-muted" : "text-muted-foreground")}>{p.who}</p>
                 <ul className="mt-4 space-y-1.5 text-sm">
-                  {[
-                    "If tracked sales don't cover your plan in 60 days, the next month is free",
-                    "Month to month, cancel any time",
-                  ].map((x) => (
+                  {p.items.map((x) => (
                     <li key={x} className="flex gap-2">
-                      <Check size={16} className="mt-0.5 shrink-0 text-cash-bright" aria-hidden="true" />
+                      <Check
+                        size={16}
+                        className={cn("mt-0.5 shrink-0", p.pick ? "text-cash-bright" : "text-night")}
+                        aria-hidden="true"
+                      />
                       {x}
                     </li>
                   ))}
                 </ul>
-              </div>
-            </div>
-          </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 max-w-2xl text-sm">
+            First 10 Raleigh-area stores pay $49 a month for life. If tracked sales don&apos;t cover your plan in
+            60 days, the next month is free. Month to month, cancel any time.
+          </p>
         </Step>
 
         {/* The ask, on the one dark band */}
@@ -157,6 +166,30 @@ export function Landing() {
     </>
   );
 }
+
+const plans = [
+  {
+    name: "Starter",
+    price: 79,
+    who: "For stores that need to post every day",
+    items: ["7 posts a week from your photos", "A promo code on every post", "Monthly proof report"],
+    pick: false,
+  },
+  {
+    name: "Growth",
+    price: 149,
+    who: "The one we'd pick for most stores",
+    items: ["Everything in Starter", "Weekly posts on your Google profile", "A drafted reply to every review", "Weekly report on what sold"],
+    pick: true,
+  },
+  {
+    name: "Done-with-you",
+    price: 299,
+    who: "For owners who want a person in the loop",
+    items: ["Everything in Growth", "A monthly call with Jackson", "A person checks every post before it goes up"],
+    pick: false,
+  },
+];
 
 // One section of the funnel. The heading leads; one rule separates it from the next.
 function Step({ id, children }: { id: string; children: React.ReactNode }) {
