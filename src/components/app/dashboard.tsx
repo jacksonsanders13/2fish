@@ -141,7 +141,7 @@ export function Dashboard({
                 <p className="mt-1 text-sm">Six questions, about 2 minutes, then 2fish has something to work with.</p>
                 <Button asChild size="sm" variant="signal" className="mt-3">
                   <Link href="/audit">
-                    Grade my store free
+                    Get my free store grade
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>

@@ -30,7 +30,7 @@ export function Landing() {
               >
                 <Button asChild size="lg" variant="signal" className="h-12 px-5 text-base">
                   <Link href="/audit">
-                    Grade my store free
+                    Get my free store grade
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
@@ -151,7 +151,7 @@ export function Landing() {
             <h2 className="max-w-2xl text-display text-white">Bring what you have and we&apos;ll multiply it</h2>
             <Button asChild size="lg" variant="signal" className="h-12 w-full px-5 text-base sm:w-auto">
               <Link href="/audit">
-                Grade my store free
+                Get my free store grade
                 <ArrowRight aria-hidden="true" />
               </Link>
             </Button>

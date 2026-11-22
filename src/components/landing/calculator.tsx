@@ -73,7 +73,7 @@ export function PostsCalculator({ className }: { className?: string }) {
 
       <Button asChild size="lg" variant="signal" className="mt-5 w-full sm:w-auto">
         <Link href="/audit">
-          Grade my store free
+          Get my free store grade
           <ArrowRight aria-hidden="true" />
         </Link>
       </Button>
