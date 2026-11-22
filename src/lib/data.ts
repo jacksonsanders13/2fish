@@ -1,21 +1,18 @@
-// Fake data for the Phase 1 mockup. One fictional Raleigh power washing
-// company, used on every screen so the numbers agree with each other.
+// Sample data for the landing page and previews. Linden Row is a made-up
+// Raleigh boutique, used everywhere so the numbers agree with each other.
+// (The text-back and leak data further down is from the old home-services
+// version and only feeds screens that are hidden now.)
 
 export const business = {
-  name: "Oak & Ash Exterior Cleaning",
-  shortName: "Oak & Ash",
-  owner: "Dana Whitfield",
-  ownerFirst: "Dana",
+  name: "Linden Row Boutique",
+  shortName: "Linden Row",
+  owner: "Maya Ellison",
+  ownerFirst: "Maya",
   city: "Raleigh, NC",
   since: 2019,
-  crew: 3,
-  phone: "(919) 555-0188",
-  avgJob: 385,
-  callsPerWeek: 20,
-  missedPerWeek: 6,
-  reviews: 14,
-  competitorReviews: 70,
-  pastCustomers: 310,
+  avgSale: 68,
+  postsLastMonth: 6,
+  reviews: 41,
 };
 
 export type LeakId = "missed-calls" | "past-customers" | "reviews" | "social";
@@ -84,58 +81,58 @@ export type PlanStep = {
 export const plan: PlanStep[] = [
   {
     rank: 1,
-    title: "Text back every missed call",
-    detail: "Live since Nov 3. 11 missed calls texted back, 4 turned into jobs.",
+    title: "Post 7 times a week from your own photos",
+    detail: "Live since Nov 3. 14 posts up so far, each with its own code.",
     status: "live",
-    impact: 2980,
-    action: { label: "See conversations", href: "/dashboard/text-back" },
+    impact: 1240,
+    action: { label: "See this week's posts", href: "/dashboard/videos" },
   },
   {
     rank: 2,
-    title: "Remind past customers it's time for a wash",
-    detail:
-      "310 customers from 2024 and 2025. The message is drafted. You approve it, 2fish sends 20 a day.",
+    title: "Approve next week's 7 posts",
+    detail: "Monday's photos are turned into 7 posts with captions. They need your okay.",
     status: "needs-you",
-    impact: 2310,
-    action: { label: "Review the message", href: "/dashboard" },
+    impact: 620,
+    action: { label: "Approve posts", href: "/dashboard/videos" },
   },
   {
     rank: 3,
-    title: "Ask every customer for a Google review",
-    detail: "Sent the morning after each job. 9 sent this week, 3 new reviews so far.",
+    title: "Show try-ons, not just flat lays",
+    detail: "Try-on clips have sold more than flat lays so far. Next week's pack leans that way.",
     status: "in-progress",
-    impact: 1150,
-    action: { label: "See requests", href: "/dashboard" },
+    impact: 420,
+    action: { label: "See what sold", href: "/dashboard" },
   },
   {
     rank: 4,
-    title: "Post 7 short videos a week",
-    detail: "Tuesday's clips are cut into 7 videos with captions. They need your okay.",
-    status: "needs-you",
-    impact: 620,
-    action: { label: "Approve videos", href: "/dashboard/videos" },
+    title: "Reply to every Google review",
+    detail: "Replies are drafted for 3 new reviews. You approve, 2fish posts them.",
+    status: "in-progress",
+    impact: 180,
+    action: { label: "See replies", href: "/dashboard" },
   },
   {
     rank: 5,
-    title: "Fix your Google Business hours and photos",
-    detail: "Weekend hours were wrong. Fixed Nov 2, plus 12 new job photos.",
+    title: "Fix your Google hours and photos",
+    detail: "Sunday hours were wrong. Fixed Nov 2, plus 10 new product photos.",
     status: "done",
-    impact: 180,
+    impact: 90,
     action: { label: "View listing", href: "/dashboard" },
   },
 ];
 
+// Tracked sales: promo codes from posts, used at the register.
 export const recovered = {
-  amount: 2140,
-  jobs: 6,
+  amount: 1840,
+  sales: 23,
   period: "Nov 1 to 14",
-  pace: 4600,
+  pace: 3900,
 };
 
 export const stats = [
-  { label: "Missed calls texted back", value: "11", sub: "4 booked" },
-  { label: "Google reviews", value: "17", sub: "was 14 on Nov 1" },
-  { label: "Videos posted", value: "5", sub: "7 waiting on you" },
+  { label: "Posts this month", value: "14", sub: "7 waiting on you" },
+  { label: "Codes used", value: "23", sub: "$1,840 in sales" },
+  { label: "Google reviews", value: "44", sub: "was 41 on Nov 1" },
 ];
 
 export type Activity = {
@@ -145,12 +142,12 @@ export type Activity = {
 };
 
 export const activity: Activity[] = [
-  { when: "2:14 PM", text: "Missed call from (919) 555-0142. Texted back in 10 seconds.", kind: "call" },
-  { when: "11:30 AM", text: "7 videos ready to post from Tuesday's clips.", kind: "video" },
-  { when: "Yesterday", text: "Review requests sent to 3 customers after their jobs closed.", kind: "review" },
-  { when: "Yesterday", text: "New 5-star review from Priya N. \"Deck looks brand new.\"", kind: "review" },
-  { when: "Nov 12", text: "Tom R. booked a driveway and walkway from a text-back. $450.", kind: "job" },
-  { when: "Nov 11", text: "Reminder drafted for 310 past customers. Waiting on your okay.", kind: "reminder" },
+  { when: "2:14 PM", text: "A shopper used LINDEN4 at the register. $86.", kind: "job" },
+  { when: "11:30 AM", text: "7 posts ready from Monday's photos. Waiting on your okay.", kind: "video" },
+  { when: "Yesterday", text: "The green wrap dress try-on is up to 6 code sales.", kind: "job" },
+  { when: "Yesterday", text: "Reply drafted for a new 5-star Google review.", kind: "review" },
+  { when: "Nov 12", text: "Weekly report: try-on clips sold more than flat lays.", kind: "reminder" },
+  { when: "Nov 11", text: "New arrivals post went up with code LINDEN2.", kind: "video" },
 ];
 
 export type VideoCard = {
@@ -163,13 +160,13 @@ export type VideoCard = {
 };
 
 export const videos: VideoCard[] = [
-  { id: 1, title: "Before and after: Cary driveway", length: "0:22", day: "Mon", caption: "Twelve years of grime, gone in an afternoon. Cary, NC.", tone: "night" },
-  { id: 2, title: "Deck restore in 60 seconds", length: "0:58", day: "Tue", caption: "Soft wash, brighten, seal. Here's the whole thing sped up.", tone: "surface" },
-  { id: 3, title: "Why we soft wash roofs", length: "0:34", day: "Wed", caption: "Pressure washing a roof wrecks shingles. Here's what we do instead.", tone: "surface" },
-  { id: 4, title: "Gutter brightening, close up", length: "0:19", day: "Thu", caption: "Those black streaks aren't permanent. Watch.", tone: "surface" },
-  { id: 5, title: "Customer question: how often?", length: "0:41", day: "Fri", caption: "Most Raleigh driveways need it every 12 to 18 months.", tone: "night" },
-  { id: 6, title: "Meet the crew", length: "0:27", day: "Sat", caption: "Three of us, two trucks, since 2019.", tone: "surface" },
-  { id: 7, title: "Oak & Ash in 15 seconds", length: "0:15", day: "Sun", caption: "Driveways, decks, roofs, gutters. Text us for a quote.", tone: "night" },
+  { id: 1, title: "Try-on: the green wrap dress", length: "0:18", day: "Mon", caption: "Three ways to wear it, one dress. Say LINDEN1 at the register for 10% off.", tone: "night" },
+  { id: 2, title: "New arrivals, unboxed", length: "0:24", day: "Tue", caption: "Fall knits just landed. Small run, so come early. Code LINDEN2.", tone: "surface" },
+  { id: 3, title: "Behind the counter", length: "0:15", day: "Wed", caption: "How Maya picks what goes on the front table. Code LINDEN3.", tone: "surface" },
+  { id: 4, title: "One outfit, under $120", length: "0:21", day: "Thu", caption: "Top, jeans, earrings. All in store now. Code LINDEN4.", tone: "surface" },
+  { id: 5, title: "Gift table for under $40", length: "0:19", day: "Fri", caption: "Candles, scarves and the mugs everyone asks about. Code LINDEN5.", tone: "night" },
+  { id: 6, title: "Saturday in the shop", length: "0:12", day: "Sat", caption: "Come say hi. We're open 10 to 6. Code LINDEN6.", tone: "surface" },
+  { id: 7, title: "Linden Row in 15 seconds", length: "0:15", day: "Sun", caption: "Clothes, gifts and a dressing room with good light. Code LINDEN7.", tone: "night" },
 ];
 
 export const uploadedClips = [

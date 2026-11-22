@@ -9,14 +9,16 @@ import { Input } from "@/components/ui/input";
 import { roundTen } from "@/lib/format";
 
 const WEEKS = 4.3;
-const BOOK_RATE = 0.3;
+// A guess, and the page says so: one code sale for every two posts.
+// The proof report replaces it with the store's real number.
+const SALES_PER_POST = 0.5;
 
-export function MissedCallCalculator({ className }: { className?: string }) {
-  const [missed, setMissed] = useState(6);
-  const [job, setJob] = useState(385);
+export function PostsCalculator({ className }: { className?: string }) {
+  const [posts, setPosts] = useState(7);
+  const [sale, setSale] = useState(68);
   const id = useId();
 
-  const monthly = roundTen(missed * WEEKS * job * BOOK_RATE);
+  const monthly = roundTen(posts * WEEKS * SALES_PER_POST * sale);
   const yearly = monthly * 12;
 
   return (
@@ -24,34 +26,34 @@ export function MissedCallCalculator({ className }: { className?: string }) {
       <div className="space-y-5">
         <div>
           <div className="flex items-baseline justify-between">
-            <label htmlFor={`${id}-missed`} className="text-sm font-semibold">
-              Calls you miss in a week
+            <label htmlFor={`${id}-posts`} className="text-sm font-semibold">
+              Posts a week
             </label>
-            <span className="num text-sm font-semibold">{missed}</span>
+            <span className="num text-sm font-semibold">{posts}</span>
           </div>
           <input
-            id={`${id}-missed`}
+            id={`${id}-posts`}
             type="range"
             min={0}
-            max={25}
-            value={missed}
-            onChange={(e) => setMissed(Number(e.target.value))}
+            max={14}
+            value={posts}
+            onChange={(e) => setPosts(Number(e.target.value))}
             className="mt-3"
           />
         </div>
         <div>
-          <label htmlFor={`${id}-job`} className="text-sm font-semibold">
-            Average job value
+          <label htmlFor={`${id}-sale`} className="text-sm font-semibold">
+            Average sale in your store
           </label>
           <div className="mt-2 flex h-11 items-center rounded-md border border-input bg-white pl-3 focus-within:border-night">
             <span className="text-muted-foreground">$</span>
             <Input
-              id={`${id}-job`}
+              id={`${id}-sale`}
               type="number"
               inputMode="numeric"
               min={0}
-              value={job}
-              onChange={(e) => setJob(Math.max(0, Number(e.target.value)))}
+              value={sale}
+              onChange={(e) => setSale(Math.max(0, Number(e.target.value)))}
               className="num h-full border-0 bg-transparent pl-1 shadow-none focus-visible:ring-0 md:text-base"
             />
           </div>
@@ -59,19 +61,19 @@ export function MissedCallCalculator({ className }: { className?: string }) {
       </div>
 
       <div className="mt-8">
-        <p className="text-sm font-semibold">Walking out the door each month</p>
+        <p className="text-sm font-semibold">What those posts could bring in each month</p>
         <p className="mt-1 text-display font-semibold">
           <AnimatedMoney amount={monthly} tone="ink" duration={0.6} />
         </p>
         <p className="mt-2 text-sm">
           About <AnimatedMoney amount={yearly} tone="ink" duration={0.6} className="font-semibold" /> a year.
-          Assumes you&apos;d book 3 of every 10 callers you text back.
+          Assumes one shopper uses a code for every two posts. Your proof report shows the real number.
         </p>
       </div>
 
       <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
         <Link href="/audit">
-          Find the rest of the leaks
+          Grade my boutique free
           <ArrowRight aria-hidden="true" />
         </Link>
       </Button>

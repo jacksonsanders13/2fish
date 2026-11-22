@@ -13,7 +13,7 @@ export function SiteHeader() {
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
           <a href="#cost" className={link}>
-            What a missed call costs
+            What posts bring in
           </a>
           <a href="#how" className={link}>
             How it works
@@ -28,8 +28,8 @@ export function SiteHeader() {
           </Button>
           <Button asChild size="sm" variant="signal">
             <Link href="/audit">
-              <span className="sm:hidden">Free audit</span>
-              <span className="hidden sm:inline">Start your free audit</span>
+              <span className="sm:hidden">Free grade</span>
+              <span className="hidden sm:inline">Grade my boutique free</span>
             </Link>
           </Button>
         </div>

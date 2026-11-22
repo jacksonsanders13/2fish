@@ -22,12 +22,12 @@ export function DashboardPreview({ chrome = "light", className }: { chrome?: "li
       </div>
       <div className="grid sm:grid-cols-[1.4fr_1fr]">
         <div className="min-w-0 border-b border-line p-4 sm:border-r sm:border-b-0 sm:p-5">
-          <p className="font-semibold">Recovered this month</p>
+          <p className="font-semibold">Tracked sales this month</p>
           <p className="mt-1 text-display font-semibold">
             <AnimatedMoney amount={recovered.amount} duration={1.6} delay={0.3} />
           </p>
           <p className="mt-2 text-muted-foreground">
-            {recovered.jobs} jobs traced to your plan, {recovered.period}
+            {recovered.sales} sales from post codes, {recovered.period}
           </p>
           <ol className="mt-4">
             {plan.slice(0, 4).map((step) => (
