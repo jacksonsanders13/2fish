@@ -143,11 +143,6 @@ export function Landing() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 max-w-2xl text-sm">
-            First 10 Raleigh-area stores pay $49 a month for life. If your sales over the first 60 days aren&apos;t
-            up by more than your plan cost, compared with the month before you started, the next month is free.
-            Month to month, cancel any time.
-          </p>
         </Step>
 
         {/* The ask, on the one dark band */}
@@ -173,7 +168,7 @@ const plans = [
     name: "Starter",
     price: 79,
     who: "For stores that need to post every day",
-    items: ["7 posts a week from your photos", "A one-tap \"how'd you hear about us\" at checkout", "Monthly proof report"],
+    items: ["7 posts a week from your photos", "Reads your Square sales", "Monthly report on what sold"],
     pick: false,
   },
   {
@@ -182,17 +177,23 @@ const plans = [
     who: "The one we'd pick for most stores",
     items: [
       "Everything in Starter",
-      "Weekly report on what sold",
-      "Weekly posts on your Google profile (after launch)",
-      "A drafted reply to every review (after launch)",
+      "Texts you when posts are ready",
+      "Learns what sells and makes more of it",
+      "Posts to Instagram for you (after launch)",
     ],
     pick: true,
   },
   {
-    name: "Done-with-you",
+    name: "Pro",
     price: 299,
-    who: "For owners who want a person in the loop",
-    items: ["Everything in Growth", "A person checks every post before it goes up"],
+    who: "For busy stores and owners with more than one shop",
+    items: [
+      "Everything in Growth",
+      "Plans holiday and sale pushes ahead of time",
+      "Google posts and review replies (after launch)",
+      "Answers Instagram DMs and comments (after launch)",
+      "Up to 3 store locations",
+    ],
     pick: false,
   },
 ];
