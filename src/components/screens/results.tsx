@@ -75,26 +75,27 @@ export function ResultsScreen() {
             <div className="max-w-3xl">
               <Reveal immediate y={16}>
                 <h1 className="text-display font-semibold">
-                  You&apos;re losing about <RollingMoney amount={est.totalMonthly} tone="ink" /> a month
+                  {est.facts.store} scored <span className="num">{est.score}</span> out of 100
                 </h1>
               </Reveal>
               <Reveal immediate delay={0.2}>
                 <p className="mt-5 max-w-xl">
-                  That&apos;s about <Money amount={est.totalMonthly * 12} tone="ink" className="font-semibold" /> a
-                  year. Here&apos;s where it goes, biggest leak first. These are estimates from your answers, not
-                  promises.
+                  {est.leaks.length === 1 ? "The fix below" : `The ${est.leaks.length} fixes below`} could bring in
+                  about <RollingMoney amount={est.totalMonthly} tone="ink" /> a month, or{" "}
+                  <Money amount={est.totalMonthly * 12} tone="ink" className="font-semibold" /> a year. These are
+                  estimates from your answers, not promises.
                 </p>
                 {sample ? (
                   <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-                    You haven&apos;t taken the audit yet, so these are sample results for a Raleigh power washing
-                    company.
+                    You haven&apos;t graded your store yet, so this is a sample score for Linden Row, a made-up
+                    Raleigh boutique.
                   </p>
                 ) : null}
               </Reveal>
               <Reveal immediate delay={0.35} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} />
                 <Button asChild size="lg" variant="outline" className="h-12 bg-white px-5 text-base">
-                  <Link href="/audit">{sample ? "Run it for my business" : "Change my answers"}</Link>
+                  <Link href="/audit">{sample ? "Grade my store" : "Change my answers"}</Link>
                 </Button>
               </Reveal>
             </div>
@@ -105,7 +106,7 @@ export function ResultsScreen() {
           <Container className="grid gap-12 py-12 sm:py-16 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
             <div>
               <Reveal>
-                <h2 className="font-semibold">Where the money goes</h2>
+                <h2 className="font-semibold">Your fixes, biggest first</h2>
               </Reveal>
               <ol className="mt-6 space-y-7">
                 {est.leaks.map((leak, i) => (
@@ -126,8 +127,20 @@ export function ResultsScreen() {
 
               <Reveal className="mt-8">
                 <details className="rounded-lg border border-line bg-white p-4 text-sm">
-                  <summary className="cursor-pointer font-semibold">How we estimated this</summary>
-                  <ul className="mt-3 space-y-2">
+                  <summary className="cursor-pointer font-semibold">How we worked this out</summary>
+                  <p className="mt-3 font-semibold">Your score</p>
+                  <ul className="mt-2 space-y-1">
+                    {est.scoreParts.map((p) => (
+                      <li key={p.label} className="flex justify-between gap-4">
+                        <span>{p.label}</span>
+                        <span className="num">
+                          {p.points} of {p.max}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 font-semibold">The dollar figures</p>
+                  <ul className="mt-2 space-y-2">
                     {est.leaks.map((leak) => (
                       <li key={leak.id}>
                         <span className="font-semibold">{leak.title}:</span> {leak.math}
@@ -135,8 +148,8 @@ export function ResultsScreen() {
                     ))}
                   </ul>
                   <p className="mt-3 text-muted-foreground">
-                    Based on your answers plus averages for businesses like yours. Real numbers replace these once
-                    2fish is connected to your phone line and Google listing.
+                    Based on your answers and one working guess: a shopper uses a code for every two posts. Your
+                    proof report replaces that guess with your store&apos;s real number.
                   </p>
                 </details>
               </Reveal>
@@ -145,7 +158,7 @@ export function ResultsScreen() {
             <aside>
               <Reveal delay={0.15} y={40} className="lg:sticky lg:top-6">
                 <div className="rounded-lg bg-surface p-5 sm:p-6">
-                    <h2 className="font-semibold">The plan to get it back</h2>
+                    <h2 className="font-semibold">What 2fish would do</h2>
                     <p className="mt-1 text-sm">Ranked by dollars. 2fish does each step after you approve it.</p>
                     <ol className="mt-4">
                       {est.steps.map((step, i) => (

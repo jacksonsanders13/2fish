@@ -1,14 +1,15 @@
 import type { Answers } from "./estimate";
 
-// Audit answers live in the browser until the owner signs in. sessionStorage
+// Grader answers live in the browser until the owner signs in. sessionStorage
 // survives the hop from /audit to /results and disappears when the tab closes.
-const KEY = "2fish.answers";
+// The key changed with the grader, so old audit answers are simply ignored.
+const KEY = "2fish.grader";
 
 export function saveAnswers(answers: Partial<Answers>) {
   try {
     window.sessionStorage.setItem(KEY, JSON.stringify(answers));
   } catch {
-    // Private mode or storage blocked. The audit still works in memory.
+    // Private mode or storage blocked. The grader still works in memory.
   }
 }
 
@@ -17,17 +18,14 @@ export function readAnswers(): Answers | null {
     const raw = window.sessionStorage.getItem(KEY);
     if (!raw) return null;
     const a = JSON.parse(raw) as Partial<Answers>;
-    if (!a.type) return null;
+    if (!a.store) return null;
     return {
-      type: a.type ?? "",
-      calls: a.calls ?? "",
-      missed: a.missed ?? "",
-      job: a.job ?? "",
+      store: a.store ?? "",
+      instagram: a.instagram ?? "",
+      posts: a.posts ?? "",
+      sale: a.sale ?? "",
       reviews: a.reviews ?? "",
-      ask: a.ask ?? "",
-      social: a.social ?? "",
-      winback: a.winback ?? "",
-      headache: a.headache ?? "",
+      track: a.track ?? "",
     };
   } catch {
     return null;

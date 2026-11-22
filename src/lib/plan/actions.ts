@@ -140,7 +140,11 @@ export async function savePlan(input: Answers) {
 
   let { data: business } = await supabase.from("businesses").select("id").eq("owner_id", user.id).order("created_at").limit(1).maybeSingle();
   if (!business) {
-    const created = await supabase.from("businesses").insert({ owner_id: user.id, kind: answers.type }).select("id").single();
+    const created = await supabase
+      .from("businesses")
+      .insert({ owner_id: user.id, kind: "Store", name: answers.store })
+      .select("id")
+      .single();
     if (created.data) business = created.data;
     else {
       const again = await supabase.from("businesses").select("id").eq("owner_id", user.id).order("created_at").limit(1).single();
@@ -148,8 +152,9 @@ export async function savePlan(input: Answers) {
       business = again.data;
     }
   } else {
-    // A business made before the audit has no type yet. Fill it in.
-    await supabase.from("businesses").update({ kind: answers.type }).eq("id", business.id).eq("kind", "Something else");
+    // A business made before the grader has no name or type yet. Fill them in.
+    await supabase.from("businesses").update({ kind: "Store" }).eq("id", business.id).eq("kind", "Something else");
+    await supabase.from("businesses").update({ name: answers.store }).eq("id", business.id).or("name.is.null,name.eq.");
   }
 
   const audit = await supabase

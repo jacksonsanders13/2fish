@@ -24,8 +24,9 @@ export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
     const client = new Anthropic({ apiKey: key });
     const model = "claude-sonnet-5-5";
     const brief = {
-      business: est.facts.kind,
-      biggestHeadache: a.headache,
+      store: est.facts.store,
+      score: est.score,
+      scoreParts: est.scoreParts,
       facts: est.facts,
       leaks: est.leaks.map((l) => ({ id: l.id, title: l.title, perMonth: l.perMonth })),
       steps: est.steps.map((s) => ({ key: s.key, title: s.title, currentDetail: s.detail, impactPerMonth: s.impact })),
@@ -35,12 +36,12 @@ export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
       model,
       max_tokens: 700,
       system: [
-        "You write short, plain copy for 2fish, a growth tool for small local businesses.",
-        "Audience: a busy owner reading on a phone. Short sentences. Specific. No hype words.",
+        "You write short, plain copy for 2fish, which posts for small stores and tracks which posts made sales with a promo code on each one.",
+        "Audience: a busy store owner reading on a phone between customers. Short sentences. Specific. No hype words.",
         "Never invent numbers. Only use the dollar figures and counts you are given.",
         "Do not use the words: unlock, unleash, elevate, empower, supercharge, transform, seamless, robust, leverage, journey, streamline, effortless.",
         'Reply with JSON only: {"summary": string, "details": {stepKey: string}}.',
-        "summary: two sentences that name the biggest leak in their own words and what happens first. Mention their headache if it fits.",
+        "summary: two sentences that give the store's score out of 100, name the biggest fix and what happens first.",
         "details: for each step key, one or two sentences (max 30 words) tailored to this business. Keep the given numbers.",
       ].join(" "),
       messages: [{ role: "user", content: JSON.stringify(brief) }],
@@ -63,9 +64,8 @@ export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
   }
 }
 
-function templateSummary(est: Estimate, a: Answers) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function templateSummary(est: Estimate, _a: Answers) {
   const top = est.leaks[0];
-  const kind = est.facts.kind === "Something else" ? "business" : est.facts.kind.toLowerCase() + " business";
-  const headache = a.headache?.trim() ? ` You said your biggest headache is: "${a.headache.trim()}".` : "";
-  return `Your ${kind} is losing about $${est.totalMonthly.toLocaleString()} a month, and ${top.title.toLowerCase()} is the biggest piece.${headache} Step 1 goes after that first.`;
+  return `${est.facts.store} scored ${est.score} out of 100. The biggest fix is to ${top.title.charAt(0).toLowerCase()}${top.title.slice(1)}, worth about $${top.perMonth.toLocaleString()} a month, so that's step 1.`;
 }

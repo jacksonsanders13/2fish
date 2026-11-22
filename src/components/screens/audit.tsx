@@ -72,7 +72,7 @@ export function AuditScreen() {
           <Link href="/" className="rounded-md">
             <Logo />
           </Link>
-          <span className="text-sm font-semibold">Free audit</span>
+          <span className="text-sm font-semibold">Store Grader</span>
           <Link href="/results" className="text-sm text-white underline underline-offset-2">
             See sample results
           </Link>
@@ -166,6 +166,29 @@ export function AuditScreen() {
                   </motion.div>
                 ) : null}
 
+                {q.type === "line" ? (
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease, delay: 0.1 }}
+                    className="flex h-14 items-center rounded-md border border-input bg-white px-4 focus-within:border-night"
+                  >
+                    {q.prefix ? <span className="text-muted-foreground">{q.prefix}</span> : null}
+                    <Input
+                      type="text"
+                      autoFocus
+                      autoComplete="off"
+                      maxLength={60}
+                      placeholder={q.placeholder}
+                      value={value}
+                      onChange={(e) => set(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && next()}
+                      className="h-full border-0 bg-transparent px-1 shadow-none focus-visible:ring-0 md:text-base"
+                      aria-label={q.prompt}
+                    />
+                  </motion.div>
+                ) : null}
+
                 {q.type === "text" ? (
                   <motion.div
                     initial={reduce ? false : { opacity: 0, y: 16 }}
@@ -193,7 +216,7 @@ export function AuditScreen() {
               Back
             </Button>
             <Button variant="signal" onClick={next} disabled={!canNext}>
-              {last ? "See my results" : "Next"}
+              {last ? "See my score" : "Next"}
               <ArrowRight aria-hidden="true" />
             </Button>
           </div>
@@ -201,7 +224,7 @@ export function AuditScreen() {
       </main>
 
       <footer>
-        <Container className="py-6 text-sm text-muted-foreground">Your answers stay on this device until you choose to save your plan.</Container>
+        <Container className="py-6 text-sm text-muted-foreground">Your answers stay on this device until you choose to save your score.</Container>
       </footer>
     </div>
   );

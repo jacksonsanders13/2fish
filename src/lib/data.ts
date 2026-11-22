@@ -15,7 +15,8 @@ export const business = {
   reviews: 41,
 };
 
-export type LeakId = "missed-calls" | "past-customers" | "reviews" | "social";
+// The first four are from the old home-services audit; the grader uses the rest.
+export type LeakId = "missed-calls" | "past-customers" | "reviews" | "social" | "posting" | "tracking" | "instagram";
 
 export type Leak = {
   id: LeakId;
@@ -213,79 +214,61 @@ export type AuditQuestion =
       suffix?: string;
       placeholder: string;
     }
-  | { id: string; prompt: string; help?: string; type: "text"; placeholder: string };
+  | { id: string; prompt: string; help?: string; type: "text"; placeholder: string }
+  | { id: string; prompt: string; help?: string; type: "line"; placeholder: string; prefix?: string };
 
+// The Store Grader: six questions, about 2 minutes.
 export const auditQuestions: AuditQuestion[] = [
   {
-    id: "type",
-    prompt: "What kind of business do you run?",
-    type: "choice",
-    options: ["Power washing", "Landscaping", "Cleaning", "Boutique", "Something else"],
+    id: "store",
+    prompt: "What's your store called?",
+    type: "line",
+    placeholder: "Linden Row Boutique",
   },
   {
-    id: "calls",
-    prompt: "About how many calls do you get a week?",
-    help: "A rough guess is fine.",
-    type: "number",
-    suffix: "calls a week",
-    placeholder: "20",
+    id: "instagram",
+    prompt: "What's the store's Instagram handle?",
+    help: "Type \"none\" if the store doesn't have one yet.",
+    type: "line",
+    prefix: "@",
+    placeholder: "lindenrow",
   },
   {
-    id: "missed",
-    prompt: "When you can't pick up, what happens?",
-    type: "choice",
-    options: ["It goes to voicemail", "Nothing, it just rings", "Someone else answers"],
-  },
-  {
-    id: "job",
-    prompt: "What's your average job or sale worth?",
-    type: "number",
-    prefix: "$",
-    placeholder: "385",
-  },
-  {
-    id: "reviews",
-    prompt: "How many Google reviews do you have?",
-    help: "Open Google Maps and search your business name if you're not sure.",
-    type: "number",
-    suffix: "reviews",
-    placeholder: "14",
-  },
-  {
-    id: "ask",
-    prompt: "Do you ask customers for a review after a job?",
-    type: "choice",
-    options: ["Always", "Sometimes", "Never"],
-  },
-  {
-    id: "social",
-    prompt: "How often do you post on social media?",
+    id: "posts",
+    prompt: "How often do you post on Instagram?",
+    help: "Or TikTok, whichever you use most. Think about last month.",
     type: "choice",
     options: ["Most days", "About once a week", "A few times a month", "Almost never"],
   },
   {
-    id: "winback",
-    prompt: "Do you ever reach back out to past customers?",
-    type: "choice",
-    options: ["Yes, regularly", "Rarely", "Never"],
+    id: "sale",
+    prompt: "What does a shopper spend on an average visit?",
+    help: "A rough guess is fine.",
+    type: "number",
+    prefix: "$",
+    placeholder: "68",
   },
   {
-    id: "headache",
-    prompt: "What's your biggest headache right now?",
-    help: "One or two sentences. This shapes your plan.",
-    type: "text",
-    placeholder: "Phone rings while I'm on a roof and I lose the job to whoever picks up first.",
+    id: "reviews",
+    prompt: "How many Google reviews does the store have?",
+    help: "Search your store's name on Google Maps if you're not sure.",
+    type: "number",
+    suffix: "reviews",
+    placeholder: "41",
+  },
+  {
+    id: "track",
+    prompt: "Can you tell which posts bring shoppers into the store?",
+    type: "choice",
+    options: ["Yes, we track it", "Sort of", "No idea"],
   },
 ];
 
 export const sampleAnswers: Record<string, string> = {
-  type: "Power washing",
-  calls: "20",
-  missed: "It goes to voicemail",
-  job: "385",
-  reviews: "14",
-  ask: "Sometimes",
-  social: "About once a week",
-  winback: "Rarely",
-  headache: "Phone rings while I'm on a roof and I lose the job to whoever picks up first.",
+  store: "Linden Row Boutique",
+  instagram: "lindenrow",
+  posts: "A few times a month",
+  sale: "68",
+  reviews: "41",
+  track: "No idea",
 };

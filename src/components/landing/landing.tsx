@@ -20,10 +20,9 @@ export function Landing() {
         <section className="border-b border-line">
           <Container className="grid gap-12 py-14 sm:py-20 lg:grid-cols-[5fr_7fr] lg:items-center lg:gap-12">
             <div className="min-w-0">
-              <h1 className="rise text-display text-ink">Daily posts for your store, and proof of what they sold</h1>
+              <h1 className="rise text-display text-ink">Daily posts, and proof they sold</h1>
               <p className="rise mt-6 max-w-xl" style={{ "--rise-delay": "0.1s" } as React.CSSProperties}>
-                Send us your product photos and clips. Every Monday you get 7 posts to approve in one tap. Each
-                one carries its own promo code, so your monthly report shows the sales it brought into the store.
+                7 posts every Monday from your photos, each with a code the register counts.
               </p>
               <div
                 className="rise mt-8 flex flex-col gap-3 sm:flex-row"

@@ -12,15 +12,15 @@ export function SiteHeader() {
           <Logo />
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
-          <a href="#cost" className={link}>
+          <Link href="/#cost" className={link}>
             What posts bring in
-          </a>
-          <a href="#how" className={link}>
+          </Link>
+          <Link href="/#how" className={link}>
             How it works
-          </a>
-          <a href="#pricing" className={link}>
+          </Link>
+          <Link href="/#pricing" className={link}>
             Pricing
-          </a>
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild size="sm" variant="outline">

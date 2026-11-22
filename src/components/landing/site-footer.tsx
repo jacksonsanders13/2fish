@@ -14,20 +14,24 @@ export function SiteFooter() {
         </div>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <li>
-            <a href="#how" className="hover:underline">
+            <Link href="/#how" className="hover:underline">
               How it works
-            </a>
+            </Link>
           </li>
           <li>
             <Link href="/audit" className="hover:underline">
               Store Grader
             </Link>
           </li>
-          <li className="text-muted-foreground">
-            <span title="Placeholder. Pages come in a later phase.">Privacy</span>
+          <li>
+            <Link href="/privacy" className="hover:underline">
+              Privacy
+            </Link>
           </li>
-          <li className="text-muted-foreground">
-            <span title="Placeholder. Pages come in a later phase.">Terms</span>
+          <li>
+            <Link href="/terms" className="hover:underline">
+              Terms
+            </Link>
           </li>
         </ul>
       </Container>
