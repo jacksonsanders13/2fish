@@ -19,7 +19,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
     input_schema: {
       type: "object",
       properties: {
-        key: { type: "string", description: "Step key: text-back, winback, reviews, videos, or a custom key." },
+        key: { type: "string", description: "Step key: posts, codes, reviews, instagram, or a custom key." },
         status: { type: "string", enum: ["not-started", "needs-you", "in-progress", "live", "done"] },
         title: { type: "string" },
         detail: { type: "string", description: "One or two plain sentences." },
@@ -58,11 +58,11 @@ export const toolDefinitions: Anthropic.Tool[] = [
   },
   {
     name: "request_clips",
-    description: "Ask the owner to upload phone clips. Shows an upload card in the chat. Use before starting a video batch when there are no clips.",
+    description: "Ask the owner to upload product photos and short phone clips (new arrivals, try-ons, the shop floor). Shows an upload card in the chat. Use before starting a week of posts when there's nothing uploaded.",
     input_schema: {
       type: "object",
       properties: {
-        count: { type: "integer", description: "How many clips you'd like, usually 3 to 8." },
+        count: { type: "integer", description: "How many photos or clips you'd like, usually 5 to 10." },
         why: { type: "string", description: "One sentence on what you'll make from them." },
       },
       required: ["count", "why"],
@@ -70,7 +70,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
   },
   {
     name: "start_video_batch",
-    description: "Queue a batch of short vertical videos from the clips the owner uploaded. Runs through the video renderer on credits when connected; otherwise it is queued.",
+    description: "Queue a week of posts (short vertical videos and photo posts, each with its own promo code) from what the owner uploaded. Runs through the video renderer when connected; otherwise it is queued.",
     input_schema: {
       type: "object",
       properties: {
@@ -102,7 +102,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
       type: "object",
       properties: {
         value: { type: "integer", minimum: 1 },
-        source_step: { type: "string", description: "text-back, reviews, winback, videos, or other." },
+        source_step: { type: "string", description: "posts, codes, reviews, instagram, or other." },
         note: { type: "string" },
       },
       required: ["value"],

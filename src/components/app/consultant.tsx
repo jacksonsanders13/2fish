@@ -121,7 +121,7 @@ export function Consultant({
             <MessageSquareText size={16} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-semibold text-night">Your consultant</p>
+            <p className="text-sm font-semibold text-night">Your 2fish helper</p>
             <p className="text-sm text-muted-foreground">{agentReady ? "Ask about your plan, or tell it what to do" : "Chat isn't switched on yet"}</p>
           </div>
         </div>
@@ -202,7 +202,7 @@ export function Consultant({
               }
             }}
             rows={1}
-            placeholder={agentReady ? "Tell your consultant what's going on…" : "Chat isn't on yet. Your plan already works."}
+            placeholder={agentReady ? "Tell 2fish what's going on in the store…" : "Chat isn't on yet. Your plan already works."}
             disabled={busy || !agentReady}
             className="max-h-40 min-h-11 resize-none py-2.5 text-sm"
             aria-label="Message your consultant"
@@ -268,7 +268,7 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
     async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
       const files = Array.from(e.target.files ?? []).slice(0, 12);
       if (!files.length) return;
-      setMsg(`Uploading ${files.length} ${files.length === 1 ? "clip" : "clips"}…`);
+      setMsg(`Uploading ${files.length} ${files.length === 1 ? "file" : "files"}…`);
       const supabase = createClient();
       const paths: string[] = [];
       for (const f of files) {
@@ -284,7 +284,7 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
         const r = await clipsUploaded(task.id, paths);
         setMsg(r.message ?? null);
         router.refresh();
-        if (r.ok) onDone(`I uploaded ${paths.length} clips.`);
+        if (r.ok) onDone(`I uploaded ${paths.length} photos and clips.`);
       });
     }
     return (
@@ -294,12 +294,12 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
           {task.title}
         </p>
         {p.why ? <p className="mt-1 text-sm text-muted-foreground">{p.why}</p> : null}
-        <input ref={fileRef} type="file" accept="video/*" multiple className="hidden" onChange={onFiles} />
+        <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={onFiles} />
         {msg ? <p className="mt-2 text-sm text-muted-foreground">{msg}</p> : null}
         <div className="mt-2 flex gap-2">
           <Button size="sm" variant="signal" disabled={pending} onClick={() => fileRef.current?.click()}>
             <Upload aria-hidden="true" />
-            Choose clips
+            Choose photos or clips
           </Button>
           <Button size="sm" variant="ghost" disabled={pending} onClick={dismiss}>
             Not now

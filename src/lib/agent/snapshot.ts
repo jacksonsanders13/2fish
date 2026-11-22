@@ -123,10 +123,10 @@ export function describeSnapshot(s: Snapshot) {
       lines.push(`  ${st.rank}. [${st.key}] ${st.title} — status ${st.status}, worth about $${st.impact.toLocaleString()}/mo.${settings} ${st.detail}`);
     }
   } else {
-    lines.push("Plan: none yet. The owner has not finished the audit.");
+    lines.push("Plan: none yet. The owner has not finished the Store Grader.");
   }
-  if (s.audit) lines.push(`Audit answers: ${Object.entries(s.audit).map(([k, v]) => `${k}=${v}`).join(", ")}.`);
-  lines.push(`Recovered this month: $${s.recovered.month.toLocaleString()} from ${s.recovered.monthJobs} logged jobs. Customers on file: ${s.customers}.`);
+  if (s.audit) lines.push(`Store Grader answers: ${Object.entries(s.audit).map(([k, v]) => `${k}=${v}`).join(", ")}.`);
+  lines.push(`Tracked sales this month: $${s.recovered.month.toLocaleString()} from ${s.recovered.monthJobs} logged sales. Customers on file: ${s.customers}.`);
   lines.push(
     s.textback
       ? `Text-back: ${s.textback.enabled ? "ON" : "OFF"}, hours ${s.textback.hoursStart}:00 to ${s.textback.hoursEnd}:00, first message: "${s.textback.template}".`

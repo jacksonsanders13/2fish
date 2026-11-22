@@ -53,14 +53,14 @@ export async function clipsUploaded(taskId: string, paths: string[]): Promise<Re
   const { supabase, user, business } = await ensureBusiness();
   const id = z.string().uuid().parse(taskId);
   const clean = z.array(z.string().min(1)).min(1).max(30).parse(paths).filter((p) => p.startsWith(`${user.id}/`));
-  if (clean.length === 0) return { ok: false, message: "No clips found." };
+  if (clean.length === 0) return { ok: false, message: "Nothing was uploaded." };
   const { error } = await supabase
     .from("agent_tasks")
     .update({ status: "done", result: { paths: clean }, updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("kind", "clips_request");
   if (error) return { ok: false, message: error.message };
-  await supabase.from("events").insert({ business_id: business.id, owner_id: user.id, kind: "video", text: `${clean.length} clips uploaded.` });
+  await supabase.from("events").insert({ business_id: business.id, owner_id: user.id, kind: "video", text: `${clean.length} photos and clips uploaded.` });
   revalidatePath("/dashboard", "layout");
-  return { ok: true, message: `${clean.length} clips uploaded.` };
+  return { ok: true, message: `${clean.length} photos and clips uploaded.` };
 }

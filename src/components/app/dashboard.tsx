@@ -36,8 +36,8 @@ export function Dashboard({
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
   const suggestions = plan
-    ? ["Walk me through my plan", "Turn on text-back", "I'm not posting enough", "I won a job today"]
-    : ["What do you do?", "How does the audit work?"];
+    ? ["Walk me through my fixes", "Make this week's posts", "Someone used a code today", "What's selling best?"]
+    : ["What do you do?", "How does the grader work?"];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
@@ -46,7 +46,7 @@ export function Dashboard({
         <div className="min-w-0">
           <p className="truncate text-sm text-on-night-muted">{who}</p>
           <h1 className="font-semibold">
-            Recovered this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
+            Tracked sales this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
           </h1>
         </div>
         <div role="group" aria-label="Show" className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
@@ -80,11 +80,11 @@ export function Dashboard({
 
         <aside className={cn("space-y-4", tab === "plan" ? "block" : "hidden lg:block")}>
           <section className="rounded-lg border-t-4 border-night bg-white p-4">
-            <h2 className="text-sm font-semibold text-night">The plan</h2>
+            <h2 className="text-sm font-semibold text-night">Your fixes</h2>
             {plan ? (
               <>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Losing about <Money amount={plan.totalMonthly} tone="ink" className="font-semibold" /> a month. Biggest leak first.
+                  Worth about <Money amount={plan.totalMonthly} tone="ink" className="font-semibold" /> a month. Biggest first.
                 </p>
                 <ol className="mt-3 divide-y divide-line">
                   {plan.steps.map((s) => (
@@ -108,10 +108,10 @@ export function Dashboard({
               </>
             ) : (
               <>
-                <p className="mt-1 text-sm">Nine questions, five minutes, then your consultant has something to work with.</p>
+                <p className="mt-1 text-sm">Six questions, about 2 minutes, then 2fish has something to work with.</p>
                 <Button asChild size="sm" variant="signal" className="mt-3">
                   <Link href="/audit">
-                    Start the free audit
+                    Grade my store free
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, LogOut, MessageSquareText, Settings, Users, Video } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, Users, Video } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { signOut } from "@/lib/plan/actions";
@@ -9,9 +9,8 @@ export type Section = "dashboard" | "text-back" | "customers" | "videos" | "sett
 
 const nav: { key: Section; label: string; icon: typeof LayoutDashboard; href: string }[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { key: "text-back", label: "Text-back", icon: MessageSquareText, href: "/dashboard/text-back" },
+  { key: "videos", label: "Posts", icon: Video, href: "/dashboard/videos" },
   { key: "customers", label: "Customers", icon: Users, href: "/dashboard/customers" },
-  { key: "videos", label: "Videos", icon: Video, href: "/dashboard/videos" },
   { key: "settings", label: "Settings", icon: Settings, href: "/dashboard/settings" },
 ];
 
