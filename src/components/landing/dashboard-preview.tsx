@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function DashboardPreview({ chrome = "light", className }: { chrome?: "light" | "night"; className?: string }) {
   return (
     <div className={cn("overflow-hidden rounded-lg bg-white text-left text-sm text-ink", className)}>
-      <h3 className="sr-only">Sample dashboard for {business.name}</h3>
+      <h2 className="sr-only">Sample dashboard for {business.name}</h2>
       <div
         className={cn(
           "flex items-center justify-between gap-3 border-b px-4 py-2.5",

@@ -28,7 +28,7 @@ export function Money({
     <span className={cn("num", tones[tone], className)}>
       {sign}
       {money(amount)}
-      {per ? <span className="font-normal opacity-80">{per}</span> : null}
+      {per ? <span className="font-normal">{per}</span> : null}
     </span>
   );
 }

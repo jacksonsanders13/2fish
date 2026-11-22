@@ -92,12 +92,13 @@ export function Landing() {
               <h2 className="text-display">2fish does the posting for you</h2>
               <dl className="mt-8 space-y-6">
                 {features.map((f) => (
-                  <div key={f.title} className="grid gap-1 sm:grid-cols-[1fr_auto] sm:gap-6">
-                    <div>
-                      <dt className="font-semibold">{f.title}</dt>
-                      <dd className="mt-1 text-sm">{f.body}</dd>
-                    </div>
-                    <dd className="text-sm text-muted-foreground sm:pt-1 sm:text-right">{f.when}</dd>
+                  // dt and dd sit directly in the div so screen readers read it as one item
+                  <div key={f.title} className="grid gap-1 sm:grid-cols-[1fr_auto] sm:gap-x-6">
+                    <dt className="font-semibold">{f.title}</dt>
+                    <dd className="text-sm">{f.body}</dd>
+                    <dd className="text-sm text-muted-foreground sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:pt-1 sm:text-right">
+                      {f.when}
+                    </dd>
                   </div>
                 ))}
               </dl>
