@@ -30,6 +30,8 @@ export type Snapshot = {
   tasks: Task[];
   recentEvents: string[];
   integrations: { sms: boolean; video: boolean };
+  // From Square, when connected: the last 4 weeks of sales and the top sellers of the last 2 weeks.
+  square: { weeks: { weekOf: string; total: number }[]; top: { item: string; qty: number }[] } | null;
 };
 
 export async function buildSnapshot(
@@ -80,6 +82,29 @@ export async function buildSnapshot(
     audit = (a.data?.answers as Record<string, string>) ?? null;
   }
 
+  const since = new Date(Date.now() - 28 * 86400_000).toISOString().slice(0, 10);
+  const recent = new Date(Date.now() - 14 * 86400_000).toISOString().slice(0, 10);
+  const [sd, idaily] = await Promise.all([
+    supabase.from("sales_daily").select("day, total").eq("business_id", business.id).gte("day", since),
+    supabase.from("item_daily").select("item, qty").eq("business_id", business.id).gte("day", recent),
+  ]);
+  let square: Snapshot["square"] = null;
+  if ((sd.data ?? []).length) {
+    const weeks = new Map<string, number>();
+    for (const r of sd.data ?? []) {
+      const d = new Date(`${r.day}T12:00:00Z`);
+      d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+      const w = d.toISOString().slice(0, 10);
+      weeks.set(w, (weeks.get(w) ?? 0) + r.total);
+    }
+    const items = new Map<string, number>();
+    for (const r of idaily.data ?? []) items.set(r.item, (items.get(r.item) ?? 0) + Number(r.qty));
+    square = {
+      weeks: [...weeks].sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([weekOf, total]) => ({ weekOf, total })),
+      top: [...items].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([item, qty]) => ({ item, qty })),
+    };
+  }
+
   return {
     business,
     plan: plan.data
@@ -108,6 +133,7 @@ export async function buildSnapshot(
     })),
     recentEvents: (events.data ?? []).map((e) => e.text),
     integrations,
+    square,
   };
 }
 
@@ -126,6 +152,12 @@ export function describeSnapshot(s: Snapshot) {
     lines.push("Plan: none yet. The owner has not finished the Store Grader.");
   }
   if (s.audit) lines.push(`Store Grader answers: ${Object.entries(s.audit).map(([k, v]) => `${k}=${v}`).join(", ")}.`);
+  if (s.square) {
+    lines.push(`Square sales by week (Monday start): ${s.square.weeks.map((w) => `${w.weekOf} $${w.total.toLocaleString()}`).join("; ")}.`);
+    lines.push(`Top sellers, last 14 days: ${s.square.top.map((t) => `${t.item} (${t.qty})`).join(", ") || "none"}.`);
+  } else {
+    lines.push("Square: not connected. Suggest connecting it in Settings so you can see sales yourself.");
+  }
   lines.push(`Tracked sales this month: $${s.recovered.month.toLocaleString()} from ${s.recovered.monthJobs} shoppers who said they saw a post. Customers on file: ${s.customers}.`);
   lines.push(
     s.textback
