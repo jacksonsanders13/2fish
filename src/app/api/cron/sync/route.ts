@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { syncAll } from "@/lib/integrations/square";
-import { weeklyAutopilot } from "@/lib/pilot/autopilot";
+import { fridayPhotoAsk, weeklyAutopilot } from "@/lib/pilot/autopilot";
 
 export const maxDuration = 300;
 
@@ -12,6 +12,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Not allowed." }, { status: 401 });
   }
   const results = await syncAll();
-  const packs = new Date().getUTCDay() === 1 ? await weeklyAutopilot() : [];
-  return NextResponse.json({ synced: results.length, failed: results.filter((r) => !r.ok).length, packs: packs.filter((p) => p.made).length });
+  const day = new Date().getUTCDay();
+  const packs = day === 1 ? await weeklyAutopilot() : [];
+  const asks = day === 5 ? await fridayPhotoAsk() : [];
+  return NextResponse.json({
+    synced: results.length,
+    failed: results.filter((r) => !r.ok).length,
+    packs: packs.filter((p) => p.made).length,
+    photoAsks: asks.filter((a) => a.asked).length,
+  });
 }

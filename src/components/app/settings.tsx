@@ -180,7 +180,7 @@ function BusinessForm({ business }: { business: Business }) {
           <Input id="b-city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Raleigh, NC" />
         </Field>
       </div>
-      <Field label="Business phone" htmlFor="b-phone" hint="The number customers call.">
+      <Field label="Your mobile number" htmlFor="b-phone" hint="2fish texts you here when posts are ready or it needs photos. 8am to 9pm only. Reply STOP any time.">
         <Input id="b-phone" type="tel" inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
       </Field>
       {msg ? <Notice tone={msg.tone}>{msg.text}</Notice> : null}
