@@ -35,14 +35,14 @@ export function VideosScreen({ email }: { email?: string }) {
       <PageBody>
         <Reveal immediate y={16}>
           <header className="max-w-2xl">
-            <h1 className="text-display font-semibold">Post 7 short videos a week</h1>
+            <h1 className="text-display font-semibold">7 posts a week from your photos</h1>
             <p className="mt-3">
-              Upload the clips you already shoot on jobs. 2fish cuts them into vertical videos with captions, one
-              for each day, and posts them on a schedule.
+              Send the product photos and try-on clips you already take. Every Monday 2fish turns them into 7
+              posts with captions, each with its own promo code.
             </p>
             <p className="mt-4 rounded-md bg-night px-4 py-3 text-sm text-white">
-              <strong>Coming soon.</strong> This is what it will look like, using sample clips from a made-up power
-              washing company. Nothing here touches your account yet.
+              <strong>Coming soon.</strong> This is what it will look like, using samples from Linden Row, a
+              made-up boutique. Nothing here touches your account yet.
             </p>
           </header>
         </Reveal>
@@ -59,15 +59,15 @@ export function VideosScreen({ email }: { email?: string }) {
             >
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-line bg-white p-8 text-center sm:p-12">
                 <Upload size={24} aria-hidden="true" />
-                <p className="mt-3 font-semibold">Drop phone clips here, or choose them</p>
-                <p className="mt-1 text-sm">MOV or MP4. Vertical or sideways, it doesn&apos;t matter.</p>
+                <p className="mt-3 font-semibold">Drop photos and clips here, or choose them</p>
+                <p className="mt-1 text-sm">Photos or short videos straight from your phone.</p>
                 <Button variant="outline" className="mt-5">
-                  Choose clips
+                  Choose photos or clips
                 </Button>
               </div>
               <aside className="rounded-lg border border-line bg-white p-5">
-                <h2 className="font-semibold">Sample clips</h2>
-                <p className="text-sm text-muted-foreground">What a Tuesday upload from your phone looks like</p>
+                <h2 className="font-semibold">Sample upload</h2>
+                <p className="text-sm text-muted-foreground">What a Monday upload from your phone looks like</p>
                 <ul className="mt-3 divide-y divide-line">
                   {uploadedClips.map((c, i) => (
                     <Reveal as="li" key={c.name} delay={i * 0.05} y={6} className="flex items-center justify-between py-2 text-sm">
@@ -80,7 +80,7 @@ export function VideosScreen({ email }: { email?: string }) {
                   ))}
                 </ul>
                 <Button className="mt-4 w-full" onClick={make} disabled={phase === "working"}>
-                  {phase === "working" ? "Cutting your clips…" : "Make my 7 videos"}
+                  {phase === "working" ? "Making your posts…" : "Make my 7 posts"}
                 </Button>
                 {phase === "working" ? (
                   <div className="mt-3 h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
@@ -94,8 +94,8 @@ export function VideosScreen({ email }: { email?: string }) {
                 ) : null}
                 <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
                   {phase === "working"
-                    ? "Usually takes a few minutes. You'll get a text when they're ready."
-                    : "About 5 minutes of footage makes a week of videos."}
+                    ? "Usually takes a few minutes."
+                    : "About 10 photos or a few short clips make a week of posts."}
                 </p>
               </aside>
             </motion.section>
@@ -109,7 +109,7 @@ export function VideosScreen({ email }: { email?: string }) {
             >
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-white p-4">
                 <p className="text-sm">
-                  <span className="font-semibold">7 videos ready.</span>{" "}
+                  <span className="font-semibold">7 posts ready.</span>{" "}
                   <span className="num">{approved.length} of 7 approved.</span>
                 </p>
                 <div className="flex gap-2">
