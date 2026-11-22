@@ -112,28 +112,28 @@ export function Landing() {
             </div>
           </div>
 
-          {/* The three plans, each on its own. Growth is the one most stores should pick, so it's the dark one. */}
+          {/* The three plans, each on its own. Growth is the one most stores should pick, so it's the orange one. */}
           <ul className="mt-12 grid gap-4 md:grid-cols-3">
             {plans.map((p) => (
               <li
                 key={p.name}
                 className={cn(
                   "flex flex-col rounded-md p-5",
-                  p.pick ? "on-night bg-night text-white" : "bg-surface",
+                  p.pick ? "on-night bg-signal text-white" : "bg-surface",
                 )}
               >
                 <h3 className="font-semibold">{p.name}</h3>
                 <p className="mt-2">
                   <span className="num text-display font-semibold">${p.price}</span>
-                  <span className={cn("text-sm", p.pick ? "text-on-night-muted" : "text-muted-foreground")}> a month</span>
+                  <span className={cn("text-sm", p.pick ? "text-white" : "text-muted-foreground")}> a month</span>
                 </p>
-                <p className={cn("mt-1 text-sm", p.pick ? "text-on-night-muted" : "text-muted-foreground")}>{p.who}</p>
+                <p className={cn("mt-1 text-sm", p.pick ? "text-white" : "text-muted-foreground")}>{p.who}</p>
                 <ul className="mt-4 space-y-1.5 text-sm">
                   {p.items.map((x) => (
                     <li key={x} className="flex gap-2">
                       <Check
                         size={16}
-                        className={cn("mt-0.5 shrink-0", p.pick ? "text-cash-bright" : "text-night")}
+                        className={cn("mt-0.5 shrink-0", p.pick ? "text-white" : "text-night")}
                         aria-hidden="true"
                       />
                       {x}
