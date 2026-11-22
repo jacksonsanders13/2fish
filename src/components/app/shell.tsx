@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, LayoutDashboard, Lightbulb, LogOut, Settings, ShoppingBag, Users, Video } from "lucide-react";
+import { FileText, LayoutDashboard, Lightbulb, LogOut, Settings, Video } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { signOut } from "@/lib/plan/actions";
@@ -12,9 +12,7 @@ const nav: { key: Section; label: string; short?: string; icon: typeof LayoutDas
   { key: "dashboard", label: "Dashboard", short: "Home", icon: LayoutDashboard, href: "/dashboard" },
   { key: "videos", label: "Posts", short: "Posts", icon: Video, href: "/dashboard/videos" },
   { key: "examples", label: "Examples", icon: Lightbulb, href: "/dashboard/examples" },
-  { key: "checkout", label: "Checkout", short: "Checkout", icon: ShoppingBag, href: "/dashboard/checkout" },
   { key: "report", label: "Report", short: "Report", icon: FileText, href: "/dashboard/report" },
-  { key: "customers", label: "Customers", icon: Users, href: "/dashboard/customers" },
   { key: "settings", label: "Settings", short: "Settings", icon: Settings, href: "/dashboard/settings" },
 ];
 
@@ -65,7 +63,7 @@ export function AppShell({ active, email, children }: { active: Section; email?:
       </header>
       <main className="overflow-x-clip">{children}</main>
       <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white md:hidden print:hidden">
-        <ul className="grid grid-cols-5">
+        <ul className="grid grid-cols-4">
           {nav
             .filter((n) => n.short)
             .map((item) => (

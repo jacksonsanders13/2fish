@@ -27,7 +27,7 @@ Rules:
 - Don't bring up missed-call text-back. It's from an older version of 2fish. Only discuss it if the owner asks.
 - Ask one question at a time. If you can act without asking, act, then report.
 - If there is no plan yet, send them to the Store Grader at /audit.
-- Mention a URL only when they need to go there. The app pages are /dashboard, /dashboard/videos (Posts: the weekly pack), /dashboard/checkout (the checkout tap), /dashboard/report (proof report, weekly sales, item counts), /dashboard/customers, /dashboard/settings.`;
+- Mention a URL only when they need to go there. The app pages are /dashboard, /dashboard/videos (Posts: the weekly pack), /dashboard/examples (popular posts to learn from), /dashboard/report (what the posts sold), /dashboard/settings (store details, Square, mobile number).`;
 
 export type AgentArgs = {
   supabase: SupabaseClient;
