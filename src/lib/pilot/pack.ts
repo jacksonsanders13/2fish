@@ -34,6 +34,7 @@ export async function buildPack(input: {
   city: string;
   notes: string;
   media: PackMedia[];
+  results?: string;
   examples?: { kind: string; hook: string; caption: string; why: string; views: number | null; likes: number | null }[];
 }): Promise<{ posts: PostDraft[]; model: string | null }> {
   const items = input.notes
@@ -55,6 +56,8 @@ export async function buildPack(input: {
       type: "text",
       text: `Store: ${input.store}${input.city ? ` in ${input.city}` : ""}\n\nWhat's in the store this week, from the owner:\n${input.notes.trim() || "(nothing written)"}\n\nFiles the owner sent (index: name):\n${list || "(none)"}\n\nThe photos you can see follow, in index order.`,
     });
+    if (input.results) content.push({ type: "text", text: input.results });
+
     // Popular posts to learn from. Patterns only: the words stay theirs.
     const examples = (input.examples ?? []).slice(0, 20);
     if (examples.length) {

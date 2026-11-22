@@ -14,7 +14,21 @@ import { cn } from "@/lib/utils";
 const MAX_FILES = 20;
 
 // The weekly pack: send photos, say what's new, get 7 posts, approve, then copy each one out.
-export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; weekOf: string; uploads: UploadFile[]; posts: Post[] }) {
+type ItemResult = { item: string; sold: number; before: number };
+
+export function PostsView({
+  userId,
+  weekOf,
+  uploads,
+  posts,
+  results = {},
+}: {
+  userId: string;
+  weekOf: string;
+  uploads: UploadFile[];
+  posts: Post[];
+  results?: Record<string, ItemResult[]>;
+}) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [notes, setNotes] = useState("");
@@ -73,7 +87,12 @@ export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; 
       </header>
 
       {!locked ? (
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+        // Once the week is written, the upload area folds away so the posts come first.
+        <details open={!posts.length} className="group mt-8">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-night underline underline-offset-2 group-open:hidden">
+            Add photos or rewrite the week
+          </summary>
+        <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="rounded-lg bg-white p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-semibold">
@@ -125,6 +144,7 @@ export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; 
             </p>
           </div>
         </section>
+        </details>
       ) : msg ? (
         <p className="mt-4 text-sm" aria-live="polite">
           {msg}
@@ -157,7 +177,7 @@ export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; 
           </div>
           <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((p) => (
-              <PostCard key={p.id} post={p} />
+              <PostCard key={p.id} post={p} result={results[p.id]} />
             ))}
           </ul>
         </section>
@@ -200,7 +220,7 @@ function RemoveUpload({ path }: { path: string }) {
   );
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, result }: { post: Post; result?: ItemResult[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -266,7 +286,17 @@ function PostCard({ post }: { post: Post }) {
         ) : (
           <>
             <p className="mt-2 text-sm whitespace-pre-wrap select-all">{post.caption}</p>
-            {post.items.length ? <p className="mt-2 text-sm text-muted-foreground">Shows: {post.items.join(", ")}</p> : null}
+            {result?.some((r) => r.sold || r.before) ? (
+              <ul className="mt-2 space-y-0.5 text-sm">
+                {result.map((r) => (
+                  <li key={r.item} className={r.sold > r.before ? "font-semibold text-cash" : "text-muted-foreground"}>
+                    {r.item}: <span className="num">{r.sold}</span> sold, <span className="num">{r.before}</span> the week before
+                  </li>
+                ))}
+              </ul>
+            ) : post.items.length ? (
+              <p className="mt-2 text-sm text-muted-foreground">Shows: {post.items.join(", ")}</p>
+            ) : null}
           </>
         )}
         {note ? (
@@ -286,11 +316,11 @@ function PostCard({ post }: { post: Post }) {
             </>
           ) : post.status === "draft" ? (
             <>
-              <Button disabled={pending} onClick={() => status("approved")}>
+              <Button size="lg" variant="signal" className="h-12 flex-1 text-base" disabled={pending} onClick={() => status("approved")}>
                 <Check aria-hidden="true" />
                 Approve
               </Button>
-              <Button variant="ghost" disabled={pending} onClick={() => setEditing(true)}>
+              <Button size="lg" variant="outline" className="h-12" disabled={pending} onClick={() => setEditing(true)}>
                 <Pencil aria-hidden="true" />
                 Edit
               </Button>

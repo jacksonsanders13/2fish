@@ -10,13 +10,26 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import type { Task } from "@/lib/agent/snapshot";
 import type { ChatMessage } from "@/lib/agent/store";
 import type { DashboardData } from "@/lib/app/queries";
+import { shortDate } from "@/lib/pilot/dates";
 import { cn } from "@/lib/utils";
 import { Consultant } from "./consultant";
 
-// The dashboard is the consultant's room: the conversation in the middle,
-// the numbers and the plan beside it. On a phone the two are tabs.
+export type AgentSummary = {
+  weekOf: string;
+  total: number;
+  approved: number;
+  posted: number;
+  square: boolean;
+  monthExtra: number;
+  learned: string | null;
+  best: { title: string; extra: number } | null;
+};
+
+// The dashboard: what the agent is doing on top, then the chat with it, and
+// setup and fixes beside it. On a phone the chat and setup are tabs.
 export function Dashboard({
   data,
+  agent,
   messages,
   tasks,
   agentReady,
@@ -24,6 +37,7 @@ export function Dashboard({
   userId,
 }: {
   data: DashboardData;
+  agent: AgentSummary;
   messages: ChatMessage[];
   tasks: Task[];
   agentReady: boolean;
@@ -31,7 +45,7 @@ export function Dashboard({
   userId: string;
 }) {
   const [tab, setTab] = useState<"chat" | "plan">("chat");
-  const { business, plan, recovered } = data;
+  const { business, plan } = data;
   const who = business.name || (business.kind && business.kind !== "Something else" ? business.kind : "Your business");
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
@@ -43,37 +57,64 @@ export function Dashboard({
   const setupLeft = setup.filter((s) => !s.done);
 
   const suggestions = plan
-    ? ["Walk me through my fixes", "Make this week's posts", "A shopper said they saw a post", "What's selling best?"]
+    ? ["Walk me through my fixes", "Make this week's posts", "What should I post next week?", "What's selling best?"]
     : ["What do you do?", "How does the grader work?"];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-      {/* Teal stat strip: the one number the owner cares about */}
-      <div className="on-night flex items-center justify-between gap-3 rounded-lg bg-night px-4 py-3.5 text-white sm:px-5">
-        <div className="min-w-0">
-          <p className="truncate text-sm text-on-night-muted">{who}</p>
-          <h1 className="font-semibold">
-            Tracked sales this month: <RollingMoney amount={recovered.month} tone="cash-bright" />
-          </h1>
+      {/* What the agent is doing: this week's posts, what they sold, what it's changing */}
+      <section className="on-night rounded-lg bg-night p-4 text-white sm:p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="min-w-0 truncate text-sm text-on-night-muted">{who}</p>
+          <div role="group" aria-label="Show" className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
+            {(["chat", "plan"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={tab === t}
+                onClick={() => setTab(t)}
+                className={cn(
+                  "rounded-[6px] px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-night-deep",
+                  tab === t ? "bg-white font-semibold text-night active:bg-white" : "text-white",
+                )}
+              >
+                {t === "chat" ? "Agent" : "Setup"}
+              </button>
+            ))}
+          </div>
         </div>
-        <div role="group" aria-label="Show" className="flex shrink-0 rounded-md border border-on-night-line p-0.5 lg:hidden">
-          {(["chat", "plan"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              aria-pressed={tab === t}
-              onClick={() => setTab(t)}
-              className={cn(
-                "rounded-[6px] px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:bg-night-deep",
-                tab === t ? "bg-white font-semibold text-night active:bg-white" : "text-white",
+        <h1 className="sr-only">What 2fish is doing for {who}</h1>
+        <div className="mt-3 grid gap-4 sm:grid-cols-3">
+          <Link href="/dashboard/videos" className="rounded-md focus-visible:outline-2 focus-visible:outline-white">
+            <p className="text-sm text-on-night-muted">Posts, week of {shortDate(agent.weekOf)}</p>
+            <p className="mt-1 text-lg font-semibold">
+              {agent.total === 0 ? (
+                "Not written yet"
+              ) : (
+                <>
+                  <span className="num">{agent.approved}</span> of <span className="num">{agent.total}</span> approved
+                </>
               )}
-            >
-              {t === "chat" ? "Consultant" : "Plan"}
-            </button>
-          ))}
+            </p>
+            <p className="text-sm text-on-night-muted">
+              {agent.total === 0 ? "Send photos to start" : agent.approved < agent.total ? "Tap to review" : `${agent.posted} posted so far`}
+            </p>
+          </Link>
+          <div>
+            <p className="text-sm text-on-night-muted">Extra sales from posts this month</p>
+            <p className="mt-1 text-lg font-semibold">
+              {agent.square ? <RollingMoney amount={agent.monthExtra} tone="cash-bright" /> : "Connect Square"}
+            </p>
+            <p className="text-sm text-on-night-muted">
+              {agent.square ? (agent.best ? `Best: ${agent.best.title}` : "Posted items vs. the week before") : "So 2fish can see what sold"}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-on-night-muted">What it&apos;s changing</p>
+            <p className="mt-1 text-sm">{agent.learned ?? "Needs about 2 weeks of posts and sales before it knows what works for your store."}</p>
+          </div>
         </div>
-      </div>
-
+      </section>
       <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_360px]">
         <Consultant
           initialMessages={messages}

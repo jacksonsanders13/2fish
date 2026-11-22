@@ -3,6 +3,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import { addDays, packWeek, todayIn } from "./dates";
 import { buildPack } from "./pack";
 import { loadExamples } from "./queries";
+import { learnings, scorePosts } from "./scores";
 import { looksLikeImage } from "./types";
 
 // The agent's Monday job: for each store on Square, pick what to feature from
@@ -43,8 +44,8 @@ export async function weeklyAutopilot() {
         continue;
       }
 
-      const examples = await loadExamples(admin, c.owner_id);
-      const { posts } = await buildPack({ store: (biz?.name as string) || "the store", city: (biz?.city as string) || "", notes: top.join("\n"), media, examples });
+      const [examples, scores] = await Promise.all([loadExamples(admin, c.owner_id), scorePosts(admin, c.business_id, addDays(week, -56), today)]);
+      const { posts } = await buildPack({ store: (biz?.name as string) || "the store", city: (biz?.city as string) || "", notes: top.join("\n"), media, examples, results: learnings(scores).forWriter });
       const { error } = await admin.from("posts").insert(
         posts.map((p) => ({ business_id: c.business_id, owner_id: c.owner_id, week_of: week, position: p.position, day: p.day, kind: p.kind, title: p.title, hook: p.hook, caption: p.caption, items: p.items, media_path: p.mediaPath })),
       );

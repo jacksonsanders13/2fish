@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { limitMessage, takeQuota } from "@/lib/app/limits";
 import { ensureBusiness } from "@/lib/app/queries";
-import { isYmd, mondayOf, todayIn } from "./dates";
+import { addDays, isYmd, mondayOf, todayIn } from "./dates";
+import { learnings, scorePosts } from "./scores";
 import { buildPack } from "./pack";
 import { listUploads, loadExamples } from "./queries";
 import { SOURCES } from "./types";
@@ -37,8 +38,9 @@ export async function makePack(input: { weekOf: string; notes: string }): Promis
     if (!media.length && !notes.trim()) return { ok: false, message: "Add a few photos or write what's new in the store first." };
     if (!(await takeQuota(supabase, "pack"))) return { ok: false, message: limitMessage.pack };
 
-    const examples = await loadExamples(supabase, user.id);
-    const { posts, model } = await buildPack({ store: business.name || "the store", city: business.city, notes, media, examples });
+    const today = todayIn(business.timezone);
+    const [examples, scores] = await Promise.all([loadExamples(supabase, user.id), scorePosts(supabase, business.id, addDays(mondayOf(today), -56), today)]);
+    const { posts, model } = await buildPack({ store: business.name || "the store", city: business.city, notes, media, examples, results: learnings(scores).forWriter });
     await supabase.from("posts").delete().eq("business_id", business.id).eq("week_of", weekOf).eq("status", "draft");
     const { error } = await supabase.from("posts").insert(
       posts.map((p) => ({

@@ -4,6 +4,8 @@ import { AppShell, PageBody } from "@/components/app/shell";
 import { requireUser } from "@/lib/app/queries";
 import { isYmd } from "@/lib/pilot/dates";
 import { getPostsPage } from "@/lib/pilot/queries";
+import { scorePosts } from "@/lib/pilot/scores";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Posts" };
 
@@ -12,10 +14,12 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
   const { user } = await requireUser();
   const { week } = await searchParams;
   const data = await getPostsPage(week && isYmd(week) ? week : undefined);
+  const scores = await scorePosts(await createClient(), data.business.id, data.weekOf, data.today);
+  const results = Object.fromEntries(scores.map((s) => [s.id, s.items]));
   return (
     <AppShell active="videos" email={user.email ?? ""}>
       <PageBody>
-        <PostsView userId={data.userId} weekOf={data.weekOf} uploads={data.uploads} posts={data.posts} />
+        <PostsView userId={data.userId} weekOf={data.weekOf} uploads={data.uploads} posts={data.posts} results={results} />
       </PageBody>
     </AppShell>
   );

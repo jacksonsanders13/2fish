@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureBusiness } from "@/lib/app/queries";
 import { addDays, mondayOf, packWeek, todayIn } from "./dates";
+import { scorePosts } from "./scores";
 import { looksLikeImage, type Checkout, type Example, type ItemSale, type Post, type SourceId, type Upload, type WeekSales } from "./types";
 
 type Supa = Awaited<ReturnType<typeof ensureBusiness>>["supabase"];
@@ -155,6 +156,7 @@ export async function getReport(month?: string) {
     month: ym,
     planPrice: (biz.data?.plan_price as number | null) ?? null,
     square,
+    scores: (await scorePosts(supabase, business.id, firstWeek, today)).filter((s) => s.weekOf < end),
     checkouts: (c.data ?? []).map(mapCheckout),
     weekly,
     itemSales,
