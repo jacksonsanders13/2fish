@@ -86,7 +86,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
           </Link>
           <span className="text-sm font-semibold">{signup ? "Create account" : "Sign in"}</span>
           <Link href={signup ? "/results" : "/audit"} className="text-sm text-white underline underline-offset-2">
-            {signup ? "Results" : "Free audit"}
+            {signup ? "Results" : "Store Grader"}
           </Link>
         </Container>
       </header>
@@ -199,6 +199,19 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
                         <ArrowRight aria-hidden="true" />
                       </Button>
                     </form>
+                    {signup ? (
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        By creating an account you agree to the{" "}
+                        <Link href="/terms" className="underline underline-offset-2">
+                          Terms
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" className="underline underline-offset-2">
+                          Privacy policy
+                        </Link>
+                        . You need to be 18 or older.
+                      </p>
+                    ) : null}
                   </>
                 )}
             </div>

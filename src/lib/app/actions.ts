@@ -321,7 +321,25 @@ export async function changePassword(input: { password: string }): Promise<Resul
 
 export async function deleteAccount(confirm: string) {
   if (confirm !== "DELETE") return { ok: false as const, message: 'Type DELETE to confirm.' };
-  const { supabase } = await ensureBusiness();
+  const { supabase, user } = await ensureBusiness();
+
+  // Delete their uploaded photos and clips first. The database rows go with the
+  // account, but files in storage don't, and the Privacy page promises they will.
+  const files: string[] = [];
+  async function walk(folder: string, depth: number) {
+    const { data } = await supabase.storage.from("clips").list(folder, { limit: 1000 });
+    for (const f of data ?? []) {
+      const path = `${folder}/${f.name}`;
+      if (f.id) files.push(path);
+      else if (depth < 4) await walk(path, depth + 1);
+    }
+  }
+  await walk(user.id, 0);
+  for (let i = 0; i < files.length; i += 100) {
+    const { error } = await supabase.storage.from("clips").remove(files.slice(i, i + 100));
+    if (error) return { ok: false as const, message: `Couldn't delete your uploads: ${error.message}` };
+  }
+
   const { error } = await supabase.rpc("delete_my_account");
   if (error) return { ok: false as const, message: error.message };
   await supabase.auth.signOut();

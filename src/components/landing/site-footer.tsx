@@ -10,7 +10,12 @@ export function SiteFooter() {
           <Link href="/" className="inline-block rounded-md">
             <Logo />
           </Link>
-          <p className="mt-3 text-sm">Made in Raleigh, NC.</p>
+          <p className="mt-3 text-sm">
+            Made in Raleigh, NC. Questions:{" "}
+            <a href="mailto:hello@join2fish.com" className="underline underline-offset-2">
+              hello@join2fish.com
+            </a>
+          </p>
         </div>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <li>

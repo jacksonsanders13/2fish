@@ -9,7 +9,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms"
       updated="Nov 22, 2026"
-      intro="These are the rules for using 2fish, written to be read. By creating an account or paying for a plan, you agree to them."
+      intro="These are the rules for using 2fish, written to be read. By creating an account or paying for a plan, you agree to them. You need to be 18 or older and using 2fish for a business."
       sections={[
         {
           heading: "What 2fish does",
@@ -25,13 +25,21 @@ export default function TermsPage() {
             "You can cancel any time in Settings. You keep your plan until the end of the period you already paid for. We don't refund partial months.",
             "The founding price of $49 a month is for the first 10 stores we sign. It stays at $49 for as long as that subscription stays active. If you cancel and come back later, current prices apply.",
             "We'll tell you at least 30 days before any price change on your plan.",
+            "The price you see is the price you pay, plus any sales tax your state requires. No setup fees.",
+          ],
+        },
+        {
+          heading: "Refunds",
+          body: [
+            "Cancel any time and you won't be charged again. We don't refund the month you're in, except under the 60-day guarantee below.",
+            "If we charged you by mistake, email hello@join2fish.com and we'll refund it.",
           ],
         },
         {
           heading: "The 60-day guarantee",
           body: [
             "We compare your total sales in your first 60 days on a paid plan with your sales in the 4 weeks before you started, scaled to the same length. If the increase is less than what you paid for those 60 days, your next month is free.",
-            "To qualify, you give us your sales for the 4 weeks before you start, type in your weekly sales number each week, and the posts you approved need to go up.",
+            "To qualify, either connect Square (it fills in your sales by itself) or type in your sales for the 4 weeks before you start and each week after, and the posts you approved need to go up.",
             "Sales go up and down for many reasons besides posts, like weather and holidays. The guarantee only looks at the numbers above.",
             "The guarantee is one free month, once per store. It isn't a cash refund.",
           ],
@@ -41,7 +49,9 @@ export default function TermsPage() {
           body: [
             "You own the photos, clips and store details you send us. You give 2fish permission to edit them into posts and to share them on the accounts you connect, only for your store.",
             "Only send things you have the right to use. That includes photos of other people, music and other brands' products.",
-            "Nothing is posted without your approval. You're responsible for posts once you approve them.",
+            "Captions are written with AI from your photos and notes. Read each post before you approve it. Nothing is posted without your approval, and you're responsible for posts once you approve them.",
+            "If you connect Square, 2fish only reads your sales. It can't change anything in Square. You can disconnect in Settings any time.",
+            "If you add a mobile number, 2fish texts you about your account. Message and data rates may apply. Reply STOP to stop.",
           ],
         },
         {
