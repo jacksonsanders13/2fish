@@ -83,7 +83,7 @@ export const plan: PlanStep[] = [
   {
     rank: 1,
     title: "Post 7 times a week from your own photos",
-    detail: "Live since Nov 3. 14 posts up so far, each with its own code.",
+    detail: "Live since Nov 3. 14 posts up so far.",
     status: "live",
     impact: 1240,
     action: { label: "See this week's posts", href: "/dashboard/videos" },
@@ -122,7 +122,7 @@ export const plan: PlanStep[] = [
   },
 ];
 
-// Tracked sales: promo codes from posts, used at the register.
+// Tracked sales: shoppers who said at checkout they found the store through a post.
 export const recovered = {
   amount: 1840,
   sales: 23,
@@ -132,7 +132,7 @@ export const recovered = {
 
 export const stats = [
   { label: "Posts this month", value: "14", sub: "7 waiting on you" },
-  { label: "Codes used", value: "23", sub: "$1,840 in sales" },
+  { label: "Shoppers from posts", value: "23", sub: "$1,840 in sales" },
   { label: "Google reviews", value: "44", sub: "was 41 on Nov 1" },
 ];
 
@@ -143,12 +143,12 @@ export type Activity = {
 };
 
 export const activity: Activity[] = [
-  { when: "2:14 PM", text: "A shopper used LINDEN4 at the register. $86.", kind: "job" },
+  { when: "2:14 PM", text: "A shopper came in from the Thursday outfit post. $86.", kind: "job" },
   { when: "11:30 AM", text: "7 posts ready from Monday's photos. Waiting on your okay.", kind: "video" },
-  { when: "Yesterday", text: "The green wrap dress try-on is up to 6 code sales.", kind: "job" },
+  { when: "Yesterday", text: "Green wrap dress: 6 sold since the try-on post, up from 2.", kind: "job" },
   { when: "Yesterday", text: "Reply drafted for a new 5-star Google review.", kind: "review" },
   { when: "Nov 12", text: "Weekly report: try-on clips sold more than flat lays.", kind: "reminder" },
-  { when: "Nov 11", text: "New arrivals post went up with code LINDEN2.", kind: "video" },
+  { when: "Nov 11", text: "New arrivals post went up with 4 fall knits.", kind: "video" },
 ];
 
 export type VideoCard = {
@@ -161,13 +161,13 @@ export type VideoCard = {
 };
 
 export const videos: VideoCard[] = [
-  { id: 1, title: "Try-on: the green wrap dress", length: "0:18", day: "Mon", caption: "Three ways to wear it, one dress. Say LINDEN1 at the register for 10% off.", tone: "night" },
-  { id: 2, title: "New arrivals, unboxed", length: "0:24", day: "Tue", caption: "Fall knits just landed. Small run, so come early. Code LINDEN2.", tone: "surface" },
-  { id: 3, title: "Behind the counter", length: "0:15", day: "Wed", caption: "How Maya picks what goes on the front table. Code LINDEN3.", tone: "surface" },
-  { id: 4, title: "One outfit, under $120", length: "0:21", day: "Thu", caption: "Top, jeans, earrings. All in store now. Code LINDEN4.", tone: "surface" },
-  { id: 5, title: "Gift table for under $40", length: "0:19", day: "Fri", caption: "Candles, scarves and the mugs everyone asks about. Code LINDEN5.", tone: "night" },
-  { id: 6, title: "Saturday in the shop", length: "0:12", day: "Sat", caption: "Come say hi. We're open 10 to 6. Code LINDEN6.", tone: "surface" },
-  { id: 7, title: "Linden Row in 15 seconds", length: "0:15", day: "Sun", caption: "Clothes, gifts and a dressing room with good light. Code LINDEN7.", tone: "night" },
+  { id: 1, title: "Try-on: the green wrap dress", length: "0:18", day: "Mon", caption: "Three ways to wear it, one dress. In store now, XS to XL.", tone: "night" },
+  { id: 2, title: "New arrivals, unboxed", length: "0:24", day: "Tue", caption: "Fall knits just landed. Small run, so come early.", tone: "surface" },
+  { id: 3, title: "Behind the counter", length: "0:15", day: "Wed", caption: "How Maya picks what goes on the front table.", tone: "surface" },
+  { id: 4, title: "One outfit, under $120", length: "0:21", day: "Thu", caption: "Top, jeans, earrings. All in store now.", tone: "surface" },
+  { id: 5, title: "Gift table for under $40", length: "0:19", day: "Fri", caption: "Candles, scarves and the mugs everyone asks about.", tone: "night" },
+  { id: 6, title: "Saturday in the shop", length: "0:12", day: "Sat", caption: "Come say hi. We're open 10 to 6.", tone: "surface" },
+  { id: 7, title: "Linden Row in 15 seconds", length: "0:15", day: "Sun", caption: "Clothes, gifts and a dressing room with good light.", tone: "night" },
 ];
 
 export const uploadedClips = [

@@ -29,8 +29,8 @@ export const loop = [
   {
     n: 4,
     name: "Prove",
-    title: "Every sale from a post, counted in dollars",
-    body: "Each post gets its own code, like LINDEN7 for 10% off. When a shopper uses it at the register, it counts. 23 codes show up as $1,840, not as likes.",
+    title: "What the posts sold, counted in dollars",
+    body: "Each month you see how many of the posted items sold, how many shoppers said they saw a post, and your sales against the month before 2fish. 23 shoppers from posts show up as $1,840, not as likes.",
   },
 ] as const;
 
@@ -118,7 +118,7 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
         <AnimatedMoney amount={recovered.amount} duration={1.4} delay={0.2} />
       </p>
       <p className="mt-2 text-muted-foreground">
-        {recovered.sales} code sales, {recovered.period}
+        {recovered.sales} shoppers from posts, {recovered.period}
       </p>
       <GrowBar pct={pct} delay={0.4} duration={1} className="mt-3 h-1.5" barClassName="bg-cash" />
       <p className="num mt-2 text-muted-foreground">On pace for about {money(recovered.pace)}</p>
@@ -133,13 +133,13 @@ export const features = [
     when: "In the first release",
   },
   {
-    title: "A code on every post",
-    body: "Each post gets its own promo code. Your staff logs it at the register in one tap.",
+    title: "Proof from your register",
+    body: "One tap at checkout for how each shopper heard about you, plus a count of the items your posts showed.",
     when: "In the first release",
   },
   {
     title: "A monthly proof report",
-    body: "Tracked sales, what you got back for your plan, your best post, and how the month compares to the 30 days before.",
+    body: "Sales from posts, what you got back for your plan, your best post, and how the month compares to the 30 days before.",
     when: "In the first release",
   },
   {

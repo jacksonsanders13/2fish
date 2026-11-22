@@ -46,8 +46,8 @@ export type Facts = {
 };
 
 const WEEKS = 4.3;
-// Our working guess until a store has its own numbers: one shopper uses a
-// code for every two posts. The proof report replaces it with the real rate.
+// Our working guess until a store has its own numbers: one extra sale for
+// every two posts. The proof report replaces it with the real rate.
 const SALES_PER_POST = 0.5;
 const POST_GOAL = 7;
 const REVIEW_TARGET = 100;
@@ -105,10 +105,10 @@ export function estimate(a: Answers): Estimate {
     const perMonth = roundTen(Math.max(postsPerWeek, 1) * WEEKS * SALES_PER_POST * sale);
     candidates.push({
       id: "tracking",
-      title: "Put a code on every post",
+      title: "Find out which posts bring people in",
       perMonth,
       short: "Right now you can't tell which posts bring people in.",
-      detail: "Give each post its own code, like 10% off with STORE7. When a shopper uses it, the register tells you that post worked, so you make more like it.",
+      detail: "Ask \"How'd you hear about us?\" at checkout and tap the answer. Count how many of each posted item sold. Then make more of what works.",
       math: `Sales your current posts may already bring in: ${fmt(Math.max(postsPerWeek, 1))} posts a week × 4.3 × 1 sale per 2 posts × $${sale}`,
     });
   }
@@ -163,9 +163,9 @@ function stepFor(leak: Leak, rank: number): PlanStepDraft {
     case "tracking":
       return {
         ...base,
-        key: "codes",
-        title: "Put a code on every post",
-        detail: "Each post gets its own promo code. Log it at the register and the sale counts toward that post.",
+        key: "proof",
+        title: "Track what your posts sell",
+        detail: "One tap at checkout for how each shopper found you, plus a count of the items each post showed.",
         href: "/dashboard",
       };
     case "reviews":

@@ -19,7 +19,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
     input_schema: {
       type: "object",
       properties: {
-        key: { type: "string", description: "Step key: posts, codes, reviews, instagram, or a custom key." },
+        key: { type: "string", description: "Step key: posts, proof, reviews, instagram, or a custom key." },
         status: { type: "string", enum: ["not-started", "needs-you", "in-progress", "live", "done"] },
         title: { type: "string" },
         detail: { type: "string", description: "One or two plain sentences." },
@@ -70,7 +70,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
   },
   {
     name: "start_video_batch",
-    description: "Queue a week of posts (short vertical videos and photo posts, each with its own promo code) from what the owner uploaded. Runs through the video renderer when connected; otherwise it is queued.",
+    description: "Queue a week of posts (short vertical videos and photo posts, each tagged with the items it shows) from what the owner uploaded. Runs through the video renderer when connected; otherwise it is queued.",
     input_schema: {
       type: "object",
       properties: {
@@ -102,7 +102,7 @@ export const toolDefinitions: Anthropic.Tool[] = [
       type: "object",
       properties: {
         value: { type: "integer", minimum: 1 },
-        source_step: { type: "string", description: "posts, codes, reviews, instagram, or other." },
+        source_step: { type: "string", description: "posts, proof, reviews, instagram, or other." },
         note: { type: "string" },
       },
       required: ["value"],

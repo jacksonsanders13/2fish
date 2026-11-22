@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { roundTen } from "@/lib/format";
 
 const WEEKS = 4.3;
-// A guess, and the page says so: one code sale for every two posts.
+// A guess, and the page says so: one extra sale for every two posts.
 // The proof report replaces it with the store's real number.
 const SALES_PER_POST = 0.5;
 
@@ -67,7 +67,7 @@ export function PostsCalculator({ className }: { className?: string }) {
         </p>
         <p className="mt-2 text-sm">
           About <AnimatedMoney amount={yearly} tone="ink" duration={0.6} className="font-semibold" /> a year.
-          Assumes one shopper uses a code for every two posts. Your proof report shows the real number.
+          Assumes one extra sale for every two posts. Your proof report shows the real number.
         </p>
       </div>
 

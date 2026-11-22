@@ -14,7 +14,7 @@ export default function TermsPage() {
         {
           heading: "What 2fish does",
           body: [
-            "2fish turns the photos and clips you send into posts for your store, puts a promo code on each one, and reports the sales logged with those codes. The free Store Grader scores your store and suggests fixes.",
+            "2fish turns the photos and clips you send into posts for your store and reports what they sold: how shoppers said they heard about you, sales of the items the posts showed, and your weekly sales. The free Store Grader scores your store and suggests fixes.",
             "Scores, estimates and calculator figures are estimates, not promises of sales.",
           ],
         },
@@ -30,16 +30,10 @@ export default function TermsPage() {
         {
           heading: "The 60-day guarantee",
           body: [
-            "If the tracked sales from your 2fish codes in your first 60 days on a paid plan add up to less than what you paid for those 60 days, your next month is free.",
-            "Tracked sales means sales logged in 2fish with one of your 2fish promo codes. To qualify, the posts you approved need to go up, and sales with codes need to be logged when they happen.",
+            "We compare your total sales in your first 60 days on a paid plan with your sales in the 4 weeks before you started, scaled to the same length. If the increase is less than what you paid for those 60 days, your next month is free.",
+            "To qualify, you give us your sales for the 4 weeks before you start, type in your weekly sales number each week, and the posts you approved need to go up.",
+            "Sales go up and down for many reasons besides posts, like weather and holidays. The guarantee only looks at the numbers above.",
             "The guarantee is one free month, once per store. It isn't a cash refund.",
-          ],
-        },
-        {
-          heading: "Promo codes",
-          body: [
-            "The discount on each code is your store's offer. You choose it, you honor it at your register, and you cover its cost.",
-            "You can change or end a code's discount any time. Tell your shoppers if you do.",
           ],
         },
         {

@@ -38,7 +38,7 @@ export function VideosScreen({ email }: { email?: string }) {
             <h1 className="text-display font-semibold">7 posts a week from your photos</h1>
             <p className="mt-3">
               Send the product photos and try-on clips you already take. Every Monday 2fish turns them into 7
-              posts with captions, each with its own promo code.
+              posts with captions, and keeps count of what they sold.
             </p>
             <p className="mt-4 rounded-md bg-night px-4 py-3 text-sm text-white">
               <strong>Coming soon.</strong> This is what it will look like, using samples from Linden Row, a

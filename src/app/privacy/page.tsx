@@ -17,14 +17,14 @@ export default function PrivacyPage() {
             "Your account: your email and a password, or the Google, Apple or Microsoft account you sign in with.",
             "Your store: its name, city, Instagram handle and the answers you give in the Store Grader.",
             "Your content: the photos and clips you upload and the posts made from them.",
-            "Your sales: the promo codes logged at your register, the sale amounts, and any sales numbers you type in. We don't need your shoppers' names for any of this.",
+            "Your sales: how shoppers said they heard about you, the sale amounts, counts of the items your posts showed, and the weekly sales numbers you type in. We don't need your shoppers' names for any of this.",
             "Your chats with the 2fish assistant.",
           ],
         },
         {
           heading: "What we use it for",
           body: [
-            "To make your posts, run your codes, build your reports and keep your account working. That's it.",
+            "To make your posts, build your reports and keep your account working. That's it.",
             "We don't sell your information, and we don't show you ads.",
           ],
         },
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
         {
           heading: "Getting it back or deleting it",
           body: [
-            "In Settings you can download everything 2fish has about your store, or delete your account. Deleting removes your store, uploads, posts, codes and chats.",
+            "In Settings you can download everything 2fish has about your store, or delete your account. Deleting removes your store, uploads, posts, sales numbers and chats.",
           ],
         },
         {

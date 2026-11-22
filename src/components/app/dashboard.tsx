@@ -36,7 +36,7 @@ export function Dashboard({
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
   const suggestions = plan
-    ? ["Walk me through my fixes", "Make this week's posts", "Someone used a code today", "What's selling best?"]
+    ? ["Walk me through my fixes", "Make this week's posts", "A shopper said they saw a post", "What's selling best?"]
     : ["What do you do?", "How does the grader work?"];
 
   return (

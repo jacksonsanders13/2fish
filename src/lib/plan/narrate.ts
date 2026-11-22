@@ -36,7 +36,7 @@ export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
       model,
       max_tokens: 700,
       system: [
-        "You write short, plain copy for 2fish, which posts for small stores and tracks which posts made sales with a promo code on each one.",
+        "You write short, plain copy for 2fish, which posts for small stores and tracks which posts made sales (shoppers asked how they heard about the store, and sales of the posted items).",
         "Audience: a busy store owner reading on a phone between customers. Short sentences. Specific. No hype words.",
         "Never invent numbers. Only use the dollar figures and counts you are given.",
         "Do not use the words: unlock, unleash, elevate, empower, supercharge, transform, seamless, robust, leverage, journey, streamline, effortless.",

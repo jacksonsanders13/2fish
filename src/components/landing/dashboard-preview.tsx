@@ -27,7 +27,7 @@ export function DashboardPreview({ chrome = "light", className }: { chrome?: "li
             <AnimatedMoney amount={recovered.amount} duration={1.6} delay={0.3} />
           </p>
           <p className="mt-2 text-muted-foreground">
-            {recovered.sales} sales from post codes, {recovered.period}
+            {recovered.sales} shoppers came in from a post, {recovered.period}
           </p>
           <ol className="mt-4">
             {plan.slice(0, 4).map((step) => (

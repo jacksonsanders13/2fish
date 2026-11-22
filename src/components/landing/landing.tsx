@@ -22,7 +22,7 @@ export function Landing() {
             <div className="min-w-0">
               <h1 className="rise text-display text-ink">Daily posts, and proof they sold</h1>
               <p className="rise mt-6 max-w-xl" style={{ "--rise-delay": "0.1s" } as React.CSSProperties}>
-                7 posts every Monday from your photos, each with a code the register counts.
+                7 posts every Monday from your photos, and a monthly report on what they sold.
               </p>
               <div
                 className="rise mt-8 flex flex-col gap-3 sm:flex-row"
@@ -56,7 +56,7 @@ export function Landing() {
               <h2 className="text-display">What a week of posts could bring in</h2>
               <p className="mt-5 max-w-md">
                 Most small stores post when there&apos;s a spare minute between customers, then can&apos;t tell if
-                any of it sold. Give every post its own code and the register tells you.
+                any of it sold. Count what the posts showed and ask who saw them, and you know.
               </p>
               <StepLink href="/audit" className="mt-6">
                 See how your store scores
@@ -144,8 +144,9 @@ export function Landing() {
             ))}
           </ul>
           <p className="mt-6 max-w-2xl text-sm">
-            First 10 Raleigh-area stores pay $49 a month for life. If tracked sales don&apos;t cover your plan in
-            60 days, the next month is free. Month to month, cancel any time.
+            First 10 Raleigh-area stores pay $49 a month for life. If your sales over the first 60 days aren&apos;t
+            up by more than your plan cost, compared with the month before you started, the next month is free.
+            Month to month, cancel any time.
           </p>
         </Step>
 
@@ -172,7 +173,7 @@ const plans = [
     name: "Starter",
     price: 79,
     who: "For stores that need to post every day",
-    items: ["7 posts a week from your photos", "A promo code on every post", "Monthly proof report"],
+    items: ["7 posts a week from your photos", "A one-tap \"how'd you hear about us\" at checkout", "Monthly proof report"],
     pick: false,
   },
   {

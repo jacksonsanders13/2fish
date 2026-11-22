@@ -148,7 +148,7 @@ export function ResultsScreen() {
                     ))}
                   </ul>
                   <p className="mt-3 text-muted-foreground">
-                    Based on your answers and one working guess: a shopper uses a code for every two posts. Your
+                    Based on your answers and one working guess: one extra sale for every two posts. Your
                     proof report replaces that guess with your store&apos;s real number.
                   </p>
                 </details>
