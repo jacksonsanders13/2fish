@@ -23,7 +23,6 @@ export default function TermsPage() {
           body: [
             "Plans are billed monthly, or yearly if you pick that. They renew until you cancel.",
             "You can cancel any time in Settings. You keep your plan until the end of the period you already paid for. We don't refund partial months.",
-            "The founding price of $49 a month is for the first 10 stores we sign. It stays at $49 for as long as that subscription stays active. If you cancel and come back later, current prices apply.",
             "We'll tell you at least 30 days before any price change on your plan.",
             "The price you see is the price you pay, plus any sales tax your state requires. No setup fees.",
           ],
@@ -31,17 +30,8 @@ export default function TermsPage() {
         {
           heading: "Refunds",
           body: [
-            "Cancel any time and you won't be charged again. We don't refund the month you're in, except under the 60-day guarantee below.",
+            "Cancel any time and you won't be charged again. We don't refund the month you're in.",
             "If we charged you by mistake, email hello@join2fish.com and we'll refund it.",
-          ],
-        },
-        {
-          heading: "The 60-day guarantee",
-          body: [
-            "We compare your total sales in your first 60 days on a paid plan with your sales in the 4 weeks before you started, scaled to the same length. If the increase is less than what you paid for those 60 days, your next month is free.",
-            "To qualify, either connect Square (it fills in your sales by itself) or type in your sales for the 4 weeks before you start and each week after, and the posts you approved need to go up.",
-            "Sales go up and down for many reasons besides posts, like weather and holidays. The guarantee only looks at the numbers above.",
-            "The guarantee is one free month, once per store. It isn't a cash refund.",
           ],
         },
         {
