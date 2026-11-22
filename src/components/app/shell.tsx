@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { FileText, LayoutDashboard, LogOut, Settings, ShoppingBag, Users, Video } from "lucide-react";
+import { FileText, LayoutDashboard, Lightbulb, LogOut, Settings, ShoppingBag, Users, Video } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
 import { signOut } from "@/lib/plan/actions";
 import { cn } from "@/lib/utils";
 
-export type Section = "dashboard" | "text-back" | "customers" | "videos" | "checkout" | "report" | "settings";
+export type Section = "dashboard" | "text-back" | "customers" | "videos" | "examples" | "checkout" | "report" | "settings";
 
 // `short` is the phone tab label; items without one stay off the phone bar.
 const nav: { key: Section; label: string; short?: string; icon: typeof LayoutDashboard; href: string }[] = [
   { key: "dashboard", label: "Dashboard", short: "Home", icon: LayoutDashboard, href: "/dashboard" },
   { key: "videos", label: "Posts", short: "Posts", icon: Video, href: "/dashboard/videos" },
+  { key: "examples", label: "Examples", icon: Lightbulb, href: "/dashboard/examples" },
   { key: "checkout", label: "Checkout", short: "Checkout", icon: ShoppingBag, href: "/dashboard/checkout" },
   { key: "report", label: "Report", short: "Report", icon: FileText, href: "/dashboard/report" },
   { key: "customers", label: "Customers", icon: Users, href: "/dashboard/customers" },

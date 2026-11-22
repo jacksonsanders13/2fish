@@ -44,3 +44,16 @@ export function looksLikeImage(name: string) {
 export function sourceLabel(id: string) {
   return SOURCES.find((s) => s.id === id)?.label ?? "Other";
 }
+
+export type Example = {
+  id: string;
+  isGlobal: boolean;
+  mine: boolean;
+  kind: string;
+  hook: string;
+  caption: string;
+  why: string;
+  views: number | null;
+  likes: number | null;
+  link: string;
+};

@@ -1,6 +1,7 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureBusiness } from "@/lib/app/queries";
 import { addDays, mondayOf, packWeek, todayIn } from "./dates";
-import { looksLikeImage, type Checkout, type ItemSale, type Post, type SourceId, type Upload, type WeekSales } from "./types";
+import { looksLikeImage, type Checkout, type Example, type ItemSale, type Post, type SourceId, type Upload, type WeekSales } from "./types";
 
 type Supa = Awaited<ReturnType<typeof ensureBusiness>>["supabase"];
 
@@ -171,4 +172,32 @@ export async function postSalesThisMonth(supabase: Supa, businessId: string, tz:
   const { data } = await supabase.from("checkouts").select("amount").eq("business_id", businessId).eq("source", "post").gte("sold_on", start);
   const rows = data ?? [];
   return { amount: rows.reduce((s, r) => s + r.amount, 0), count: rows.length };
+}
+
+/** The examples the agent studies: this owner's plus the shared ones, best performers first. */
+export async function loadExamples(db: SupabaseClient, ownerId: string, limit = 20): Promise<Example[]> {
+  const { data } = await db
+    .from("post_examples")
+    .select("*")
+    .or(`is_global.eq.true,owner_id.eq.${ownerId}`)
+    .order("views", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    isGlobal: r.is_global,
+    mine: r.owner_id === ownerId,
+    kind: r.kind,
+    hook: r.hook,
+    caption: r.caption,
+    why: r.why,
+    views: r.views,
+    likes: r.likes,
+    link: r.link,
+  }));
+}
+
+export async function getExamplesPage() {
+  const { supabase, user } = await ensureBusiness();
+  return { examples: await loadExamples(supabase, user.id, 300) };
 }

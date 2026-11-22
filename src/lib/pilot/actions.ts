@@ -6,7 +6,7 @@ import { limitMessage, takeQuota } from "@/lib/app/limits";
 import { ensureBusiness } from "@/lib/app/queries";
 import { isYmd, mondayOf, todayIn } from "./dates";
 import { buildPack } from "./pack";
-import { listUploads } from "./queries";
+import { listUploads, loadExamples } from "./queries";
 import { SOURCES } from "./types";
 
 type Result = { ok: true; message?: string } | { ok: false; message: string };
@@ -37,7 +37,8 @@ export async function makePack(input: { weekOf: string; notes: string }): Promis
     if (!media.length && !notes.trim()) return { ok: false, message: "Add a few photos or write what's new in the store first." };
     if (!(await takeQuota(supabase, "pack"))) return { ok: false, message: limitMessage.pack };
 
-    const { posts, model } = await buildPack({ store: business.name || "the store", city: business.city, notes, media });
+    const examples = await loadExamples(supabase, user.id);
+    const { posts, model } = await buildPack({ store: business.name || "the store", city: business.city, notes, media, examples });
     await supabase.from("posts").delete().eq("business_id", business.id).eq("week_of", weekOf).eq("status", "draft");
     const { error } = await supabase.from("posts").insert(
       posts.map((p) => ({

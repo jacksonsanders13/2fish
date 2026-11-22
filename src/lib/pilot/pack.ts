@@ -29,7 +29,13 @@ const VISION = /\.(jpe?g|png|webp|gif)$/i;
 const MAX_IMAGES = 8;
 
 /** Seven posts, Monday to Sunday. Claude writes them when it can; otherwise a plain template. */
-export async function buildPack(input: { store: string; city: string; notes: string; media: PackMedia[] }): Promise<{ posts: PostDraft[]; model: string | null }> {
+export async function buildPack(input: {
+  store: string;
+  city: string;
+  notes: string;
+  media: PackMedia[];
+  examples?: { kind: string; hook: string; caption: string; why: string; views: number | null; likes: number | null }[];
+}): Promise<{ posts: PostDraft[]; model: string | null }> {
   const items = input.notes
     .split(/\n|,/)
     .map((s) => s.trim())
@@ -49,6 +55,16 @@ export async function buildPack(input: { store: string; city: string; notes: str
       type: "text",
       text: `Store: ${input.store}${input.city ? ` in ${input.city}` : ""}\n\nWhat's in the store this week, from the owner:\n${input.notes.trim() || "(nothing written)"}\n\nFiles the owner sent (index: name):\n${list || "(none)"}\n\nThe photos you can see follow, in index order.`,
     });
+    // Popular posts to learn from. Patterns only: the words stay theirs.
+    const examples = (input.examples ?? []).slice(0, 20);
+    if (examples.length) {
+      const lines = examples.map((x, i) => {
+        const stats = [x.views != null ? `${x.views.toLocaleString()} views` : "", x.likes != null ? `${x.likes.toLocaleString()} likes` : ""].filter(Boolean).join(", ");
+        return `${i + 1}. [${x.kind}]${stats ? ` (${stats})` : ""} hook: "${x.hook}" caption: "${x.caption.slice(0, 400)}"${x.why ? ` why it worked: ${x.why}` : ""}`;
+      });
+      content.push({ type: "text", text: `Posts that did well for other stores. Study their patterns:\n${lines.join("\n")}` });
+    }
+
     let shown = 0;
     input.media.forEach((m, i) => {
       if (shown >= MAX_IMAGES || !m.url || !VISION.test(m.name)) return;
@@ -66,6 +82,7 @@ export async function buildPack(input: { store: string; city: string; notes: str
         "Each post features 1 to 3 specific items from the owner's list or clearly visible in a photo. Name items the way a shopper would ask for them at the counter (\"green wrap dress\").",
         "hook: the first line someone reads, under 12 words. caption: under 220 characters, plain and warm, ends by giving a reason to come in. Up to 3 hashtags, local ones welcome. No emoji. No promo codes or discounts unless the owner wrote one. Never invent prices, sizes or stock counts.",
         "Never use: unlock, elevate, curated, obsessed, must-have, game-changer, journey, vibes.",
+        "If example posts are given, borrow what made them work (hook style, format, structure, pacing) and apply it to this store's items. Never copy their words, names or claims.",
         "media: the index of the file that fits the post best, or null. Spread the files across the week.",
         'Reply with JSON only: {"posts":[{"kind":string,"title":string,"hook":string,"caption":string,"items":string[],"media":number|null}]}',
       ].join("\n"),
