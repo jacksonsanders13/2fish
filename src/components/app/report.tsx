@@ -213,6 +213,40 @@ function ItemsSection({ data }: { data: ReportData }) {
   const [counts, setCounts] = useState<Record<string, { sold: string; soldBefore: string }>>({});
   const [msg, setMsg] = useState<string | null>(null);
 
+  if (data.square) {
+    const rows = [...data.itemSales].sort((a, b) => (a.weekOf < b.weekOf ? 1 : -1));
+    return (
+      <section className="mt-6 rounded-lg bg-white p-5">
+        <h2 className="font-semibold">Posted items sold</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Counted from Square: the week each item was posted, and the week before.</p>
+        {rows.length ? (
+          <table className="mt-4 w-full text-sm">
+            <thead>
+              <tr className="text-left">
+                <th className="pb-2 font-semibold">Item</th>
+                <th className="pb-2 font-semibold">Posted</th>
+                <th className="pb-2 text-right font-semibold">That week</th>
+                <th className="pb-2 text-right font-semibold">Before</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={`${r.weekOf}|${r.item}`}>
+                  <td className="py-1 pr-2">{r.item}</td>
+                  <td className="py-1 pr-2">{shortDate(r.weekOf)}</td>
+                  <td className={cn("num py-1 text-right", r.sold > r.soldBefore && "font-semibold text-cash")}>{r.sold}</td>
+                  <td className="num py-1 text-right">{r.soldBefore}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">Shows up once a week of approved posts has run.</p>
+        )}
+      </section>
+    );
+  }
+
   const val = (item: string, k: "sold" | "soldBefore") => counts[`${week}|${item}`]?.[k] ?? String(saved.get(item)?.[k] ?? "");
   const set = (item: string, k: "sold" | "soldBefore", v: string) =>
     setCounts((c) => ({ ...c, [`${week}|${item}`]: { sold: val(item, "sold"), soldBefore: val(item, "soldBefore"), [k]: v } }));
@@ -302,8 +336,9 @@ function WeeklySection({ data, baseline }: { data: ReportData; baseline: number 
       <p className="mt-1 text-sm text-muted-foreground">
         Your register&apos;s total for each week, Monday to Sunday. The 4 weeks before your first approved posts are the &quot;before&quot; number.
       </p>
+      {data.square ? <p className="mt-2 text-sm font-semibold">From Square, updated every morning.</p> : null}
       <form
-        className="mt-4 flex flex-wrap items-end gap-2 print:hidden"
+        className={cn("mt-4 flex flex-wrap items-end gap-2 print:hidden", data.square && "hidden")}
         onSubmit={(e) => {
           e.preventDefault();
           start(async () => {

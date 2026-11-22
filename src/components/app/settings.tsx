@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { changePassword, deleteAccount, updateBusiness } from "@/lib/app/actions";
+import { disconnectSquareNow, syncSquareNow } from "@/lib/integrations/square-actions";
 import { BUSINESS_KINDS, formatPhone, type Business } from "@/lib/app/types";
 import { Field, Notice, selectClass } from "./forms";
 
-export function SettingsView({ email, business }: { email: string; business: Business }) {
+type SquareState = { ready: boolean; connectedAt: string | null; syncedAt: string | null; status: string | null };
+
+export function SettingsView({ email, business, square }: { email: string; business: Business; square: SquareState }) {
   return (
     <>
       <Reveal immediate y={16}>
@@ -20,6 +23,12 @@ export function SettingsView({ email, business }: { email: string; business: Bus
       </Reveal>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Reveal immediate delay={0.05}>
+          <Card title="Square" sub="2fish reads your sales so it can tell which posts sold. It can't change anything in Square.">
+            <SquareCard square={square} />
+          </Card>
+        </Reveal>
+
         <Reveal immediate delay={0.1}>
           <Card title="Your business" sub="Shows up in your texts and on your plan.">
             <BusinessForm business={business} />
@@ -63,6 +72,65 @@ export function SettingsView({ email, business }: { email: string; business: Bus
           </Card>
         </Reveal>
       </div>
+    </>
+  );
+}
+
+function SquareCard({ square }: { square: SquareState }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(
+    square.status === "connected" ? "Connected. Your last 90 days of sales are in." : square.status === "failed" ? "Square didn't connect. Try again." : null,
+  );
+
+  if (!square.ready) return <p className="text-sm text-muted-foreground">Not switched on yet. It works once 2fish&apos;s Square keys are added.</p>;
+
+  if (!square.connectedAt) {
+    return (
+      <>
+        <Button asChild variant="signal">
+          <a href="/api/square/connect">Connect Square</a>
+        </Button>
+        {msg ? <p className="mt-2 text-sm" role="status">{msg}</p> : null}
+      </>
+    );
+  }
+
+  const synced = square.syncedAt ? new Date(square.syncedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "not yet";
+  return (
+    <>
+      <p className="text-sm">
+        <span className="font-semibold">Connected.</span> Last sync: {synced}. It syncs every morning on its own.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              const r = await syncSquareNow();
+              setMsg(r.message);
+              router.refresh();
+            })
+          }
+        >
+          {pending ? "Syncing…" : "Sync now"}
+        </Button>
+        <Button
+          variant="ghost"
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              await disconnectSquareNow();
+              setMsg("Disconnected.");
+              router.refresh();
+            })
+          }
+        >
+          Disconnect
+        </Button>
+      </div>
+      {msg ? <p className="mt-2 text-sm" role="status">{msg}</p> : null}
     </>
   );
 }

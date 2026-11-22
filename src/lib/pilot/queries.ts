@@ -108,8 +108,41 @@ export async function getReport(month?: string) {
     supabase.from("posts").select("week_of").eq("business_id", business.id).in("status", ["approved", "posted"]).order("week_of").limit(1).maybeSingle(),
   ]);
 
-  const weekly: WeekSales[] = (ws.data ?? []).map((r) => ({ weekOf: r.week_of, amount: r.amount }));
-  const itemSales: ItemSale[] = (items.data ?? []).map((r) => ({ weekOf: r.week_of, item: r.item, sold: r.sold, soldBefore: r.sold_before }));
+  let weekly: WeekSales[] = (ws.data ?? []).map((r) => ({ weekOf: r.week_of, amount: r.amount }));
+  let itemSales: ItemSale[] = (items.data ?? []).map((r) => ({ weekOf: r.week_of, item: r.item, sold: r.sold, soldBefore: r.sold_before }));
+  const postRows = posts.data ?? [];
+
+  // With Square connected, the numbers come from the register instead of being typed in.
+  const [sd, idaily] = await Promise.all([
+    supabase.from("sales_daily").select("day, total").eq("business_id", business.id).gte("day", addDays(today, -200)),
+    supabase.from("item_daily").select("day, item, qty").eq("business_id", business.id).gte("day", addDays(firstWeek, -7)).lt("day", end),
+  ]);
+  const square = (sd.data ?? []).length > 0;
+  if (square) {
+    const byWeek = new Map<string, number>();
+    for (const r of sd.data ?? []) {
+      const w = mondayOf(r.day);
+      if (addDays(w, 6) >= today) continue; // only finished weeks
+      byWeek.set(w, (byWeek.get(w) ?? 0) + r.total);
+    }
+    weekly = [...byWeek].map(([weekOf, amount]) => ({ weekOf, amount }));
+
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+    const soldIn = (item: string, from: string, to: string) => {
+      const key = norm(item);
+      return (idaily.data ?? [])
+        .filter((r) => r.day >= from && r.day <= to && (norm(r.item).includes(key) || key.includes(norm(r.item))))
+        .reduce((s, r) => s + Number(r.qty), 0);
+    };
+    const auto: ItemSale[] = [];
+    for (const w of [...new Set(postRows.filter((p) => p.status !== "draft").map((p) => p.week_of as string))]) {
+      if (w > today) continue;
+      for (const item of new Set(postRows.filter((p) => p.week_of === w).flatMap((p) => (p.items as string[]) ?? []))) {
+        auto.push({ weekOf: w, item, sold: soldIn(item, w, addDays(w, 6)), soldBefore: soldIn(item, addDays(w, -7), addDays(w, -1)) });
+      }
+    }
+    itemSales = auto;
+  }
 
   // Weeks with a Monday inside the month, up to this week, for the entry forms.
   const weeks: string[] = [];
@@ -120,12 +153,13 @@ export async function getReport(month?: string) {
     today,
     month: ym,
     planPrice: (biz.data?.plan_price as number | null) ?? null,
+    square,
     checkouts: (c.data ?? []).map(mapCheckout),
     weekly,
     itemSales,
     weeks,
     startedWeek: (firstPack.data?.week_of as string | undefined) ?? null,
-    posts: (posts.data ?? []).map((r) => ({ id: r.id as string, weekOf: r.week_of as string, label: `${r.day} · ${r.title}`, items: (r.items as string[]) ?? [], live: r.status !== "draft" })),
+    posts: postRows.map((r) => ({ id: r.id as string, weekOf: r.week_of as string, label: `${r.day} · ${r.title}`, items: (r.items as string[]) ?? [], live: r.status !== "draft" })),
   };
 }
 
