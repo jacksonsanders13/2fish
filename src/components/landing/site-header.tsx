@@ -23,10 +23,10 @@ export function SiteHeader() {
           </Link>
         </nav>
         <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="h-10 sm:h-9">
             <Link href="/login">Sign in</Link>
           </Button>
-          <Button asChild size="sm" variant="signal">
+          <Button asChild size="sm" variant="signal" className="h-10 sm:h-9">
             <Link href="/audit">
               <span className="sm:hidden">Free store grade</span>
               <span className="hidden sm:inline">Get your free store grade</span>

@@ -18,6 +18,7 @@
   --night-deep: #0e4746;
   --signal: #c8402f;
   --signal-tint: #a8321f;
+  --signal-soft: #fcece8; /* light coral: highlights that aren't buttons */
   --cash: #047857;
   --cash-bright: #6ee7b7;
   --on-night-muted: #d3e8e7;
@@ -76,6 +77,7 @@
   --color-night-deep: var(--night-deep);
   --color-signal: var(--signal);
   --color-signal-tint: var(--signal-tint);
+  --color-signal-soft: var(--signal-soft);
   --color-cash: var(--cash);
   --color-cash-bright: var(--cash-bright);
   --color-on-night-muted: var(--on-night-muted);

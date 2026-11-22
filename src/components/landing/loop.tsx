@@ -30,7 +30,7 @@ export const loop = [
     n: 4,
     name: "Prove",
     title: "What the posts sold, counted in dollars",
-    body: "Each month you see how many of the posted items sold, how many shoppers said they saw a post, and your sales against the month before 2fish. 23 shoppers from posts show up as $1,840, not as likes.",
+    body: "2fish reads your Square sales and matches them to your posts. When the green dress sells 6 the week it's posted, up from 2, you see it in dollars, not likes.",
   },
 ] as const;
 
@@ -125,31 +125,3 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
     </div>
   );
 }
-
-export const features = [
-  {
-    title: "A week of posts every Monday",
-    body: "Your photos and clips in. Seven posts with captions out, ready for Instagram and TikTok.",
-    when: "In the first release",
-  },
-  {
-    title: "Proof from your register",
-    body: "One tap at checkout for how each shopper heard about you, plus a count of the items your posts showed.",
-    when: "In the first release",
-  },
-  {
-    title: "A monthly proof report",
-    body: "Sales from posts, what you got back for your plan, your best post, and how the month compares to the 30 days before.",
-    when: "In the first release",
-  },
-  {
-    title: "Posting for you",
-    body: "Approved posts go up on their own at the best time. Until then, each post comes ready to share from your phone.",
-    when: "Coming after launch",
-  },
-  {
-    title: "Google profile posts and review replies",
-    body: "Weekly posts on your Google profile and a drafted reply to every new review.",
-    when: "Coming after launch",
-  },
-];

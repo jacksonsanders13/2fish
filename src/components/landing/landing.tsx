@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
 import { PostsCalculator } from "./calculator";
 import { DashboardPreview } from "./dashboard-preview";
-import { features, loop, StepSnippet } from "./loop";
+import { loop, StepSnippet } from "./loop";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -38,6 +38,9 @@ export function Landing() {
                   <a href="#how">See how it works</a>
                 </Button>
               </div>
+              <p className="rise mt-3 text-sm text-muted-foreground" style={{ "--rise-delay": "0.2s" } as React.CSSProperties}>
+                About 2 minutes. No card.
+              </p>
             </div>
             <div
               className="rise min-w-0 rounded-md bg-night p-3 sm:p-6"
@@ -56,7 +59,7 @@ export function Landing() {
               <h2 className="text-display">What a week of posts could bring in</h2>
               <p className="mt-5 max-w-md">
                 Most small stores post when there&apos;s a spare minute between customers, then can&apos;t tell if
-                any of it sold. Count what the posts showed and ask who saw them, and you know.
+                any of it sold. 2fish reads your Square sales and shows you which posts did.
               </p>
               <StepLink href="/audit" className="mt-6">
                 See how your store scores
@@ -87,68 +90,59 @@ export function Landing() {
 
         {/* The work, and what it costs */}
         <Step id="pricing">
-          <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
-            <div>
-              <h2 className="text-display">2fish does the posting for you</h2>
-              <dl className="mt-8 space-y-6">
-                {features.map((f) => (
-                  // dt and dd sit directly in the div so screen readers read it as one item
-                  <div key={f.title} className="grid gap-1 sm:grid-cols-[1fr_auto] sm:gap-x-6">
-                    <dt className="font-semibold">{f.title}</dt>
-                    <dd className="text-sm">{f.body}</dd>
-                    <dd className="text-sm text-muted-foreground sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:pt-1 sm:text-right">
-                      {f.when}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-            <div className="self-start rounded-md bg-surface p-5">
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-semibold">Store Grader</h3>
-                <span className="num font-semibold">Free</span>
-              </div>
-              <p className="mt-1 text-sm">Your score out of 100 and three fixes for your store. No card, no account.</p>
-            </div>
-          </div>
+          <h2 className="max-w-2xl text-display">2fish does the posting for you</h2>
+          <p className="mt-4 max-w-xl">Pick a plan. Month to month, cancel any time.</p>
 
-          {/* The three plans, each on its own. Growth is the one most stores should pick, so it's the orange one. */}
-          <ul className="mt-12 grid gap-4 md:grid-cols-3">
+          {/* The three plans, each with its own button. Growth is the pick, marked in light coral. */}
+          <ul className="mt-10 grid gap-4 md:grid-cols-3">
             {plans.map((p) => (
               <li
                 key={p.name}
-                className={cn(
-                  "flex flex-col rounded-md p-5",
-                  p.pick ? "on-night bg-signal text-white" : "bg-surface",
-                )}
+                className={cn("flex flex-col rounded-md p-5", p.pick ? "border-2 border-signal bg-signal-soft" : "border-2 border-transparent bg-surface")}
               >
-                <h3 className="font-semibold">{p.name}</h3>
+                <h3 className="font-semibold">
+                  {p.name}
+                  {p.pick ? <span className="ml-2 text-sm font-semibold text-signal-tint">Most stores pick this</span> : null}
+                </h3>
                 <p className="mt-2">
                   <span className="num text-display font-semibold">${p.price}</span>
-                  <span className={cn("text-sm", p.pick ? "text-white" : "text-muted-foreground")}> a month</span>
+                  <span className="text-sm text-muted-foreground"> a month</span>
                 </p>
-                <p className={cn("mt-1 text-sm", p.pick ? "text-white" : "text-muted-foreground")}>{p.who}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{p.who}</p>
                 <ul className="mt-4 space-y-1.5 text-sm">
                   {p.items.map((x) => (
                     <li key={x} className="flex gap-2">
-                      <Check
-                        size={16}
-                        className={cn("mt-0.5 shrink-0", p.pick ? "text-white" : "text-night")}
-                        aria-hidden="true"
-                      />
+                      <Check size={16} className="mt-0.5 shrink-0 text-night" aria-hidden="true" />
                       {x}
                     </li>
                   ))}
                 </ul>
+                <Button asChild size="lg" variant={p.pick ? "signal" : "outline"} className="mt-6 h-12 w-full text-base">
+                  <Link href={`/signup?plan=${p.name.toLowerCase()}`}>Start with {p.name}</Link>
+                </Button>
               </li>
             ))}
           </ul>
+
+          {/* The free way in, right next to the paid ones */}
+          <div className="mt-4 flex flex-col gap-4 rounded-md bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm">
+              <span className="font-semibold">Not sure yet?</span> The Store Grader is free: your score out of 100 and three fixes. No
+              card, no account.
+            </p>
+            <StepLink href="/audit" className="shrink-0">
+              Get your free store grade
+            </StepLink>
+          </div>
         </Step>
 
         {/* The ask, on the one dark band */}
         <section className="on-night bg-night text-white">
           <Container className="grid gap-8 py-16 lg:grid-cols-[1fr_auto] lg:items-end lg:py-24">
-            <h2 className="max-w-2xl text-display text-white">Bring what you have and we&apos;ll multiply it</h2>
+            <div>
+              <h2 className="max-w-2xl text-display text-white">Bring what you have and we&apos;ll multiply it</h2>
+              <p className="mt-3 text-on-night-muted">Month to month. Cancel any time.</p>
+            </div>
             <Button asChild size="lg" variant="signal" className="h-12 w-full px-5 text-base sm:w-auto">
               <Link href="/audit">
                 Get your free store grade
@@ -174,7 +168,7 @@ const plans = [
   {
     name: "Growth",
     price: 149,
-    who: "The one we'd pick for most stores",
+    who: "For stores ready to grow from what sells",
     items: [
       "Everything in Starter",
       "Texts you when posts are ready",
