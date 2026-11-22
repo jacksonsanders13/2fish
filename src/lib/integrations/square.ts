@@ -34,6 +34,7 @@ async function tokenRequest(body: Record<string, string>): Promise<TokenResponse
     method: "POST",
     headers: { "Content-Type": "application/json", "Square-Version": VERSION },
     body: JSON.stringify({ client_id: c.appId, client_secret: c.secret, ...body }),
+    signal: AbortSignal.timeout(20_000),
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json?.errors?.[0]?.detail ?? json?.message ?? "Square said no.");
@@ -85,6 +86,7 @@ async function api<T>(token: string, path: string, body?: unknown): Promise<T> {
     method: body ? "POST" : "GET",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "Square-Version": VERSION },
     body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(30_000),
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json?.errors?.[0]?.detail ?? `Square ${res.status}`);

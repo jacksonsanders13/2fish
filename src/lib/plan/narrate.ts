@@ -10,7 +10,7 @@ export type Narration = {
 // Claude writes the words. The numbers always come from estimate.ts, and if
 // there's no API key (or the call fails) we fall back to the built-in wording
 // so the product never depends on the model being up.
-export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
+export async function narrate(est: Estimate, a: Answers, allowModel = true): Promise<Narration> {
   const fallback: Narration = {
     summary: templateSummary(est, a),
     details: Object.fromEntries(est.steps.map((s) => [s.key, s.detail])),
@@ -18,10 +18,10 @@ export async function narrate(est: Estimate, a: Answers): Promise<Narration> {
   };
 
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return fallback;
+  if (!key || !allowModel) return fallback;
 
   try {
-    const client = new Anthropic({ apiKey: key });
+    const client = new Anthropic({ apiKey: key, timeout: 25_000, maxRetries: 1 });
     const model = "claude-sonnet-5-5";
     const brief = {
       store: est.facts.store,

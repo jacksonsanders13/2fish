@@ -60,7 +60,7 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
     return;
   }
 
-  const client = new Anthropic({ apiKey: key });
+  const client = new Anthropic({ apiKey: key, timeout: 90_000, maxRetries: 1 });
   let snapshot = await buildSnapshot(supabase, business, integrations);
   const messages: Anthropic.MessageParam[] = [
     ...history.slice(-20).map((m) => ({ role: m.role, content: m.content })),

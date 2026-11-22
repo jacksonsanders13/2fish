@@ -7,6 +7,7 @@ import { answersSchema, emailSchema, passwordSchema } from "./schema";
 import { createClient } from "@/lib/supabase/server";
 import { estimate, type Answers } from "./estimate";
 import { narrate } from "./narrate";
+import { takeQuota } from "@/lib/app/limits";
 
 const PENDING_COOKIE = "2fish_pending_audit";
 
@@ -136,7 +137,8 @@ export async function savePlan(input: Answers) {
   if (!user) redirect("/login?next=/results");
 
   const est = estimate(answers);
-  const words = await narrate(est, answers);
+  // Each save calls Claude, so it counts against the daily chat cap. Over the cap, the plain wording is used.
+  const words = await narrate(est, answers, await takeQuota(supabase, "chat"));
 
   let { data: business } = await supabase.from("businesses").select("id").eq("owner_id", user.id).order("created_at").limit(1).maybeSingle();
   if (!business) {

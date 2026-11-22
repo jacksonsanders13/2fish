@@ -29,6 +29,13 @@ export function PostsView({ userId, weekOf, uploads, posts }: { userId: string; 
     const files = Array.from(e.target.files ?? []).slice(0, Math.max(0, MAX_FILES - uploads.length));
     e.target.value = "";
     if (!files.length) return;
+    // Photos up to 25 MB, clips up to 200 MB. Anything bigger is skipped with a note.
+    const tooBig = files.filter((f) => f.size > (f.type.startsWith("video/") ? 200 : 25) * 1024 * 1024);
+    if (tooBig.length) {
+      setMsg(`Skipped ${tooBig.map((f) => f.name).join(", ")}: too big. Photos up to 25 MB, clips up to 200 MB.`);
+      files.splice(0, files.length, ...files.filter((f) => !tooBig.includes(f)));
+      if (!files.length) return;
+    }
     const supabase = createClient();
     for (const [i, f] of files.entries()) {
       setUploading(`Uploading ${i + 1} of ${files.length}…`);

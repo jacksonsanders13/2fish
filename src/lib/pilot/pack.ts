@@ -41,7 +41,7 @@ export async function buildPack(input: { store: string; city: string; notes: str
   if (!key) return fallback;
 
   try {
-    const client = new Anthropic({ apiKey: key });
+    const client = new Anthropic({ apiKey: key, timeout: 90_000, maxRetries: 1 });
     const model = "claude-sonnet-5-5";
     const content: Anthropic.ContentBlockParam[] = [];
     const list = input.media.map((m, i) => `${i}: ${m.name}${m.isImage ? "" : " (video clip)"}`).join("\n");

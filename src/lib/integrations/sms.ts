@@ -23,6 +23,7 @@ export async function sendSms(to: string, body: string): Promise<SendResult> {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({ To: to, From: from, Body: body }),
+      signal: AbortSignal.timeout(15_000),
     });
     const json = (await res.json()) as { sid?: string; message?: string };
     if (!res.ok) return { status: "failed", error: json.message ?? `Twilio returned ${res.status}` };
