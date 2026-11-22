@@ -186,7 +186,7 @@ const plans = [
     name: "Done-with-you",
     price: 299,
     who: "For owners who want a person in the loop",
-    items: ["Everything in Growth", "A monthly call with Jackson", "A person checks every post before it goes up"],
+    items: ["Everything in Growth", "A person checks every post before it goes up"],
     pick: false,
   },
 ];
