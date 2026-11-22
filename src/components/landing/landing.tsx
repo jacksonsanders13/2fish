@@ -20,7 +20,7 @@ export function Landing() {
         <section className="border-b border-line">
           <Container className="grid gap-12 py-14 sm:py-20 lg:grid-cols-[5fr_7fr] lg:items-center lg:gap-12">
             <div className="min-w-0">
-              <h1 className="rise text-display text-ink">Daily posts for your boutique, and proof of what they sold</h1>
+              <h1 className="rise text-display text-ink">Daily posts for your store, and proof of what they sold</h1>
               <p className="rise mt-6 max-w-xl" style={{ "--rise-delay": "0.1s" } as React.CSSProperties}>
                 Send us your product photos and clips. Every Monday you get 7 posts to approve in one tap. Each
                 one carries its own promo code, so your monthly report shows the sales it brought into the store.
@@ -31,7 +31,7 @@ export function Landing() {
               >
                 <Button asChild size="lg" variant="signal" className="h-12 px-5 text-base">
                   <Link href="/audit">
-                    Grade my boutique free
+                    Grade my store free
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
@@ -56,7 +56,7 @@ export function Landing() {
             <div>
               <h2 className="text-display">What a week of posts could bring in</h2>
               <p className="mt-5 max-w-md">
-                Most boutiques post when there&apos;s a spare minute between customers, then can&apos;t tell if
+                Most small stores post when there&apos;s a spare minute between customers, then can&apos;t tell if
                 any of it sold. Give every post its own code and the register tells you.
               </p>
               <StepLink href="/audit" className="mt-6">
@@ -71,7 +71,7 @@ export function Landing() {
 
         {/* How it works */}
         <Step id="how">
-          <h2 className="max-w-2xl text-display">The marketing help big brands pay for, built for your boutique</h2>
+          <h2 className="max-w-2xl text-display">The marketing help big brands pay for, built for your store</h2>
           <ol className="mt-10 grid gap-10 md:grid-cols-2 lg:gap-x-12">
             {loop.map((step) => (
               <li key={step.n} className="min-w-0">
@@ -106,7 +106,7 @@ export function Landing() {
             <div className="self-start overflow-hidden rounded-md">
               <div className="bg-surface p-5">
                 <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-semibold">Boutique Grader</h3>
+                  <h3 className="font-semibold">Store Grader</h3>
                   <span className="num font-semibold">Free</span>
                 </div>
                 <p className="mt-1 text-sm">Your score out of 100 and three fixes for your store.</p>
@@ -122,7 +122,7 @@ export function Landing() {
                   post.
                 </p>
                 <p className="mt-2 text-sm text-on-night-muted">
-                  First 10 Raleigh-area boutiques: $49 a month for life.
+                  First 10 Raleigh-area stores: $49 a month for life.
                 </p>
                 <ul className="mt-4 space-y-1.5 text-sm">
                   {[
@@ -146,7 +146,7 @@ export function Landing() {
             <h2 className="max-w-2xl text-display text-white">Bring what you have and we&apos;ll multiply it</h2>
             <Button asChild size="lg" variant="signal" className="h-12 w-full px-5 text-base sm:w-auto">
               <Link href="/audit">
-                Grade my boutique free
+                Grade my store free
                 <ArrowRight aria-hidden="true" />
               </Link>
             </Button>

@@ -20,7 +20,7 @@ export function SiteFooter() {
           </li>
           <li>
             <Link href="/audit" className="hover:underline">
-              Boutique Grader
+              Store Grader
             </Link>
           </li>
           <li className="text-muted-foreground">

@@ -11,7 +11,7 @@ export const loop = [
   {
     n: 1,
     name: "Grade",
-    title: "Your boutique, scored in about 2 minutes",
+    title: "Your store, scored in about 2 minutes",
     body: "Enter your store name and Instagram handle. You get a score out of 100 and three fixes, like \"You posted 3 times in October.\"",
   },
   {

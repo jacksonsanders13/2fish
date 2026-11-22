@@ -1,5 +1,5 @@
 // Sample data for the landing page and previews. Linden Row is a made-up
-// Raleigh boutique, used everywhere so the numbers agree with each other.
+// Raleigh store (a boutique), used everywhere so the numbers agree with each other.
 // (The text-back and leak data further down is from the old home-services
 // version and only feeds screens that are hidden now.)
 

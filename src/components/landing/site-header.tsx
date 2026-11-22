@@ -29,7 +29,7 @@ export function SiteHeader() {
           <Button asChild size="sm" variant="signal">
             <Link href="/audit">
               <span className="sm:hidden">Free grade</span>
-              <span className="hidden sm:inline">Grade my boutique free</span>
+              <span className="hidden sm:inline">Grade my store free</span>
             </Link>
           </Button>
         </div>

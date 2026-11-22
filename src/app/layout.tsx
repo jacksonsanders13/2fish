@@ -19,7 +19,7 @@ const plex = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   title: { default: "2fish", template: "%s · 2fish" },
-  description: "Daily posts for your boutique, and proof of what they sold.",
+  description: "Daily posts for your store, and proof of what they sold.",
   // Not launched yet. Keep it out of search results.
   robots: { index: false, follow: false },
 };
