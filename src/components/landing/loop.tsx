@@ -23,7 +23,7 @@ export const loop = [
   {
     n: 3,
     name: "Post",
-    title: "7 posts every Monday, from your own photos",
+    title: "7 posts a week from your own photos, on the day you pick",
     body: "Send new-arrival photos and try-on clips. 2fish writes the captions and turns them into a week of posts. You approve the week in one tap.",
   },
   {
@@ -92,7 +92,7 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
     return (
       <div className={frame} aria-hidden="true">
         <div className="flex items-center justify-between gap-3">
-          <span className="font-semibold">7 posts ready from Monday&apos;s photos</span>
+          <span className="font-semibold">7 posts ready from this week&apos;s photos</span>
           <span className="shrink-0 rounded-md bg-night px-2.5 py-1 font-medium text-white">Approve all</span>
         </div>
         <ul className="mt-3 grid grid-cols-3 gap-2">

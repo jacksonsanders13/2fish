@@ -157,7 +157,7 @@ function stepFor(leak: Leak, rank: number): PlanStepDraft {
         ...base,
         key: "posts",
         title: "Post 7 times a week from your photos",
-        detail: "Send product photos and try-on clips. Every Monday you get 7 posts with captions to approve.",
+        detail: "Send product photos and try-on clips. Once a week, on the day you pick, you get 7 posts with captions to approve.",
         href: "/dashboard/videos",
       };
     case "tracking":

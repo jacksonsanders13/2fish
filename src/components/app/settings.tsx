@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { changePassword, deleteAccount, updateBusiness } from "@/lib/app/actions";
 import { disconnectSquareNow, syncSquareNow } from "@/lib/integrations/square-actions";
+import { setPackDay } from "@/lib/pilot/actions";
+import { WEEKDAYS } from "@/lib/pilot/dates";
 import { BUSINESS_KINDS, formatPhone, type Business } from "@/lib/app/types";
 import { Field, Notice, selectClass } from "./forms";
 
 type SquareState = { ready: boolean; connectedAt: string | null; syncedAt: string | null; status: string | null };
 
-export function SettingsView({ email, business, square }: { email: string; business: Business; square: SquareState }) {
+export function SettingsView({ email, business, square, packDay }: { email: string; business: Business; square: SquareState; packDay: number }) {
   return (
     <>
       <Reveal immediate y={16}>
@@ -26,6 +28,12 @@ export function SettingsView({ email, business, square }: { email: string; busin
         <Reveal immediate delay={0.05}>
           <Card title="Square" sub="2fish reads your sales so it can tell which posts sold. It can't change anything in Square.">
             <SquareCard square={square} />
+          </Card>
+        </Reveal>
+
+        <Reveal immediate delay={0.08}>
+          <Card title="Weekly posts" sub="Pick the day 2fish writes your next 7 posts. You get a text to approve them, and a photo request 3 days before.">
+            <PackDayForm initial={packDay} />
           </Card>
         </Reveal>
 
@@ -73,6 +81,43 @@ export function SettingsView({ email, business, square }: { email: string; busin
         </Reveal>
       </div>
     </>
+  );
+}
+
+function PackDayForm({ initial }: { initial: number }) {
+  const [day, setDay] = useState(String(initial));
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <form
+      className="flex flex-wrap items-end gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        start(async () => {
+          const r = await setPackDay({ day });
+          setMsg(r.ok ? `Saved. Your posts get written every ${WEEKDAYS[Number(day)]}.` : r.message ?? "Something went wrong.");
+        });
+      }}
+    >
+      <label className="text-sm font-semibold">
+        Write my posts on
+        <select value={day} onChange={(e) => setDay(e.target.value)} className="mt-1 block h-10 rounded-md border border-input bg-white px-2 font-normal">
+          {WEEKDAYS.map((d, i) => (
+            <option key={d} value={i}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </label>
+      <Button type="submit" variant="outline" disabled={pending}>
+        Save
+      </Button>
+      {msg ? (
+        <p className="w-full text-sm" role="status">
+          {msg}
+        </p>
+      ) : null}
+    </form>
   );
 }
 

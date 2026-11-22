@@ -1,14 +1,15 @@
 import { siteUrl, textOwner } from "@/lib/integrations/notify";
 import { adminClient } from "@/lib/supabase/admin";
-import { addDays, packWeek, todayIn } from "./dates";
+import { addDays, packWeek, todayIn, weekdayOf } from "./dates";
 import { buildPack } from "./pack";
 import { loadExamples } from "./queries";
 import { learnings, scorePosts } from "./scores";
 import { looksLikeImage } from "./types";
 
-// The agent's Monday job: for each store on Square, pick what to feature from
-// what's selling, write the week's 7 posts as drafts, and leave them for the
-// owner to approve. Nothing posts without that approval.
+// The agent's weekly job, on the day each owner picked (Monday by default): pick
+// what to feature from what's selling, write the next week's 7 posts as drafts,
+// and leave them for the owner to approve. Nothing posts without that approval.
+// Runs every day; stores whose day it isn't are skipped.
 export async function weeklyAutopilot() {
   const admin = adminClient();
   if (!admin) return [];
@@ -17,8 +18,12 @@ export async function weeklyAutopilot() {
 
   for (const c of conns ?? []) {
     try {
-      const { data: biz } = await admin.from("businesses").select("name, city, timezone").eq("id", c.business_id).single();
+      const { data: biz } = await admin.from("businesses").select("name, city, timezone, pack_day").eq("id", c.business_id).single();
       const today = todayIn((biz?.timezone as string) || "America/New_York");
+      if (weekdayOf(today) !== ((biz?.pack_day as number | null) ?? 1)) {
+        out.push({ business: c.business_id, made: false, why: "not their day" });
+        continue;
+      }
       const week = packWeek(today);
 
       const existing = await admin.from("posts").select("id", { count: "exact", head: true }).eq("business_id", c.business_id).eq("week_of", week);
@@ -53,7 +58,7 @@ export async function weeklyAutopilot() {
       await textOwner(
         admin,
         c.business_id,
-        `this week's 7 posts are ready${top.length ? ` (featuring ${top.slice(0, 2).join(" and ")})` : ""}. Approve them here: ${siteUrl()}/dashboard/videos`,
+        `your next 7 posts are ready${top.length ? ` (featuring ${top.slice(0, 2).join(" and ")})` : ""}. Approve them here: ${siteUrl()}/dashboard/videos`,
       );
       await admin.from("events").insert({
         business_id: c.business_id,
@@ -69,8 +74,8 @@ export async function weeklyAutopilot() {
   return out;
 }
 
-// The agent's Friday job: say which items it plans to feature next week and
-// ask for photos of them, so Monday's posts have something real to show.
+// 3 days before each store's pack day: say which items it plans to feature
+// and ask for photos of them, so the posts have something real to show.
 export async function fridayPhotoAsk() {
   const admin = adminClient();
   if (!admin) return [];
@@ -78,9 +83,15 @@ export async function fridayPhotoAsk() {
   const out: { business: string; asked: boolean }[] = [];
 
   for (const c of conns ?? []) {
-    const { data: biz } = await admin.from("businesses").select("timezone").eq("id", c.business_id).single();
+    const { data: biz } = await admin.from("businesses").select("timezone, pack_day").eq("id", c.business_id).single();
     const today = todayIn((biz?.timezone as string) || "America/New_York");
-    const week = packWeek(today);
+    // Ask 3 days before their pack day.
+    const packDay = (biz?.pack_day as number | null) ?? 1;
+    if (weekdayOf(today) !== (packDay + 4) % 7) {
+      out.push({ business: c.business_id, asked: false });
+      continue;
+    }
+    const week = packWeek(addDays(today, 3));
     const { data: items } = await admin.from("item_daily").select("item, qty").eq("business_id", c.business_id).gte("day", addDays(today, -14));
     const totals = new Map<string, number>();
     for (const r of items ?? []) totals.set(r.item, (totals.get(r.item) ?? 0) + Number(r.qty));
@@ -92,7 +103,7 @@ export async function fridayPhotoAsk() {
     const r = await textOwner(
       admin,
       c.business_id,
-      `next week I'm featuring ${top.join(", ")}. Send 3 to 5 photos or short clips of them by Sunday: ${siteUrl()}/dashboard/videos?week=${week}`,
+      `next week I'm featuring ${top.join(", ")}. Send 3 to 5 photos or short clips of them in the next couple of days: ${siteUrl()}/dashboard/videos?week=${week}`,
     );
     if (r.status !== "skipped") {
       await admin.from("events").insert({ business_id: c.business_id, owner_id: c.owner_id, kind: "reminder", text: `Asked for photos of ${top.join(", ")} for next week.` });

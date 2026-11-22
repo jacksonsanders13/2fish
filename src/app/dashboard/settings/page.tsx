@@ -11,13 +11,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const { email, business } = await getSettings();
   const { square } = await searchParams;
   const supabase = await createClient();
-  const { data } = await supabase.from("businesses").select("square_connected_at, square_synced_at").eq("id", business.id).single();
+  const { data } = await supabase.from("businesses").select("square_connected_at, square_synced_at, pack_day").eq("id", business.id).single();
   return (
     <AppShell active="settings" email={email}>
       <PageBody>
         <SettingsView
           email={email}
           business={business}
+          packDay={(data?.pack_day as number | undefined) ?? 1}
           square={{ ready: squareReady(), connectedAt: data?.square_connected_at ?? null, syncedAt: data?.square_synced_at ?? null, status: square ?? null }}
         />
       </PageBody>

@@ -219,3 +219,16 @@ export async function setPlanPrice(input: { price: number | string }): Promise<R
     return fail(e);
   }
 }
+
+export async function setPackDay(input: { day: number | string }): Promise<Result> {
+  try {
+    const day = z.coerce.number().int().min(0).max(6).parse(input.day);
+    const { supabase, business } = await ensureBusiness();
+    const { error } = await supabase.from("businesses").update({ pack_day: day }).eq("id", business.id);
+    if (error) throw error;
+    refresh();
+    return { ok: true, message: "Saved." };
+  } catch (e) {
+    return fail(e);
+  }
+}

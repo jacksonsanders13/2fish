@@ -22,7 +22,7 @@ export function Landing() {
             <div className="min-w-0">
               <h1 className="rise text-display text-ink">Daily posts, and proof they sold</h1>
               <p className="rise mt-6 max-w-xl" style={{ "--rise-delay": "0.1s" } as React.CSSProperties}>
-                7 posts every Monday from your photos, and a monthly report on what they sold.
+                7 posts a week from your photos, made on the day you pick, and a monthly report on what they sold.
               </p>
               <div
                 className="rise mt-8 flex flex-col gap-3 sm:flex-row"

@@ -41,4 +41,11 @@ export function monthName(ym: string) {
   return asDate(`${ym}-01`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
+/** 0 = Sunday ... 6 = Saturday. */
+export function weekdayOf(ymd: string) {
+  return asDate(ymd).getUTCDay();
+}
+
+export const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;

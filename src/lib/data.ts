@@ -91,7 +91,7 @@ export const plan: PlanStep[] = [
   {
     rank: 2,
     title: "Approve next week's 7 posts",
-    detail: "Monday's photos are turned into 7 posts with captions. They need your okay.",
+    detail: "This week's photos are turned into 7 posts with captions. They need your okay.",
     status: "needs-you",
     impact: 620,
     action: { label: "Approve posts", href: "/dashboard/videos" },
@@ -144,7 +144,7 @@ export type Activity = {
 
 export const activity: Activity[] = [
   { when: "2:14 PM", text: "A shopper came in from the Thursday outfit post. $86.", kind: "job" },
-  { when: "11:30 AM", text: "7 posts ready from Monday's photos. Waiting on your okay.", kind: "video" },
+  { when: "11:30 AM", text: "7 posts ready from this week's photos. Waiting on your okay.", kind: "video" },
   { when: "Yesterday", text: "Green wrap dress: 6 sold since the try-on post, up from 2.", kind: "job" },
   { when: "Yesterday", text: "Reply drafted for a new 5-star Google review.", kind: "review" },
   { when: "Nov 12", text: "Weekly report: try-on clips sold more than flat lays.", kind: "reminder" },
