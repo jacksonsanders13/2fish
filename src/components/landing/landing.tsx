@@ -39,9 +39,6 @@ export function Landing() {
                   <a href="#how">See how it works</a>
                 </Button>
               </div>
-              <p className="rise mt-3 text-sm text-muted-foreground" style={{ "--rise-delay": "0.2s" } as React.CSSProperties}>
-                Opening soon. Join the list to get in first.
-              </p>
             </div>
             <div
               className="rise min-w-0 rounded-md bg-night p-3 sm:p-6"
