@@ -14,6 +14,7 @@ export default function PrivacyPage() {
         {
           heading: "What we keep",
           body: [
+            "If you join the waitlist: your email, and your store name and plan if you give them. We only use them to tell you when 2fish opens.",
             "Your account: your email and a password, or the Google, Apple or Microsoft account you sign in with.",
             "Your store: its name, city, Instagram handle and the answers you give in the Store Grader.",
             "Your content: the photos and clips you upload and the posts made from them.",

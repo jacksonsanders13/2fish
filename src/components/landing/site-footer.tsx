@@ -24,8 +24,8 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
-            <Link href="/audit" className="hover:underline">
-              Store Grader
+            <Link href="/#waitlist" className="hover:underline">
+              Join the waitlist
             </Link>
           </li>
           <li>

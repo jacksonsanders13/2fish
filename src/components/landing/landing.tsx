@@ -8,6 +8,7 @@ import { DashboardPreview } from "./dashboard-preview";
 import { loop, StepSnippet } from "./loop";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
+import { WaitlistForm } from "./waitlist-form";
 
 // Landing page, laid out as a funnel: the leak, the plan, the work, then the ask.
 // Only the hero animates in. Everything below is just there when you scroll to it.
@@ -29,15 +30,18 @@ export function Landing() {
                 style={{ "--rise-delay": "0.2s" } as React.CSSProperties}
               >
                 <Button asChild size="lg" variant="signal" className="h-12 px-5 text-base">
-                  <Link href="/audit">
-                    Get your free store grade
+                  <a href="#waitlist">
+                    Join the waitlist
                     <ArrowRight aria-hidden="true" />
-                  </Link>
+                  </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 px-5 text-base">
                   <a href="#how">See how it works</a>
                 </Button>
               </div>
+              <p className="rise mt-3 text-sm text-muted-foreground" style={{ "--rise-delay": "0.2s" } as React.CSSProperties}>
+                Opening soon. Join the list to get in first.
+              </p>
             </div>
             <div
               className="rise min-w-0 rounded-md bg-night p-3 sm:p-6"
@@ -58,8 +62,8 @@ export function Landing() {
                 Most small stores post when there&apos;s a spare minute between customers, then can&apos;t tell if
                 any of it sold. 2fish reads your Square sales and shows you which posts did.
               </p>
-              <StepLink href="/audit" className="mt-6">
-                See how your store scores
+              <StepLink href="#waitlist" className="mt-6">
+                Join the waitlist
               </StepLink>
             </div>
             <div className="rounded-md bg-surface p-5 sm:p-8">
@@ -80,15 +84,15 @@ export function Landing() {
               </li>
             ))}
           </ol>
-          <StepLink href="/audit" className="mt-10">
-            Get your store&apos;s score
+          <StepLink href="#waitlist" className="mt-10">
+            Join the waitlist
           </StepLink>
         </Step>
 
         {/* The work, and what it costs */}
         <Step id="pricing">
           <h2 className="max-w-2xl text-display">2fish does the posting for you</h2>
-          <p className="mt-4 max-w-xl">Pick a plan. Month to month, cancel any time.</p>
+          <p className="mt-4 max-w-xl">Planned pricing for launch. Month to month, cancel any time.</p>
 
           {/* The three plans, each with its own button. Growth is the pick, marked in light coral. */}
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
@@ -115,37 +119,23 @@ export function Landing() {
                   ))}
                 </ul>
                 <Button asChild size="lg" variant={p.pick ? "signal" : "outline"} className="mt-6 h-12 w-full text-base">
-                  <Link href={`/signup?plan=${p.name.toLowerCase()}`}>Start with {p.name}</Link>
+                  <a href="#waitlist">Join the waitlist</a>
                 </Button>
               </li>
             ))}
           </ul>
-
-          {/* The free way in, right next to the paid ones */}
-          <div className="mt-4 flex flex-col gap-4 rounded-md bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm">
-              <span className="font-semibold">Not sure yet?</span> The Store Grader is free: your score out of 100 and three fixes. No
-              card, no account.
-            </p>
-            <StepLink href="/audit" className="shrink-0">
-              Get your free store grade
-            </StepLink>
-          </div>
         </Step>
 
-        {/* The ask, on the one dark band */}
-        <section className="on-night bg-night text-white">
-          <Container className="grid gap-8 py-16 lg:grid-cols-[1fr_auto] lg:items-end lg:py-24">
+        {/* The ask, on the one dark band: the waitlist */}
+        <section id="waitlist" className="on-night scroll-mt-20 bg-night text-white">
+          <Container className="grid gap-10 py-16 lg:grid-cols-[1fr_1fr] lg:items-start lg:py-24">
             <div>
               <h2 className="max-w-2xl text-display text-white">Bring what you have and we&apos;ll multiply it</h2>
-              <p className="mt-3 text-on-night-muted">Month to month. Cancel any time.</p>
+              <p className="mt-4 max-w-md text-on-night-muted">
+                2fish is opening to small stores soon. Join the waitlist and you&apos;ll hear first when it&apos;s ready.
+              </p>
             </div>
-            <Button asChild size="lg" variant="signal" className="h-12 w-full px-5 text-base sm:w-auto">
-              <Link href="/audit">
-                Get your free store grade
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
+            <WaitlistForm />
           </Container>
         </section>
       </main>

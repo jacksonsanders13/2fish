@@ -72,8 +72,8 @@ export function PostsCalculator({ className }: { className?: string }) {
       </div>
 
       <Button asChild size="lg" variant="signal" className="mt-5 w-full sm:w-auto">
-        <Link href="/audit">
-          Get your free store grade
+        <Link href="/#waitlist">
+          Join the waitlist
           <ArrowRight aria-hidden="true" />
         </Link>
       </Button>
