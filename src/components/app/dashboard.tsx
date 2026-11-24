@@ -14,7 +14,7 @@ import { SalesChart } from "./sales-chart";
 type Tab = "sales" | "posts" | "chat";
 
 // The dashboard. Left: the sales vs. posts graph on top, the posts (to approve,
-// or on a calendar) under it. Right: the chat with Fisher, the 2fish helper.
+// or on a calendar) under it. Right: the chat with Fisher, the marketing helper.
 // On a phone the three are tabs.
 export function Dashboard({
   data,

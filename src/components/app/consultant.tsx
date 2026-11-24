@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 type Local = { id: string; role: "user" | "assistant" | "tool"; content: string; meta?: Record<string, unknown>; pending?: boolean };
 
-// Fisher, the 2fish helper. A running conversation with the owner, with the work it
+// Fisher, the marketing helper. A running conversation with the owner, with the work it
 // needs from them (uploads, approvals) shown as cards above the composer.
 export function Consultant({
   initialMessages,
@@ -121,7 +121,7 @@ export function Consultant({
           <FisherAvatar size={36} />
           <div>
             <p className="text-sm font-semibold text-night">Fisher</p>
-            <p className="text-sm text-muted-foreground">{agentReady ? "Your 2fish helper. Ask anything, or tell him what to do" : "Chat isn't switched on yet"}</p>
+            <p className="text-sm text-muted-foreground">{agentReady ? "Your marketing helper. Ask anything, or tell him what to do" : "Chat isn't switched on yet"}</p>
           </div>
         </div>
         {working.length ? (

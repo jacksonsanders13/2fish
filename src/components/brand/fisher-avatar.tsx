@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-// Fisher, the 2fish helper: a little white fish in a coral bucket hat.
+// Fisher, the marketing helper: a little white fish in a coral bucket hat.
 // Drawn from plain shapes so it stays sharp at any size and uses the brand colors.
 export function FisherAvatar({ size = 32, className }: { size?: number; className?: string }) {
   return (

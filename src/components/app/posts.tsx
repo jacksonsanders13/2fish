@@ -82,7 +82,7 @@ export function PostsView({
       <header className="max-w-2xl">
         <h1 className="text-display font-semibold">Posts for the week of {shortDate(weekOf)}</h1>
         <p className="mt-3">
-          Send this week&apos;s product photos and try-on clips, list what&apos;s new, and Fisher, your 2fish helper, writes the week&apos;s posts.
+          Send this week&apos;s product photos and try-on clips, list what&apos;s new, and Fisher, your marketing helper, writes the week&apos;s posts.
           Approve them and they land on your{" "}
           <Link href="/dashboard" className="font-semibold text-night underline underline-offset-2">
             calendar
