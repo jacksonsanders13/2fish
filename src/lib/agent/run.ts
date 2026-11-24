@@ -2,13 +2,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Business } from "@/lib/app/types";
 import { buildSnapshot, describeSnapshot } from "./snapshot";
-import { runTool, toolDefinitions } from "./tools";
+import { runTool, toolDefinitions, type ToolCard } from "./tools";
 
 export const MODEL = "claude-sonnet-5-5";
 
 export type StreamEvent =
   | { type: "text"; delta: string }
-  | { type: "tool"; name: string; summary: string }
+  | { type: "tool"; name: string; summary: string; card?: ToolCard }
   | { type: "done"; messageId: string | null }
   | { type: "error"; message: string };
 
@@ -17,6 +17,17 @@ const SYSTEM = `You are Fisher, the owner's marketing helper at 2fish. Introduce
 What 2fish does for the store: once a week, on the day the owner picks in Settings (Monday unless they change it), it turns the owner's product photos and try-on clips into 7 posts with captions. The owner approves the week. Proof comes from three places, no promo codes: at checkout the store taps how each shopper heard about them (a post, Google, walked by, a friend, a regular), the store counts how many of each posted item sold that week against the week before, and the owner types in one weekly sales number that is compared with the weeks before 2fish. Each month a proof report shows sales from posts, what the store got back for its plan, the best post, and how the month compares to the 30 days before. The more you know about what sold (try-ons, new arrivals, behind the counter, sales), the more of it you suggest.
 
 How you talk: short sentences, plain words, specific numbers. Like a sharp friend who runs a bigger shop, not a report. Two to five sentences unless they ask for detail. Never use: unlock, unleash, elevate, empower, supercharge, transform, seamless, robust, leverage, journey, streamline, effortless, game-changer, AI-powered. No bullet lists of three for the sake of it. No hype.
+
+Your specialists (the ask_specialist tool). Each one has proven marketing skills built in. Call one when the owner wants something it does, with a full brief:
+- poster: a sale, event, holiday-hours or new-arrival graphic, plus its caption
+- campaign: a sale, holiday push or event planned out, with draft posts put on their calendar
+- local_seo: getting found on Google Maps, Google search and AI answers
+- google_post: Google Business Profile posts
+- review_reply: replies to reviews they paste in
+- email: an email to their customer list
+- text_message: marketing texts for customers who opted in
+- referral: a word-of-mouth idea they can run at the counter
+After a specialist finishes, its draft is already on the owner's screen. Say in one or two sentences what it made and what to do next (approve, copy, fill in a [NEED]). Don't paste the draft again. If the owner's request is missing a key fact (the dates of a sale, the discount), ask for it first, one question.
 
 What you do: explain their score and fixes in their words, say what you will do and what it is worth, and when they agree, do it with your tools. Tools change the plan, ask for photos and clips (request_clips), queue a week of posts (start_video_batch), log a sale at checkout (log_job, with how the shopper heard about the store), and add customers. If they tell you something new (for example "my try-ons do better"), adjust the plan with update_plan_step and tell them what changed, then ask for what you need (photos, their okay).
 
@@ -68,12 +79,12 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
   ];
 
   let finalText = "";
-  const toolSummaries: { name: string; summary: string }[] = [];
+  const toolSummaries: { name: string; summary: string; card?: ToolCard }[] = [];
 
   try {
     for (let round = 0; round < 6; round++) {
       const system = `${SYSTEM}\n\nToday is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}.\n\nSNAPSHOT\n${describeSnapshot(snapshot)}`;
-      const stream = client.messages.stream({ model: MODEL, max_tokens: 900, system, messages, tools: toolDefinitions });
+      const stream = client.messages.stream({ model: MODEL, max_tokens: 1200, system, messages, tools: toolDefinitions });
       let roundText = "";
       stream.on("text", (delta) => {
         roundText += delta;
@@ -89,8 +100,10 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
       const results: Anthropic.ToolResultBlockParam[] = [];
       for (const use of toolUses) {
         const outcome = await runTool(use.name, (use.input ?? {}) as Record<string, unknown>, { supabase, ownerId, business, snapshot });
-        toolSummaries.push({ name: use.name, summary: outcome.summary });
-        emit({ type: "tool", name: use.name, summary: outcome.summary });
+        // Cards show the owner the draft itself; the chat line stays short.
+        const line = outcome.card ? `${outcome.card.title} ready` : outcome.summary;
+        toolSummaries.push({ name: use.name, summary: line, card: outcome.card });
+        emit({ type: "tool", name: use.name, summary: line, card: outcome.card });
         results.push({ type: "tool_result", tool_use_id: use.id, content: outcome.summary });
       }
       messages.push({ role: "user", content: results });
@@ -104,7 +117,7 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
   }
 
   for (const t of toolSummaries) {
-    await supabase.from("chat_messages").insert({ conversation_id: conversationId, owner_id: ownerId, role: "tool", content: t.summary, meta: { name: t.name } });
+    await supabase.from("chat_messages").insert({ conversation_id: conversationId, owner_id: ownerId, role: "tool", content: t.summary, meta: { name: t.name, ...(t.card ? { card: t.card } : {}) } });
   }
   const saved = await supabase
     .from("chat_messages")

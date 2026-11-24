@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowUp, Check, Clock, Film, Upload, X } from "lucide-react";
+import { ArrowUp, Check, Clock, Copy, Download, Film, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { approveText, clipsUploaded, dismissTask } from "@/lib/agent/actions";
 import type { StreamEvent } from "@/lib/agent/run";
+import type { ToolCard } from "@/lib/agent/tools";
 import type { Task } from "@/lib/agent/snapshot";
 import type { ChatMessage } from "@/lib/agent/store";
 import { formatPhone } from "@/lib/app/types";
@@ -84,7 +85,7 @@ export function Consultant({
         } else if (ev.type === "tool") {
           setMessages((m) => {
             const i = m.findIndex((x) => x.id === assistantId);
-            const chip: Local = { id: `t-${Date.now()}-${Math.random()}`, role: "tool", content: ev.summary, meta: { name: ev.name } };
+            const chip: Local = { id: `t-${Date.now()}-${Math.random()}`, role: "tool", content: ev.summary, meta: { name: ev.name, ...(ev.card ? { card: ev.card } : {}) } };
             return [...m.slice(0, i), chip, ...m.slice(i)];
           });
         } else if (ev.type === "error") {
@@ -134,7 +135,9 @@ export function Consultant({
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {messages.map((m) =>
-          m.role === "tool" ? (
+          m.role === "tool" && m.meta?.card ? (
+            <WorkCard key={m.id} card={m.meta.card as ToolCard} />
+          ) : m.role === "tool" ? (
             <div key={m.id} className="flex items-start gap-2 pl-1 text-sm text-muted-foreground">
               <Check size={14} className="mt-1 shrink-0 text-night" aria-hidden="true" />
               <span>{m.content}</span>
@@ -315,6 +318,45 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
       <Button size="sm" variant="ghost" className="mt-2" disabled={pending} onClick={dismiss}>
         Dismiss
       </Button>
+    </div>
+  );
+}
+
+// What a specialist made: a draft to copy, or a poster to download.
+function WorkCard({ card }: { card: ToolCard }) {
+  const [copied, setCopied] = useState(false);
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+  return (
+    <div className="rounded-md border border-line bg-white p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-night">{card.kind === "poster" ? "Poster" : card.title}</p>
+        <Button size="sm" variant="outline" onClick={() => copy(card.body)} className="h-9 shrink-0">
+          <Copy aria-hidden="true" />
+          {copied ? "Copied" : card.kind === "poster" ? "Copy caption" : "Copy"}
+        </Button>
+      </div>
+      {card.kind === "poster" ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- drawn on our own server, per owner */}
+          <img src={`/api/poster/${card.posterId}`} alt={`Poster: ${card.title}`} width={1080} height={1350} className="mt-2 h-auto w-full max-w-72 rounded-[4px] bg-surface" loading="lazy" />
+          <Button asChild size="sm" variant="signal" className="mt-2 h-9">
+            <a href={`/api/poster/${card.posterId}?download=1`} download>
+              <Download aria-hidden="true" />
+              Download poster
+            </a>
+          </Button>
+          {card.body ? <p className="mt-2 text-sm whitespace-pre-wrap">{card.body}</p> : null}
+        </>
+      ) : (
+        <p className="mt-2 max-h-96 overflow-y-auto text-sm whitespace-pre-wrap">{card.body}</p>
+      )}
     </div>
   );
 }

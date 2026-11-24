@@ -138,7 +138,7 @@ const PLAN: { kind: string; title: (item: string) => string; hook: (item: string
  * to a smaller, cheaper model with the copy-editing rules. Clean posts skip it.
  * If the editor fails, the writer's version stands.
  */
-async function editPosts<T extends { hook: string; caption: string }>(client: Anthropic, posts: T[]): Promise<T[]> {
+export async function editPosts<T extends { hook: string; caption: string }>(client: Anthropic, posts: T[]): Promise<T[]> {
   const flagged = posts.map((p, i) => ({ i, problems: findTells(p.hook, p.caption), hook: p.hook, caption: p.caption })).filter((x) => x.problems.length);
   if (!flagged.length) return posts;
   try {

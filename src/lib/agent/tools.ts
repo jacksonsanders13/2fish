@@ -3,15 +3,31 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { startVideoJob } from "@/lib/integrations/video";
 import { defaultTemplate, normalizePhone, type Business } from "@/lib/app/types";
 import type { Snapshot } from "./snapshot";
+import { runSpecialist, SPECIALIST_NAMES, SPECIALISTS } from "./specialists";
 
 // What the consultant is allowed to do. Every tool runs with the owner's own
 // Supabase session, so row-level security still applies. Anything that reaches
 // a customer becomes a task the owner approves first.
 
 export type ToolContext = { supabase: SupabaseClient; ownerId: string; business: Business; snapshot: Snapshot };
-export type ToolOutcome = { summary: string; data?: Record<string, unknown> };
+/** A card shown in the chat: a draft to read and copy, or a poster to download. */
+export type ToolCard = { kind: "draft"; title: string; body: string } | { kind: "poster"; posterId: string; title: string; body: string };
+export type ToolOutcome = { summary: string; data?: Record<string, unknown>; card?: ToolCard };
 
 export const toolDefinitions: Anthropic.Tool[] = [
+  {
+    name: "ask_specialist",
+    description:
+      "Hand one job to a specialist with marketing skills built in. Use it when the owner wants: a poster or sale graphic (poster), a sale, holiday or event plan with posts on the calendar (campaign), help getting found on Google Maps and search (local_seo), Google Business Profile posts (google_post), replies to reviews they paste in (review_reply), an email to their customers (email), marketing texts (text_message), or a referral idea (referral). The draft shows up in the chat as a card. Write a full brief: what the owner asked for, every fact they gave (items, dates, prices, offer, hours, address, review text) and the goal. One specialist per call.",
+    input_schema: {
+      type: "object",
+      properties: {
+        specialist: { type: "string", enum: SPECIALIST_NAMES, description: Object.entries(SPECIALISTS).map(([k, v]) => `${k}: ${v.label}`).join("; ") },
+        brief: { type: "string", description: "Everything the specialist needs, in plain words. Include every fact the owner gave; the specialist sees nothing else except the store snapshot." },
+      },
+      required: ["specialist", "brief"],
+    },
+  },
   {
     name: "update_plan_step",
     description:
@@ -130,6 +146,9 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
   const event = (kind: string, text: string) => supabase.from("events").insert({ business_id: business.id, owner_id: ownerId, kind, text });
 
   switch (name) {
+    case "ask_specialist":
+      return runSpecialist(String(input.specialist), String(input.brief ?? "").slice(0, 6000), ctx);
+
     case "update_plan_step": {
       if (!planId) return { summary: "There is no plan yet, so nothing to update." };
       const key = String(input.key);
