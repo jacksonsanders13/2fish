@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureBusiness } from "@/lib/app/queries";
 import { addDays, mondayOf, packWeek, todayIn } from "./dates";
-import { scorePosts } from "./scores";
+import { matches, scorePosts } from "./scores";
 import { looksLikeImage, type Checkout, type Example, type ItemSale, type Post, type SourceId, type Upload, type WeekSales } from "./types";
 
 type Supa = Awaited<ReturnType<typeof ensureBusiness>>["supabase"];
@@ -34,6 +34,8 @@ function mapPost(r: Record<string, unknown>, urls: Map<string, string>): Post {
     mediaUrl: path ? urls.get(path) ?? null : null,
     isImage: path ? looksLikeImage(path) : false,
     status: r.status as Post["status"],
+    postOn: r.post_on ? String(r.post_on) : addDays(String(r.week_of), Number(r.position) - 1),
+    campaign: String(r.campaign ?? ""),
   };
 }
 
@@ -203,3 +205,58 @@ export async function getExamplesPage() {
   const { supabase, user } = await ensureBusiness();
   return { examples: await loadExamples(supabase, user.id, 300) };
 }
+export type ChartWeek = { weekOf: string; total: number; posted: number };
+
+/**
+ * The dashboard home: a month of the post calendar, the posts waiting on an okay,
+ * and six weeks of sales split into the items the posts featured vs. everything else.
+ */
+export async function getHome(supabase: Supa, businessId: string, today: string, month?: string) {
+  const ym = month && /^\d{4}-\d{2}$/.test(month) ? month : today.slice(0, 7);
+  const first = `${ym}-01`;
+  const gridStart = mondayOf(first);
+  const nextMonth = addDays(first, 32).slice(0, 7) + "-01";
+  const gridEnd = addDays(mondayOf(addDays(nextMonth, -1)), 6);
+  const chartStart = addDays(mondayOf(today), -35);
+
+  const [cal, drafts, sd, idl, posted] = await Promise.all([
+    supabase.from("posts").select("*").eq("business_id", businessId).gte("post_on", gridStart).lte("post_on", gridEnd).order("post_on").order("position"),
+    supabase.from("posts").select("*").eq("business_id", businessId).eq("status", "draft").gte("post_on", addDays(today, -7)).order("post_on").limit(14),
+    supabase.from("sales_daily").select("day, total").eq("business_id", businessId).gte("day", chartStart).lte("day", today),
+    supabase.from("item_daily").select("day, item, amount").eq("business_id", businessId).gte("day", chartStart).lte("day", today),
+    supabase.from("posts").select("post_on, items").eq("business_id", businessId).neq("status", "draft").gte("post_on", chartStart).lte("post_on", today),
+  ]);
+
+  const rows = [...(cal.data ?? []), ...(drafts.data ?? [])];
+  const urls = await signed(supabase, [...new Set(rows.map((r) => r.media_path).filter(Boolean))]);
+
+  // Items each week's posts featured.
+  const featured = new Map<string, string[]>();
+  for (const p of posted.data ?? []) {
+    const w = mondayOf(String(p.post_on));
+    featured.set(w, [...(featured.get(w) ?? []), ...((p.items as string[]) ?? [])]);
+  }
+  const weeks: ChartWeek[] = [];
+  for (let i = 0; i < 6; i++) {
+    const w = addDays(chartStart, i * 7);
+    const end = addDays(w, 6);
+    const total = (sd.data ?? []).filter((r) => r.day >= w && r.day <= end).reduce((s, r) => s + Number(r.total), 0);
+    const names = featured.get(w) ?? [];
+    const fromPosts = names.length
+      ? (idl.data ?? []).filter((r) => r.day >= w && r.day <= end && names.some((n) => matches(String(r.item), n))).reduce((s, r) => s + Number(r.amount), 0)
+      : 0;
+    weeks.push({ weekOf: w, total, posted: Math.min(fromPosts, total) });
+  }
+
+  return {
+    month: ym,
+    gridStart,
+    gridEnd,
+    calendar: (cal.data ?? []).map((r) => mapPost(r, urls)),
+    drafts: (drafts.data ?? []).map((r) => mapPost(r, urls)),
+    weeks,
+    hasSales: (sd.data ?? []).length > 0,
+  };
+}
+
+export type HomeData = Awaited<ReturnType<typeof getHome>>;

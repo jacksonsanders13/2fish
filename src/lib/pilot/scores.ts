@@ -19,7 +19,7 @@ export type PostScore = {
 };
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
-const matches = (squareName: string, postItem: string) => {
+export const matches = (squareName: string, postItem: string) => {
   const a = norm(squareName);
   const b = norm(postItem);
   return Boolean(a && b) && (a.includes(b) || b.includes(a));

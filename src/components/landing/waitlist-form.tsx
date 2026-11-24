@@ -67,9 +67,9 @@ export function WaitlistForm({ className }: { className?: string }) {
             className="mt-1 block h-11 w-full rounded-md border border-input bg-white px-2 text-sm text-ink"
           >
             <option value="">Pick one</option>
-            <option value="starter">Starter, $79</option>
-            <option value="growth">Growth, $149</option>
-            <option value="pro">Pro, $299</option>
+            <option value="starter">Solo, $20</option>
+            <option value="growth">Growing, $50</option>
+            <option value="pro">Established, $75</option>
             <option value="not sure">Not sure yet</option>
           </select>
         </div>

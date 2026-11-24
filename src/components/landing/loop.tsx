@@ -23,7 +23,7 @@ export const loop = [
   {
     n: 3,
     name: "Post",
-    title: "7 posts a week from your own photos, on the day you pick",
+    title: "A week of posts from your own photos, on the day you pick",
     body: "Send new-arrival photos and try-on clips. 2fish writes the captions and turns them into a week of posts. You approve the week in one tap.",
   },
   {

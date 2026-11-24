@@ -23,7 +23,7 @@ export function Landing() {
             <div className="min-w-0">
               <h1 className="rise text-display text-ink">Daily posts, and proof they sold</h1>
               <p className="rise mt-6 max-w-xl" style={{ "--rise-delay": "0.1s" } as React.CSSProperties}>
-                7 posts a week from your photos, made on the day you pick, and a monthly report on what they sold.
+                Posts made from your photos every week, a calendar that plans them, and a monthly report on what they sold.
               </p>
               <div
                 className="rise mt-8 flex flex-col gap-3 sm:flex-row"
@@ -91,7 +91,7 @@ export function Landing() {
           <h2 className="max-w-2xl text-display">2fish does the posting for you</h2>
           <p className="mt-4 max-w-xl">Planned pricing for launch. Month to month, cancel any time.</p>
 
-          {/* The three plans, each with its own button. Growth is the pick, marked in light coral. */}
+          {/* The three plans, each with its own button. Growing is the pick, marked in light coral. */}
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
             {plans.map((p) => (
               <li
@@ -143,35 +143,30 @@ export function Landing() {
 
 const plans = [
   {
-    name: "Starter",
-    price: 79,
-    who: "For stores that need to post every day",
-    items: ["7 posts a week from your photos", "Reads your Square sales", "Monthly report on what sold"],
+    name: "Solo",
+    price: 20,
+    who: "For one-person shops and side businesses",
+    items: ["3 posts a week from your photos", "A calendar of what posts when", "Monthly marketing grade", "Chat with your 2fish consultant"],
     pick: false,
   },
   {
-    name: "Growth",
-    price: 149,
+    name: "Growing",
+    price: 50,
     who: "For stores ready to grow from what sells",
     items: [
-      "Everything in Starter",
+      "Everything in Solo",
+      "7 posts a week",
+      "Graph of your sales vs. your posts",
       "Texts you when posts are ready",
       "Learns what sells and makes more of it",
-      "Posts to Instagram for you (after launch)",
     ],
     pick: true,
   },
   {
-    name: "Pro",
-    price: 299,
-    who: "For busy stores and owners with more than one shop",
-    items: [
-      "Everything in Growth",
-      "Plans holiday and sale pushes ahead of time",
-      "Google posts and review replies (after launch)",
-      "Answers Instagram DMs and comments (after launch)",
-      "Up to 3 store locations",
-    ],
+    name: "Established",
+    price: 75,
+    who: "For busy shops, restaurants and owners with more than one location",
+    items: ["Everything in Growing", "Plans holiday and sale pushes ahead of time", "More time with your consultant", "Up to 3 locations"],
     pick: false,
   },
 ];

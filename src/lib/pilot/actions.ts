@@ -55,6 +55,8 @@ export async function makePack(input: { weekOf: string; notes: string }): Promis
         caption: p.caption,
         items: p.items,
         media_path: p.mediaPath,
+        post_on: addDays(weekOf, p.position - 1),
+        campaign: p.campaign,
       })),
     );
     if (error) throw error;
@@ -90,6 +92,21 @@ export async function setPostStatus(input: { id: string; status: "draft" | "appr
     const p = z.object({ id: z.string().uuid(), status: z.enum(["draft", "approved", "posted"]) }).parse(input);
     const { supabase } = await ensureBusiness();
     const { error } = await supabase.from("posts").update({ status: p.status, updated_at: new Date().toISOString() }).eq("id", p.id);
+    if (error) throw error;
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+/** Moves a post to another day on the calendar. */
+export async function movePost(input: { id: string; postOn: string }): Promise<Result> {
+  try {
+    const p = z.object({ id: z.string().uuid(), postOn: z.string().refine(isYmd, "Pick a date.") }).parse(input);
+    const { supabase, business } = await ensureBusiness();
+    if (p.postOn < addDays(todayIn(business.timezone), -1)) return { ok: false, message: "Pick today or a later day." };
+    const { error } = await supabase.from("posts").update({ post_on: p.postOn, updated_at: new Date().toISOString() }).eq("id", p.id);
     if (error) throw error;
     refresh();
     return { ok: true };

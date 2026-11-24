@@ -13,6 +13,7 @@ export type PostDraft = {
   caption: string;
   items: string[];
   mediaPath: string | null;
+  campaign: string;
 };
 
 const draftSchema = z.object({
@@ -22,6 +23,7 @@ const draftSchema = z.object({
   caption: z.string().max(600),
   items: z.array(z.string().max(120)).max(6),
   media: z.number().int().nullable().optional(),
+  campaign: z.string().max(80).nullable().optional(),
 });
 
 // Claude can look at these photo types. HEIC and videos go in by file name only.
@@ -87,7 +89,8 @@ export async function buildPack(input: {
         "Never use: unlock, elevate, curated, obsessed, must-have, game-changer, journey, vibes.",
         "If example posts are given, borrow what made them work (hook style, format, structure, pacing) and apply it to this store's items. Never copy their words, names or claims.",
         "media: the index of the file that fits the post best, or null. Spread the files across the week.",
-        'Reply with JSON only: {"posts":[{"kind":string,"title":string,"hook":string,"caption":string,"items":string[],"media":number|null}]}',
+        "If the owner mentions a sale, holiday or event, the posts that push it share one short campaign name (\"Holiday gift week\"). Every other post gets an empty campaign.",
+        'Reply with JSON only: {"posts":[{"kind":string,"title":string,"hook":string,"caption":string,"items":string[],"media":number|null,"campaign":string}]}',
       ].join("\n"),
       messages: [{ role: "user", content }],
     });
@@ -106,6 +109,7 @@ export async function buildPack(input: {
         caption: p.caption.trim(),
         items: p.items.map((x) => x.trim()).filter(Boolean),
         mediaPath: typeof p.media === "number" ? input.media[p.media]?.path ?? null : null,
+        campaign: (p.campaign ?? "").trim(),
       })),
     };
   } catch (e) {
@@ -137,6 +141,7 @@ function templatePack(store: string, items: string[], media: PackMedia[]): PostD
       caption: p.caption(item, store),
       items: items.length ? [item] : [],
       mediaPath: media.length ? media[i % media.length].path : null,
+      campaign: "",
     };
   });
 }

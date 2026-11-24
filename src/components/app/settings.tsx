@@ -50,14 +50,14 @@ export function SettingsView({ email, business, square, packDay }: { email: stri
         </Reveal>
 
         <Reveal delay={0.2}>
-          <Card title="Plan" sub="Free while we build. Pro turns on the steps that do the work.">
+          <Card title="Plan" sub="Free while we build. Paid plans: Solo $20, Growing $50, Established $75 a month.">
             <dl className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="font-semibold">Current plan</dt>
                 <dd>Free</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="font-semibold">Pro</dt>
+                <dt className="font-semibold">Paid plans</dt>
                 <dd className="text-muted-foreground">Coming soon</dd>
               </div>
             </dl>

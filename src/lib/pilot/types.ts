@@ -26,6 +26,8 @@ export type Post = {
   mediaUrl: string | null;
   isImage: boolean;
   status: "draft" | "approved" | "posted";
+  postOn: string; // the date it goes up
+  campaign: string; // empty when it isn't part of one
 };
 
 export type Upload = { path: string; name: string; url: string | null; isImage: boolean };
