@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-// Fisher, the marketing helper: the line-drawn fish in the orange bucket hat.
+// Fisher, the marketing helper: a plain line-drawn fish.
 // The picture lives in public/brand/fisher.png.
 export function FisherAvatar({ size = 32, className }: { size?: number; className?: string }) {
   return (
