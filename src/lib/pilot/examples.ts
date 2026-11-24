@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { isAdmin } from "@/lib/app/admin";
 import { ensureBusiness } from "@/lib/app/queries";
 import { adminClient } from "@/lib/supabase/admin";
 
@@ -17,11 +18,6 @@ const row = z.object({
   link: z.string().trim().max(500).default(""),
 });
 
-/** Emails allowed to add examples every store learns from (Vercel env ADMIN_EMAILS, comma separated). */
-function isAdmin(email: string | undefined) {
-  const list = (process.env.ADMIN_EMAILS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-  return Boolean(email && list.includes(email.toLowerCase()));
-}
 
 export async function addExamples(input: { rows: unknown[]; global?: boolean }): Promise<Result> {
   try {

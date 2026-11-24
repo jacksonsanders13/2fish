@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ReportView } from "@/components/app/report";
-import { AppShell, PageBody } from "@/components/app/shell";
+import { AppShell, BackToDashboard, PageBody } from "@/components/app/shell";
 import { ensureBusiness } from "@/lib/app/queries";
 import { addDays, mondayOf } from "@/lib/pilot/dates";
 import { getReport, salesByWeek } from "@/lib/pilot/queries";
@@ -20,6 +20,7 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
   return (
     <AppShell active="report" email={user.email ?? ""}>
       <PageBody>
+        <BackToDashboard />
         <ReportView key={data.month} data={data} split={split} />
       </PageBody>
     </AppShell>
