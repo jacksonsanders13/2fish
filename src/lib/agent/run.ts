@@ -10,6 +10,7 @@ export const MODEL = "claude-sonnet-5-5";
 export type StreamEvent =
   | { type: "text"; delta: string }
   | { type: "tool"; name: string; summary: string; card?: ToolCard; madePosts?: number }
+  | { type: "conversation"; id: string }
   | { type: "done"; messageId: string | null }
   | { type: "error"; message: string };
 

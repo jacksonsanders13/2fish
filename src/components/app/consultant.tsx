@@ -1,15 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowUp, Check, Clock, Copy, Download, Film, Upload, X } from "lucide-react";
+import { ArrowUp, Check, Clock, Copy, Download, Film, History, SquarePen, Trash2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { approveText, clipsUploaded, dismissTask } from "@/lib/agent/actions";
+import { approveText, clipsUploaded, deleteConversation, dismissTask } from "@/lib/agent/actions";
 import type { StreamEvent } from "@/lib/agent/run";
 import type { ToolCard } from "@/lib/agent/tools";
 import type { Task } from "@/lib/agent/snapshot";
-import type { ChatMessage } from "@/lib/agent/store";
+import type { ChatMessage, ChatSummary } from "@/lib/agent/store";
 import { formatPhone } from "@/lib/app/types";
 import { createClient } from "@/lib/supabase/client";
 import { FisherAvatar } from "@/components/brand/fisher-avatar";
@@ -27,6 +28,9 @@ export function Consultant({
   userId,
   suggestions,
   onMadePosts,
+  chats,
+  conversationId,
+  firstEver,
   className,
 }: {
   initialMessages: ChatMessage[];
@@ -36,9 +40,15 @@ export function Consultant({
   userId: string;
   suggestions: string[];
   onMadePosts?: () => void;
+  chats: ChatSummary[];
+  conversationId: string | null;
+  firstEver: boolean;
   className?: string;
 }) {
   const router = useRouter();
+  // The chat being shown. A new chat has no id until its first message is saved.
+  const convRef = useRef<string | null>(conversationId);
+  const [showChats, setShowChats] = useState(false);
   const [messages, setMessages] = useState<Local[]>(() =>
     initialMessages.length ? initialMessages.map((m) => ({ id: m.id, role: m.role, content: m.content, meta: m.meta })) : [{ id: "intro", role: "assistant", content: intro }],
   );
@@ -52,9 +62,10 @@ export function Consultant({
     bottomRef.current?.scrollIntoView({ block: "end" });
   }, [messages, tasks]);
 
-  // First visit with a working brain: have the consultant open the conversation.
+  // The owner's very first chat: Fisher opens it. New chats after that wait
+  // for the owner, so nobody pays for a greeting they didn't ask for.
   useEffect(() => {
-    if (agentReady && initialMessages.length === 0 && !startedRef.current) {
+    if (agentReady && firstEver && initialMessages.length === 0 && !startedRef.current) {
       startedRef.current = true;
       void send("Walk me through my plan.", { silentUser: true });
     }
@@ -65,6 +76,7 @@ export function Consultant({
     const clean = text.trim();
     if (!clean || busy) return;
     setError(null);
+    setShowChats(false);
     setBusy(true);
     setDraft("");
     const userId = `u-${Date.now()}`;
@@ -76,7 +88,7 @@ export function Consultant({
     ]);
 
     try {
-      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean }) });
+      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current }) });
       if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({ error: "Could not reach Fisher." }))).error);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -91,6 +103,10 @@ export function Consultant({
             const chip: Local = { id: `t-${Date.now()}-${Math.random()}`, role: "tool", content: ev.summary, meta: { name: ev.name, ...(ev.card ? { card: ev.card } : {}) } };
             return [...m.slice(0, i), chip, ...m.slice(i)];
           });
+        } else if (ev.type === "conversation") {
+          // A new chat was just saved: keep using it, and put it in the link.
+          convRef.current = ev.id;
+          window.history.replaceState(null, "", `/dashboard?chat=${ev.id}`);
         } else if (ev.type === "error") {
           setError(ev.message);
         } else if (ev.type === "done") {
@@ -125,18 +141,32 @@ export function Consultant({
           <FisherAvatar size={36} />
           <div>
             <p className="text-sm font-semibold text-night">Fisher</p>
-            <p className="text-sm text-muted-foreground">{agentReady ? "Your marketing helper. Ask anything, or tell him what to do" : "Chat isn't switched on yet"}</p>
+            <p className="text-sm text-muted-foreground">{agentReady ? "Your marketing helper" : "Chat isn't switched on yet"}</p>
           </div>
         </div>
-        {working.length ? (
-          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock size={14} aria-hidden="true" />
-            {working.length} in progress
-          </span>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-1">
+          {working.length ? (
+            <span className="mr-2 hidden items-center gap-1.5 text-sm text-muted-foreground sm:flex">
+              <Clock size={14} aria-hidden="true" />
+              {working.length} in progress
+            </span>
+          ) : null}
+          <Button size="sm" variant="ghost" className="h-9" aria-pressed={showChats} onClick={() => setShowChats((v) => !v)}>
+            <History aria-hidden="true" />
+            Chats
+          </Button>
+          <Button asChild size="sm" variant="outline" className="h-9">
+            <Link href="/dashboard?chat=new" scroll={false}>
+              <SquarePen aria-hidden="true" />
+              New chat
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
+      {showChats ? <ChatList chats={chats} current={convRef.current} onPick={() => setShowChats(false)} /> : null}
+
+      <div className={cn("min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4", showChats && "hidden")}>
         {messages.map((m) =>
           m.role === "tool" && m.meta?.card ? (
             <WorkCard key={m.id} card={m.meta.card as ToolCard} />
@@ -359,6 +389,72 @@ function WorkCard({ card }: { card: ToolCard }) {
         </>
       ) : (
         <p className="mt-2 max-h-96 overflow-y-auto text-sm whitespace-pre-wrap">{card.body}</p>
+      )}
+    </div>
+  );
+}
+
+function whenLabel(iso: string) {
+  const d = new Date(iso);
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (days < 1) return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (days < 7) return d.toLocaleDateString("en-US", { weekday: "short" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// Past chats: open one, or delete it for good.
+function ChatList({ chats, current, onPick }: { chats: ChatSummary[]; current: string | null; onPick: () => void }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  function remove(id: string, title: string) {
+    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return;
+    setError(null);
+    start(async () => {
+      const r = await deleteConversation(id);
+      if (!r.ok) return setError(r.message ?? "Couldn't delete that chat.");
+      if (id === current) router.push("/dashboard?chat=new", { scroll: false });
+      else router.refresh();
+    });
+  }
+
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+      <h3 className="px-2 py-1 text-sm font-semibold">Your chats</h3>
+      {error ? (
+        <p role="alert" className="px-2 text-sm text-signal-tint">
+          {error}
+        </p>
+      ) : null}
+      {chats.length ? (
+        <ul className="mt-1 space-y-0.5">
+          {chats.map((c) => (
+            <li key={c.id} className={cn("flex items-center gap-1 rounded-md", c.id === current && "bg-surface")}>
+              <Link
+                href={`/dashboard?chat=${c.id}`}
+                scroll={false}
+                onClick={onPick}
+                aria-current={c.id === current ? "true" : undefined}
+                className="flex min-h-11 min-w-0 flex-1 items-center justify-between gap-3 rounded-md px-2 text-sm hover:bg-surface focus-visible:outline-2 focus-visible:outline-signal"
+              >
+                <span className="min-w-0 truncate">{c.title}</span>
+                <span className="num shrink-0 text-muted-foreground">{whenLabel(c.updatedAt)}</span>
+              </Link>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => remove(c.id, c.title)}
+                className="flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-surface hover:text-signal-tint focus-visible:outline-2 focus-visible:outline-signal"
+              >
+                <Trash2 size={16} aria-hidden="true" />
+                <span className="sr-only">Delete {c.title}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-2 py-2 text-sm text-muted-foreground">No saved chats yet. Each chat is saved after your first message.</p>
       )}
     </div>
   );

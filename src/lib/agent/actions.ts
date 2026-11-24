@@ -64,3 +64,14 @@ export async function clipsUploaded(taskId: string, paths: string[]): Promise<Re
   revalidatePath("/dashboard", "layout");
   return { ok: true, message: `${clean.length} photos and clips uploaded.` };
 }
+
+/** Deletes one chat and everything said in it. */
+export async function deleteConversation(conversationId: string): Promise<Result> {
+  const id = z.string().uuid().safeParse(conversationId);
+  if (!id.success) return { ok: false, message: "That chat doesn't exist." };
+  const { supabase, business } = await ensureBusiness();
+  const { error } = await supabase.from("conversations").delete().eq("id", id.data).eq("business_id", business.id);
+  if (error) return { ok: false, message: "Couldn't delete that chat. Try again." };
+  revalidatePath("/dashboard");
+  return { ok: true };
+}

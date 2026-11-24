@@ -9,23 +9,18 @@ export type ChatMessage = {
   createdAt: string;
 };
 
-/** The one running conversation for this business, plus its history for the model. */
-export async function getOrCreateConversation(supabase: SupabaseClient, ownerId: string, businessId: string) {
-  let { data: convo } = await supabase
-    .from("conversations")
-    .select("id")
-    .eq("business_id", businessId)
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
-  if (!convo) {
-    const made = await supabase.from("conversations").insert({ business_id: businessId, owner_id: ownerId }).select("id").single();
-    if (made.data) convo = made.data;
-    else {
-      const again = await supabase.from("conversations").select("id").eq("business_id", businessId).order("created_at").limit(1).single();
-      convo = again.data!;
-    }
-  }
+export type ChatSummary = { id: string; title: string; updatedAt: string };
+
+/** The owner's chats, newest first. */
+export async function listConversations(supabase: SupabaseClient, businessId: string): Promise<ChatSummary[]> {
+  const { data } = await supabase.from("conversations").select("id, title, updated_at").eq("business_id", businessId).order("updated_at", { ascending: false }).limit(40);
+  return (data ?? []).map((c) => ({ id: c.id as string, title: (c.title as string) || "New chat", updatedAt: c.updated_at as string }));
+}
+
+/** One chat's messages, plus its history for the model. Returns null if it isn't this store's. */
+export async function loadConversation(supabase: SupabaseClient, businessId: string, conversationId: string) {
+  const { data: convo } = await supabase.from("conversations").select("id").eq("id", conversationId).eq("business_id", businessId).maybeSingle();
+  if (!convo) return null;
   const { data: rows } = await supabase
     .from("chat_messages")
     .select("id, role, content, meta, created_at")
@@ -34,7 +29,20 @@ export async function getOrCreateConversation(supabase: SupabaseClient, ownerId:
     .limit(200);
   const messages: ChatMessage[] = (rows ?? []).map((r) => ({ id: r.id, role: r.role, content: r.content, meta: (r.meta as Record<string, unknown>) ?? {}, createdAt: r.created_at }));
   const history = messages.filter((m) => m.role !== "tool" && m.content).map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
-  return { conversationId: convo.id, messages, history };
+  return { conversationId: convo.id as string, messages, history };
+}
+
+/** Starts a chat, named after its first message. */
+export async function createConversation(supabase: SupabaseClient, ownerId: string, businessId: string, firstMessage: string) {
+  const title = firstMessage.replace(/\s+/g, " ").trim().slice(0, 60);
+  const { data, error } = await supabase.from("conversations").insert({ business_id: businessId, owner_id: ownerId, title }).select("id").single();
+  if (error) throw error;
+  return data.id as string;
+}
+
+/** Marks a chat as just used, so it moves to the top of the list. */
+export async function touchConversation(supabase: SupabaseClient, conversationId: string) {
+  await supabase.from("conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId);
 }
 
 export async function getOpenTasks(supabase: SupabaseClient, businessId: string): Promise<Task[]> {

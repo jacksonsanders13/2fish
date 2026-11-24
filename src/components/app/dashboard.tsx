@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Task } from "@/lib/agent/snapshot";
-import type { ChatMessage } from "@/lib/agent/store";
+import type { ChatMessage, ChatSummary } from "@/lib/agent/store";
 import type { DashboardData } from "@/lib/app/queries";
 import type { HomeData } from "@/lib/pilot/queries";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,9 @@ export function Dashboard({
   home,
   today,
   messages,
+  chats,
+  conversationId,
+  firstEver,
   tasks,
   agentReady,
   intro,
@@ -30,6 +33,9 @@ export function Dashboard({
   home: HomeData;
   today: string;
   messages: ChatMessage[];
+  chats: ChatSummary[];
+  conversationId: string | null;
+  firstEver: boolean;
   tasks: Task[];
   agentReady: boolean;
   intro: string;
@@ -104,6 +110,11 @@ export function Dashboard({
         </div>
 
         <Consultant
+          // A different chat is a fresh conversation on screen.
+          key={conversationId ?? "new"}
+          chats={chats}
+          conversationId={conversationId}
+          firstEver={firstEver}
           initialMessages={messages}
           tasks={tasks}
           agentReady={agentReady}
