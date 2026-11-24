@@ -8,7 +8,7 @@ import type { DashboardData } from "@/lib/app/queries";
 import type { HomeData } from "@/lib/pilot/queries";
 import { cn } from "@/lib/utils";
 import { Consultant } from "./consultant";
-import { PostBoard } from "./post-board";
+import { PostBoard, type BoardView } from "./post-board";
 import { SalesChart } from "./sales-chart";
 
 type Tab = "sales" | "posts" | "chat";
@@ -36,6 +36,7 @@ export function Dashboard({
   userId: string;
 }) {
   const [tab, setTab] = useState<Tab>("posts");
+  const [board, setBoard] = useState<BoardView>(home.drafts.length ? "approve" : "calendar");
   const { business, plan } = data;
   const who = business.name || "Your store";
 
@@ -92,13 +93,13 @@ export function Dashboard({
         </p>
       ) : null}
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-6">
+      <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:gap-6">
         <div className="min-w-0 space-y-4">
           <div className={cn(tab === "sales" ? "block" : "hidden lg:block")}>
             <SalesChart weeks={home.weeks} hasSales={home.hasSales} today={today} />
           </div>
           <div className={cn(tab === "posts" ? "block" : "hidden lg:block")}>
-            <PostBoard home={home} today={today} />
+            <PostBoard home={home} today={today} view={board} setView={setBoard} />
           </div>
         </div>
 
@@ -109,6 +110,8 @@ export function Dashboard({
           intro={intro}
           userId={userId}
           suggestions={suggestions}
+          // When Fisher makes posts, show them where the owner approves them.
+          onMadePosts={() => setBoard("approve")}
           className={cn("h-[calc(100dvh-14rem)] min-h-[26rem] lg:sticky lg:top-6 lg:h-[calc(100dvh-9rem)]", tab === "chat" ? "flex" : "hidden lg:flex")}
         />
       </div>

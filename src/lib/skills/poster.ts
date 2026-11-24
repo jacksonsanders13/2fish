@@ -33,6 +33,8 @@ export const posterSpec = z.object({
   details: z.string().trim().max(60).default(""),
   photo: z.number().int().min(0).nullable().default(null),
   caption: z.string().trim().max(900).default(""),
+  date: z.string().trim().max(10).default(""),
+  kind: z.string().trim().max(40).default("sale"),
 });
 export type PosterSpec = z.infer<typeof posterSpec>;
 
@@ -57,6 +59,8 @@ Rules for the words
 - Pick the palette that fits the store and the moment (sale: coral or sun; calm new arrival: white, rose or sky; evening event: ink or forest). Avoid the same palette as a poster you were told the store just made.
 - photo: index of the best file from the list, or null. Use layout "type" when photo is null.
 - caption: the Instagram caption to post with it, following the caption rules.
+- date: the day to post it, YYYY-MM-DD. For a sale or event, 1 to 3 days before it starts (never in the past). If there's no date, use today.
+- kind: one of try-on, new arrival, behind the scenes, outfit, gift idea, in the shop, sale.
 
-Reply with JSON only: {"layout":string,"palette":string,"headline":string,"subline":string,"details":string,"photo":number|null,"caption":string}
+Reply with JSON only: {"layout":string,"palette":string,"headline":string,"subline":string,"details":string,"photo":number|null,"caption":string,"date":string,"kind":string}
 `.trim();

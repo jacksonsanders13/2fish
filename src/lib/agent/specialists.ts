@@ -8,6 +8,7 @@ import { POST_KINDS } from "@/lib/pilot/types";
 import { CAPTION_SKILL } from "@/lib/skills/captions";
 import { SKILL_TEXT } from "@/lib/skills/library.generated";
 import { POSTER_KIT, posterSpec } from "@/lib/skills/poster";
+import { renderPoster } from "@/lib/skills/render-poster";
 import { describeSnapshot } from "./snapshot";
 import type { ToolContext, ToolOutcome } from "./tools";
 import { claudeKey } from "@/lib/ai-key";
@@ -150,9 +151,41 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
     const finalSpec = { ...p, layout: photo ? p.layout : "type", photo: null };
     const { data, error } = await supabase.from("posters").insert({ business_id: business.id, owner_id: ownerId, spec: finalSpec, media_path: photo }).select("id").single();
     if (error) return { summary: `Couldn't save the poster: ${error.message}` };
+    const posterId = data.id as string;
+    const card = { kind: "poster" as const, posterId, title: p.headline, body: p.caption };
+
+    // Save the finished poster as the photo on a draft post, so it waits in Posts to approve.
+    const postOn = isYmd(p.date) && p.date >= today ? p.date : today;
+    try {
+      const src = photo ? ((await supabase.storage.from("clips").createSignedUrl(photo, 300)).data?.signedUrl ?? null) : null;
+      const png = await (await renderPoster({ spec: { ...finalSpec, layout: src ? p.layout : "type" }, photo: src, store: business.name || "" })).arrayBuffer();
+      const path = `${ownerId}/posters/${posterId}.png`;
+      const up = await supabase.storage.from("clips").upload(path, new Uint8Array(png), { contentType: "image/png", upsert: true });
+      if (up.error) throw up.error;
+      const idx = (new Date(`${postOn}T12:00:00Z`).getUTCDay() + 6) % 7;
+      const ins = await supabase.from("posts").insert({
+        business_id: business.id,
+        owner_id: ownerId,
+        week_of: mondayOf(postOn),
+        position: idx + 1,
+        day: DAYS[idx],
+        post_on: postOn,
+        kind: POST_KINDS.includes(p.kind as (typeof POST_KINDS)[number]) ? p.kind : "sale",
+        title: p.headline,
+        hook: p.headline,
+        caption: p.caption,
+        items: [],
+        media_path: path,
+      });
+      if (ins.error) throw ins.error;
+    } catch (e) {
+      console.error("poster: couldn't add it as a draft post", e);
+      return { summary: `Poster made and shown in the chat: "${p.headline}". It couldn't be added to Posts to approve, so the owner can download it from the chat.`, card };
+    }
     return {
-      summary: `Poster made and shown in the chat: "${p.headline}" (${finalSpec.layout}, ${p.palette}). Caption: ${p.caption}`,
-      card: { kind: "poster", posterId: data.id as string, title: p.headline, body: p.caption },
+      summary: `Poster made: "${p.headline}". It's now a draft post for ${postOn}, waiting in Posts to approve. Tell the owner, in about these words: "Your post is in Posts to approve, waiting for your okay." Don't describe the poster again.`,
+      card,
+      madePosts: 1,
     };
   }
 
@@ -183,10 +216,11 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
     const { error } = await supabase.from("posts").insert(rows);
     if (error) return { summary: `Planned it, but couldn't add the posts to the calendar: ${error.message}\n\nPLAN:\n${plan.summary}` };
   }
-  const body = `${plan.summary}\n\n${cleaned.length} draft posts are on your calendar under "${plan.campaign}". Open each one to approve it.`;
+  const body = `${plan.summary}\n\n${cleaned.length} draft posts are waiting in Posts to approve, under "${plan.campaign}".`;
   return {
-    summary: `Campaign "${plan.campaign}" planned. ${cleaned.length} draft posts added to the calendar. Tell the owner the plan in two or three sentences.\n\nPLAN:\n${plan.summary}`,
+    summary: `Campaign "${plan.campaign}" planned. ${cleaned.length} draft posts added, waiting in Posts to approve. Tell the owner the plan in two sentences, then: "Your ${cleaned.length} posts are in Posts to approve, waiting for your okay."\n\nPLAN:\n${plan.summary}`,
     card: { kind: "draft", title: `Campaign: ${plan.campaign}`, body },
+    madePosts: cleaned.length,
   };
 }
 

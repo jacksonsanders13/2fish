@@ -13,10 +13,9 @@ import { PostDialog } from "./post-dialog";
 
 // The bottom-left panel: a switch between the posts waiting on an okay and a
 // month calendar with each post in a little box on its day.
-export function PostBoard({ home, today }: { home: HomeData; today: string }) {
-  const [view, setView] = useState<"approve" | "calendar">(
-    home.drafts.length ? "approve" : "calendar",
-  );
+export type BoardView = "approve" | "calendar";
+
+export function PostBoard({ home, today, view, setView }: { home: HomeData; today: string; view: BoardView; setView: (v: BoardView) => void }) {
   const [open, setOpen] = useState<Post | null>(null);
 
   return (

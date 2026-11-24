@@ -26,6 +26,7 @@ export function Consultant({
   intro,
   userId,
   suggestions,
+  onMadePosts,
   className,
 }: {
   initialMessages: ChatMessage[];
@@ -34,6 +35,7 @@ export function Consultant({
   intro: string;
   userId: string;
   suggestions: string[];
+  onMadePosts?: () => void;
   className?: string;
 }) {
   const router = useRouter();
@@ -83,6 +85,7 @@ export function Consultant({
         if (ev.type === "text") {
           setMessages((m) => m.map((x) => (x.id === assistantId ? { ...x, content: x.content + ev.delta } : x)));
         } else if (ev.type === "tool") {
+          if (ev.madePosts) onMadePosts?.();
           setMessages((m) => {
             const i = m.findIndex((x) => x.id === assistantId);
             const chip: Local = { id: `t-${Date.now()}-${Math.random()}`, role: "tool", content: ev.summary, meta: { name: ev.name, ...(ev.card ? { card: ev.card } : {}) } };

@@ -9,7 +9,7 @@ export const MODEL = "claude-sonnet-5-5";
 
 export type StreamEvent =
   | { type: "text"; delta: string }
-  | { type: "tool"; name: string; summary: string; card?: ToolCard }
+  | { type: "tool"; name: string; summary: string; card?: ToolCard; madePosts?: number }
   | { type: "done"; messageId: string | null }
   | { type: "error"; message: string };
 
@@ -28,7 +28,7 @@ Your specialists (the ask_specialist tool). Each one has proven marketing skills
 - email: an email to their customer list
 - text_message: marketing texts for customers who opted in
 - referral: a word-of-mouth idea they can run at the counter
-After a specialist finishes, its draft is already on the owner's screen. Say in one or two sentences what it made and what to do next (approve, copy, fill in a [NEED]). Don't paste the draft again. If the owner's request is missing a key fact (the dates of a sale, the discount), ask for it first, one question.
+After a specialist finishes, its draft is already on the owner's screen. Posters and campaign posts become draft posts: always tell the owner they're in Posts to approve, waiting for their okay. Say in one or two sentences what it made and what to do next (approve, copy, fill in a [NEED]). Don't paste the draft again. If the owner's request is missing a key fact (the dates of a sale, the discount), ask for it first, one question.
 
 What you do: explain their score and fixes in their words, say what you will do and what it is worth, and when they agree, do it with your tools. Tools change the plan, ask for photos and clips (request_clips), queue a week of posts (start_video_batch), log a sale at checkout (log_job, with how the shopper heard about the store), and add customers. If they tell you something new (for example "my try-ons do better"), adjust the plan with update_plan_step and tell them what changed, then ask for what you need (photos, their okay).
 
@@ -104,7 +104,7 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
         // Cards show the owner the draft itself; the chat line stays short.
         const line = outcome.card ? `${outcome.card.title} ready` : outcome.summary;
         toolSummaries.push({ name: use.name, summary: line, card: outcome.card });
-        emit({ type: "tool", name: use.name, summary: line, card: outcome.card });
+        emit({ type: "tool", name: use.name, summary: line, card: outcome.card, madePosts: outcome.madePosts });
         results.push({ type: "tool_result", tool_use_id: use.id, content: outcome.summary });
       }
       messages.push({ role: "user", content: results });

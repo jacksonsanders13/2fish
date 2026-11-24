@@ -12,7 +12,7 @@ import { runSpecialist, SPECIALIST_NAMES, SPECIALISTS } from "./specialists";
 export type ToolContext = { supabase: SupabaseClient; ownerId: string; business: Business; snapshot: Snapshot };
 /** A card shown in the chat: a draft to read and copy, or a poster to download. */
 export type ToolCard = { kind: "draft"; title: string; body: string } | { kind: "poster"; posterId: string; title: string; body: string };
-export type ToolOutcome = { summary: string; data?: Record<string, unknown>; card?: ToolCard };
+export type ToolOutcome = { summary: string; data?: Record<string, unknown>; card?: ToolCard; madePosts?: number };
 
 export const toolDefinitions: Anthropic.Tool[] = [
   {
