@@ -58,6 +58,6 @@ export async function getOpenTasks(supabase: SupabaseClient, businessId: string)
 
 /** A first message when the owner arrives and the consultant hasn't spoken yet. Used only when Claude isn't connected. */
 export function fallbackIntro(hasPlan: boolean, totalMonthly: number, firstStep?: string) {
-  if (!hasPlan) return "Hi, I'm your 2fish helper. Grade your store first (six questions, about 2 minutes) and I'll come back with your fixes, biggest first. Then we work on them together.";
-  return `Hi, I'm your 2fish helper. Your fixes could bring in about $${totalMonthly.toLocaleString()} a month, and "${firstStep ?? "the first fix"}" is where we start. Send me a few product photos when you're ready and I'll turn them into your first week of posts.`;
+  if (!hasPlan) return "Hi, I'm Fisher, your 2fish helper. Grade your store first (six questions, about 2 minutes) and I'll come back with your fixes, biggest first. Then we work on them together.";
+  return `Hi, I'm Fisher, your 2fish helper. Your fixes could bring in about $${totalMonthly.toLocaleString()} a month, and "${firstStep ?? "the first fix"}" is where we start. Send me a few product photos when you're ready and I'll turn them into your first week of posts.`;
 }

@@ -146,7 +146,7 @@ const plans = [
     name: "Solo",
     price: 20,
     who: "For one-person shops and side businesses",
-    items: ["3 posts a week from your photos", "A calendar of what posts when", "Monthly marketing grade", "Chat with your 2fish consultant"],
+    items: ["3 posts a week from your photos", "A calendar of what posts when", "Monthly marketing grade", "Chat with Fisher, your marketing helper"],
     pick: false,
   },
   {
@@ -166,7 +166,7 @@ const plans = [
     name: "Established",
     price: 75,
     who: "For busy shops, restaurants and owners with more than one location",
-    items: ["Everything in Growing", "Plans holiday and sale pushes ahead of time", "More time with your consultant", "Up to 3 locations"],
+    items: ["Everything in Growing", "Plans holiday and sale pushes ahead of time", "More time with Fisher", "Up to 3 locations"],
     pick: false,
   },
 ];

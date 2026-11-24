@@ -183,7 +183,7 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
       if (typeof input.enabled === "boolean" && planId) {
         await supabase.from("plan_steps").update({ status: input.enabled ? "live" : "needs-you" }).eq("plan_id", planId).eq("key", "text-back");
       }
-      await event("setting", row.enabled ? "Missed-call text-back turned on by your consultant." : "Text-back settings updated by your consultant.");
+      await event("setting", row.enabled ? "Missed-call text-back turned on by Fisher." : "Text-back settings updated by Fisher.");
       return {
         summary: `Text-back is ${row.enabled ? "on" : "off"}. First message: "${row.template}". Hours ${row.hours_start}:00 to ${row.hours_end}:00.${snapshot.integrations.sms ? "" : " Texting is not connected yet, so messages queue until it is."}`,
       };

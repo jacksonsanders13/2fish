@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowUp, Check, Clock, Film, MessageSquareText, Upload, X } from "lucide-react";
+import { ArrowUp, Check, Clock, Film, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { approveText, clipsUploaded, dismissTask } from "@/lib/agent/actions";
@@ -11,11 +11,12 @@ import type { Task } from "@/lib/agent/snapshot";
 import type { ChatMessage } from "@/lib/agent/store";
 import { formatPhone } from "@/lib/app/types";
 import { createClient } from "@/lib/supabase/client";
+import { FisherAvatar } from "@/components/brand/fisher-avatar";
 import { cn } from "@/lib/utils";
 
 type Local = { id: string; role: "user" | "assistant" | "tool"; content: string; meta?: Record<string, unknown>; pending?: boolean };
 
-// The consultant. A running conversation with the owner, with the work it
+// Fisher, the 2fish helper. A running conversation with the owner, with the work it
 // needs from them (uploads, approvals) shown as cards above the composer.
 export function Consultant({
   initialMessages,
@@ -73,7 +74,7 @@ export function Consultant({
 
     try {
       const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean }) });
-      if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({ error: "Could not reach the consultant." }))).error);
+      if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({ error: "Could not reach Fisher." }))).error);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -117,12 +118,10 @@ export function Consultant({
     <div className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border-t-4 border-night bg-white", className)}>
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-full bg-night text-white">
-            <MessageSquareText size={16} aria-hidden="true" />
-          </span>
+          <FisherAvatar size={36} />
           <div>
-            <p className="text-sm font-semibold text-night">Your 2fish helper</p>
-            <p className="text-sm text-muted-foreground">{agentReady ? "Ask about your plan, or tell it what to do" : "Chat isn't switched on yet"}</p>
+            <p className="text-sm font-semibold text-night">Fisher</p>
+            <p className="text-sm text-muted-foreground">{agentReady ? "Your 2fish helper. Ask anything, or tell him what to do" : "Chat isn't switched on yet"}</p>
           </div>
         </div>
         {working.length ? (
@@ -141,7 +140,8 @@ export function Consultant({
               <span>{m.content}</span>
             </div>
           ) : (
-            <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+            <div key={m.id} className={cn("flex items-end gap-2", m.role === "user" ? "justify-end" : "justify-start")}>
+              {m.role === "assistant" ? <FisherAvatar size={24} className="mb-0.5" /> : null}
               <div
                 className={cn(
                   "max-w-[88%] rounded-lg px-3.5 py-2.5 text-sm whitespace-pre-wrap",
@@ -202,10 +202,10 @@ export function Consultant({
               }
             }}
             rows={1}
-            placeholder={agentReady ? "Tell 2fish what's going on in the store…" : "Chat isn't on yet. Your plan already works."}
+            placeholder={agentReady ? "Tell Fisher what's going on in the store…" : "Chat isn't on yet. Your plan already works."}
             disabled={busy || !agentReady}
             className="max-h-40 min-h-11 resize-none py-2.5 text-sm"
-            aria-label="Message your consultant"
+            aria-label="Message Fisher"
           />
           <Button type="submit" size="icon" variant="signal" disabled={busy || !draft.trim() || !agentReady} aria-label="Send">
             <ArrowUp aria-hidden="true" />

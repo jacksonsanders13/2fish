@@ -87,7 +87,7 @@ function ApproveList({
     return (
       <div className="text-sm">
         <p>
-          Nothing waiting on you. Send photos and your consultant writes the
+          Nothing waiting on you. Send photos and Fisher writes the
           next week of posts.
         </p>
         <Link

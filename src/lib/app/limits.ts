@@ -12,7 +12,7 @@ export async function takeQuota(supabase: SupabaseClient, kind: keyof typeof DAI
 }
 
 export const limitMessage = {
-  chat: `That's ${DAILY_LIMITS.chat} messages today, the daily limit. Your consultant is back tomorrow.`,
+  chat: `That's ${DAILY_LIMITS.chat} messages today, the daily limit. Fisher is back tomorrow.`,
   text: `That's ${DAILY_LIMITS.text} texts today, the daily limit. Sending opens again tomorrow.`,
   pack: `That's ${DAILY_LIMITS.pack} weekly packs made today, the daily limit. Try again tomorrow.`,
 };
