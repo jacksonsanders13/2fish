@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
+import { CAPTION_SKILL, EDITOR_SKILL } from "@/lib/skills/captions";
+import { findTells } from "@/lib/skills/tells";
 import { DAYS } from "./dates";
 import { POST_KINDS } from "./types";
 
@@ -20,7 +22,7 @@ const draftSchema = z.object({
   kind: z.string().max(40),
   title: z.string().max(80),
   hook: z.string().max(140),
-  caption: z.string().max(600),
+  caption: z.string().max(900),
   items: z.array(z.string().max(120)).max(6),
   media: z.number().int().nullable().optional(),
   campaign: z.string().max(80).nullable().optional(),
@@ -80,13 +82,15 @@ export async function buildPack(input: {
 
     const res = await client.messages.create({
       model,
-      max_tokens: 2500,
+      max_tokens: 3500,
       system: [
-        "You write a week of Instagram and TikTok posts for a small independent store. The owner approves every post before it goes up.",
+        "You are Fisher, and you write a week of Instagram and TikTok posts for a small independent store. The owner approves every post before it goes up.",
+        CAPTION_SKILL,
+        "",
+        "THIS WEEK'S JOB",
         `Write exactly 7 posts, Monday to Sunday. Mix the kinds: ${POST_KINDS.join(", ")}. Use "sale" only if the owner mentions a sale.`,
         "Each post features 1 to 3 specific items from the owner's list or clearly visible in a photo. Name items the way a shopper would ask for them at the counter (\"green wrap dress\").",
-        "hook: the first line someone reads, under 12 words. caption: under 220 characters, plain and warm, ends by giving a reason to come in. Up to 3 hashtags, local ones welcome. No emoji. No promo codes or discounts unless the owner wrote one. Never invent prices, sizes or stock counts.",
-        "Never use: unlock, elevate, curated, obsessed, must-have, game-changer, journey, vibes.",
+        "hook and caption follow HOW TO WRITE A STORE POST above. No promo codes or discounts unless the owner wrote one.",
         "If example posts are given, borrow what made them work (hook style, format, structure, pacing) and apply it to this store's items. Never copy their words, names or claims.",
         "media: the index of the file that fits the post best, or null. Spread the files across the week.",
         "If the owner mentions a sale, holiday or event, the posts that push it share one short campaign name (\"Holiday gift week\"). Every other post gets an empty campaign.",
@@ -98,9 +102,10 @@ export async function buildPack(input: {
     const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
     const json = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
     const parsed = z.object({ posts: z.array(draftSchema).min(7) }).parse(json).posts.slice(0, 7);
+    const edited = await editPosts(client, parsed);
     return {
       model,
-      posts: parsed.map((p, i) => ({
+      posts: edited.map((p, i) => ({
         position: i + 1,
         day: DAYS[i],
         kind: POST_KINDS.includes(p.kind as (typeof POST_KINDS)[number]) ? p.kind : "in the shop",
@@ -127,6 +132,43 @@ const PLAN: { kind: string; title: (item: string) => string; hook: (item: string
   { kind: "in the shop", title: () => "Saturday in the shop", hook: () => "Come say hi this weekend", caption: (x, s) => `${s} this Saturday: the ${x} and a lot more. Come say hi.` },
   { kind: "in the shop", title: () => "The store in 15 seconds", hook: () => "In case you haven't been in yet", caption: (_x, s) => `Clothes, gifts and good light in the dressing room. That's ${s}.` },
 ];
+
+/**
+ * The editor pass: posts that still read as AI-written (per the tell check) go
+ * to a smaller, cheaper model with the copy-editing rules. Clean posts skip it.
+ * If the editor fails, the writer's version stands.
+ */
+async function editPosts<T extends { hook: string; caption: string }>(client: Anthropic, posts: T[]): Promise<T[]> {
+  const flagged = posts.map((p, i) => ({ i, problems: findTells(p.hook, p.caption), hook: p.hook, caption: p.caption })).filter((x) => x.problems.length);
+  if (!flagged.length) return posts;
+  try {
+    const res = await client.messages.create(
+      {
+        model: "claude-haiku-5-5",
+        max_tokens: 2000,
+        system: EDITOR_SKILL,
+        messages: [{ role: "user", content: JSON.stringify({ posts: flagged }) }],
+      },
+      { timeout: 25_000 },
+    );
+    const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
+    const json = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+    const fixes = z
+      .object({ posts: z.array(z.object({ i: z.number().int(), hook: z.string().min(1).max(140), caption: z.string().min(1).max(600) })) })
+      .parse(json).posts;
+    const out = [...posts];
+    for (const f of fixes) {
+      // Only take an edit for a post we sent, and only if it has fewer problems than before.
+      const before = flagged.find((x) => x.i === f.i);
+      if (!before) continue;
+      if (findTells(f.hook, f.caption).length <= before.problems.length) out[f.i] = { ...out[f.i], hook: f.hook.trim(), caption: f.caption.trim() };
+    }
+    return out;
+  } catch (e) {
+    console.error("pack: editor pass skipped", e);
+    return posts;
+  }
+}
 
 function templatePack(store: string, items: string[], media: PackMedia[]): PostDraft[] {
   const pick = (i: number) => items[i % Math.max(items.length, 1)] || "new arrivals";
