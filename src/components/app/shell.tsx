@@ -43,7 +43,7 @@ const NAV: NavItem[] = [
     label: "Examples",
     icon: Lightbulb,
     href: "/dashboard/examples",
-    team: true,
+    // Open to everyone for now. Put `team: true` back to hide it from stores.
   },
   {
     key: "settings",
