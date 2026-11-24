@@ -11,6 +11,7 @@ export type PostScore = {
   day: string;
   kind: string;
   title: string;
+  campaign: string;
   items: { item: string; sold: number; before: number }[];
   sold: number;
   before: number;
@@ -27,7 +28,7 @@ export const matches = (squareName: string, postItem: string) => {
 
 export async function scorePosts(db: SupabaseClient, businessId: string, sinceWeek: string, today: string): Promise<PostScore[]> {
   const [p, i] = await Promise.all([
-    db.from("posts").select("id, week_of, day, kind, title, items, status").eq("business_id", businessId).neq("status", "draft").gte("week_of", sinceWeek).lte("week_of", today).order("week_of").order("position"),
+    db.from("posts").select("*").eq("business_id", businessId).neq("status", "draft").gte("week_of", sinceWeek).lte("week_of", today).order("week_of").order("position"),
     db.from("item_daily").select("day, item, qty, amount").eq("business_id", businessId).gte("day", addDays(sinceWeek, -7)).lte("day", today),
   ]);
   const rows = (i.data ?? []).map((r) => ({ day: r.day as string, item: r.item as string, qty: Number(r.qty), amount: Number(r.amount) }));
@@ -51,6 +52,7 @@ export async function scorePosts(db: SupabaseClient, businessId: string, sinceWe
       day: post.day as string,
       kind: post.kind as string,
       title: post.title as string,
+      campaign: String(post.campaign ?? ""),
       items: items.map(({ item, sold, before }) => ({ item, sold, before })),
       sold: items.reduce((s, x) => s + x.sold, 0),
       before: items.reduce((s, x) => s + x.before, 0),

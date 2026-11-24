@@ -1,19 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { Check, Copy, Download, Film, Pencil, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { approveWeek, makePack, removeUpload, setPostStatus, updatePost } from "@/lib/pilot/actions";
-import { shortDate } from "@/lib/pilot/dates";
+import { approveWeek, makePack, movePost, removeUpload, setPostStatus, updatePost } from "@/lib/pilot/actions";
+import { shortDate, weekdayOf, WEEKDAYS } from "@/lib/pilot/dates";
 import type { Post, Upload as UploadFile } from "@/lib/pilot/types";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const MAX_FILES = 20;
 
-// The weekly pack: send photos, say what's new, get 7 posts, approve, then copy each one out.
+// The weekly pack: send photos, say what's new, get a week of posts, approve, then copy each one out.
 type ItemResult = { item: string; sold: number; before: number };
 
 export function PostsView({
@@ -81,8 +82,12 @@ export function PostsView({
       <header className="max-w-2xl">
         <h1 className="text-display font-semibold">Posts for the week of {shortDate(weekOf)}</h1>
         <p className="mt-3">
-          Send this week&apos;s product photos and try-on clips, list what&apos;s new, and 2fish writes 7 posts. Approve them,
-          then copy each one to Instagram or TikTok from your phone.
+          Send this week&apos;s product photos and try-on clips, list what&apos;s new, and your consultant writes the week&apos;s posts.
+          Approve them and they land on your{" "}
+          <Link href="/dashboard" className="font-semibold text-night underline underline-offset-2">
+            calendar
+          </Link>
+          . Mention a sale or holiday and those posts become one campaign.
         </p>
       </header>
 
@@ -134,10 +139,10 @@ export function PostsView({
               onChange={(e) => setNotes(e.target.value)}
               rows={6}
               className="mt-3 text-sm"
-              placeholder={"Green wrap dress\nFall knit sweaters\nGold hoop earrings\nCandles, the fig one"}
+              placeholder={"Green wrap dress\nFall knit sweaters\nGold hoop earrings\nHoliday sale, 20% off gifts Dec 12 to 15"}
             />
             <Button variant={posts.length ? "outline" : "signal"} className="mt-4 w-full" disabled={pending || Boolean(uploading)} onClick={make}>
-              {pending ? "Writing your posts…" : posts.length ? "Write them again" : "Make my 7 posts"}
+              {pending ? "Writing your posts…" : posts.length ? "Write them again" : "Make this week's posts"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
               {pending ? "Takes about 30 seconds." : msg ?? (posts.length ? "Starting over replaces the drafts below." : "")}
@@ -156,7 +161,7 @@ export function PostsView({
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white p-4">
             <p className="text-sm">
               <span className="num font-semibold">{approved} of {posts.length} approved.</span>{" "}
-              {approved === posts.length ? "Post one a day. Tap Copy, then paste into Instagram." : "Read each one, fix anything, then approve."}
+              {approved === posts.length ? "On each post's day, tap Copy, then paste into Instagram." : "Read each one, fix anything, then approve."}
             </p>
             {approved < posts.length ? (
               <Button
@@ -261,7 +266,7 @@ function PostCard({ post, result }: { post: Post; result?: ItemResult[] }) {
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">
-            {post.day} · {post.kind}
+            {WEEKDAYS[weekdayOf(post.postOn)].slice(0, 3)} {shortDate(post.postOn)} · {post.kind}
           </span>
           {post.status !== "draft" ? (
             <span className="confirm flex items-center gap-1 font-semibold text-night">
@@ -271,6 +276,11 @@ function PostCard({ post, result }: { post: Post; result?: ItemResult[] }) {
           ) : null}
         </div>
         <h3 className="mt-1 font-semibold">{post.title}</h3>
+        {post.campaign ? (
+          <p className="mt-1 text-sm">
+            <span className="rounded-[4px] bg-signal-soft px-1.5 py-0.5 font-semibold text-signal-tint">{post.campaign}</span>
+          </p>
+        ) : null}
         {post.hook ? <p className="mt-1 text-sm font-medium">{post.hook}</p> : null}
         {editing ? (
           <div className="mt-2 space-y-2">
@@ -299,6 +309,29 @@ function PostCard({ post, result }: { post: Post; result?: ItemResult[] }) {
             ) : null}
           </>
         )}
+        {post.status !== "posted" && !editing ? (
+          <div className="mt-3">
+            <label htmlFor={`day-${post.id}`} className="text-sm font-semibold">
+              Post it on
+            </label>
+            <input
+              id={`day-${post.id}`}
+              type="date"
+              defaultValue={post.postOn}
+              disabled={pending}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) return;
+                start(async () => {
+                  const r = await movePost({ id: post.id, postOn: v });
+                  setNote(r.ok ? `Moved to ${shortDate(v)}.` : r.message ?? "Couldn't move it.");
+                  router.refresh();
+                });
+              }}
+              className="num mt-1 block h-10 rounded-md border border-input bg-white px-2 text-sm"
+            />
+          </div>
+        ) : null}
         {note ? (
           <p className="mt-2 text-sm" aria-live="polite">
             {note}

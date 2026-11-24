@@ -1,16 +1,29 @@
 import Link from "next/link";
 import { Money } from "@/components/ui/money";
 import { money } from "@/lib/format";
-import { shortDate } from "@/lib/pilot/dates";
+import { mondayOf, shortDate } from "@/lib/pilot/dates";
 import type { ChartWeek } from "@/lib/pilot/queries";
 
 // Six weeks of sales as stacked bars: the bottom part is what the posted items
 // sold, the rest is everything else in the store. Comparing the two is how we
 // keep a busy season from making every post look like a winner.
-export function SalesChart({ weeks, hasSales }: { weeks: ChartWeek[]; hasSales: boolean }) {
+export function SalesChart({
+  weeks,
+  hasSales,
+  today,
+  label = "Last 6 weeks",
+  wholeRange = false,
+}: {
+  weeks: ChartWeek[];
+  hasSales: boolean;
+  today: string;
+  label?: string;
+  wholeRange?: boolean; // sum every week (a month report) instead of quoting last week
+}) {
   const max = Math.max(1, ...weeks.map((w) => w.total));
-  const thisWeek = weeks[weeks.length - 1];
-  const lastFull = weeks[weeks.length - 2];
+  const current = mondayOf(today);
+  const sum = { weekOf: "", total: weeks.reduce((s, w) => s + w.total, 0), posted: weeks.reduce((s, w) => s + w.posted, 0) };
+  const lastFull = wholeRange ? sum : weeks.filter((w) => w.weekOf < current).at(-1);
   const share = (w?: ChartWeek) => (w && w.total ? Math.round((w.posted / w.total) * 100) : 0);
 
   return (
@@ -19,7 +32,7 @@ export function SalesChart({ weeks, hasSales }: { weeks: ChartWeek[]; hasSales: 
         <h2 id="sales-h" className="font-semibold text-night">
           Sales vs. posts
         </h2>
-        <p className="text-sm text-muted-foreground">Last 6 weeks</p>
+        <p className="text-sm text-muted-foreground">{label}</p>
       </div>
 
       {!hasSales ? (
@@ -32,7 +45,7 @@ export function SalesChart({ weeks, hasSales }: { weeks: ChartWeek[]; hasSales: 
       ) : (
         <>
           <p className="mt-2 text-sm">
-            Last week the items in your posts sold <Money amount={lastFull?.posted ?? 0} className="font-semibold" />, or{" "}
+            {wholeRange ? "This month" : "Last week"} the items in your posts sold <Money amount={lastFull?.posted ?? 0} className="font-semibold" />, or{" "}
             <span className="num font-semibold">{share(lastFull)}%</span> of all sales.
           </p>
 
@@ -49,7 +62,7 @@ export function SalesChart({ weeks, hasSales }: { weeks: ChartWeek[]; hasSales: 
           <div className="mt-1.5 flex gap-2 sm:gap-4" aria-hidden="true">
             {weeks.map((w) => (
               <p key={w.weekOf} className="num min-w-0 flex-1 truncate text-center text-sm text-muted-foreground">
-                {w === thisWeek ? "This wk" : shortDate(w.weekOf)}
+                {w.weekOf === current ? "This wk" : shortDate(w.weekOf)}
               </p>
             ))}
           </div>

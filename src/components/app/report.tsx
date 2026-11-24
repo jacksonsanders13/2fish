@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Money } from "@/components/ui/money";
 import { setPlanPrice } from "@/lib/pilot/actions";
 import { monthName, shortDate } from "@/lib/pilot/dates";
-import type { ReportData } from "@/lib/pilot/queries";
+import type { ChartWeek, ReportData } from "@/lib/pilot/queries";
 import { cn } from "@/lib/utils";
+import { SalesChart } from "./sales-chart";
 
 function shiftMonth(ym: string, n: number) {
   const d = new Date(`${ym}-01T12:00:00Z`);
@@ -24,7 +25,7 @@ function pct(n: number) {
 
 // The monthly report, all from Square: what the posted items sold, the best and
 // worst posts, and weekly sales against the weeks before 2fish. Nothing to type.
-export function ReportView({ data }: { data: ReportData }) {
+export function ReportView({ data, split }: { data: ReportData; split: { weeks: ChartWeek[]; hasSales: boolean } }) {
   const { planPrice, weekly, startedWeek, month, today, square, scores } = data;
 
   const done = scores.filter((s) => s.items.length);
@@ -32,6 +33,12 @@ export function ReportView({ data }: { data: ReportData }) {
   const ranked = [...done].filter((s) => !s.partial).sort((a, b) => b.extraDollars - a.extraDollars);
   const best = ranked.slice(0, 3).filter((s) => s.extraDollars > 0);
   const worst = ranked.length > 3 ? ranked.slice(-2).reverse() : [];
+
+  // Campaigns: posts that shared a campaign name, added up.
+  const campaigns = [...new Set(done.map((s) => s.campaign).filter(Boolean))].map((name) => {
+    const ps = done.filter((s) => s.campaign === name);
+    return { name, posts: ps.length, extra: ps.reduce((s, x) => s + x.extraDollars, 0) };
+  });
 
   // Baseline: the last 4 finished weeks before the first approved posts.
   const sorted = [...weekly].sort((a, b) => (a.weekOf < b.weekOf ? -1 : 1));
@@ -101,6 +108,29 @@ export function ReportView({ data }: { data: ReportData }) {
           </section>
           {!planPrice ? <PlanPriceForm /> : null}
 
+          <div className="mt-6">
+            <SalesChart weeks={split.weeks} hasSales={split.hasSales} today={today} label={monthName(month)} wholeRange />
+          </div>
+
+          {campaigns.length ? (
+            <section className="mt-6 rounded-lg bg-white p-5">
+              <h2 className="font-semibold">Campaigns</h2>
+              <ul className="mt-3 space-y-2 text-sm">
+                {campaigns.map((c) => (
+                  <li key={c.name} className="flex justify-between gap-3">
+                    <span>
+                      <span className="font-semibold">{c.name}</span>{" "}
+                      <span className="text-muted-foreground">
+                        ({c.posts} {c.posts === 1 ? "post" : "posts"})
+                      </span>
+                    </span>
+                    <Money amount={Math.abs(c.extra)} sign={c.extra < 0 ? "-" : "+"} tone={c.extra > 0 ? "cash" : "ink"} className="shrink-0 font-semibold" />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <section className="rounded-lg bg-white p-5">
               <h2 className="font-semibold">Best posts</h2>
@@ -113,7 +143,7 @@ export function ReportView({ data }: { data: ReportData }) {
                         <Money amount={s.extraDollars} sign="+" className="shrink-0 font-semibold" />
                       </div>
                       <p className="text-muted-foreground">
-                        {s.kind} · {shortDate(s.weekOf)} · {s.items.map((i) => `${i.item} ${i.sold} sold (${i.before} before)`).join(", ")}
+                        {s.kind}{s.campaign ? ` · ${s.campaign}` : ""} · {shortDate(s.weekOf)} · {s.items.map((i) => `${i.item} ${i.sold} sold (${i.before} before)`).join(", ")}
                       </p>
                     </li>
                   ))}
@@ -218,7 +248,7 @@ function PlanPriceForm() {
         <label htmlFor="plan-price" className="text-sm font-semibold">
           What this store pays a month
         </label>
-        <Input id="plan-price" type="number" inputMode="numeric" min={0} required value={price} onChange={(e) => setPrice(e.target.value)} className="num mt-1 w-32" placeholder="149" />
+        <Input id="plan-price" type="number" inputMode="numeric" min={0} required value={price} onChange={(e) => setPrice(e.target.value)} className="num mt-1 w-32" placeholder="50" />
       </div>
       <Button type="submit" variant="outline" disabled={pending}>
         Save

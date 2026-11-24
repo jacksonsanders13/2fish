@@ -58,7 +58,7 @@ export async function getPostsPage(week?: string) {
   const today = todayIn(business.timezone);
   const weekOf = week ?? packWeek(today);
   const [postsRes, uploads] = await Promise.all([
-    supabase.from("posts").select("*").eq("business_id", business.id).eq("week_of", weekOf).order("position"),
+    supabase.from("posts").select("*").eq("business_id", business.id).eq("week_of", weekOf).order("post_on").order("position"),
     listUploads(supabase, user.id, weekOf),
   ]);
   const rows = postsRes.data ?? [];
@@ -219,16 +219,37 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
   const gridEnd = addDays(mondayOf(addDays(nextMonth, -1)), 6);
   const chartStart = addDays(mondayOf(today), -35);
 
-  const [cal, drafts, sd, idl, posted] = await Promise.all([
+  const [cal, drafts, chart] = await Promise.all([
     supabase.from("posts").select("*").eq("business_id", businessId).gte("post_on", gridStart).lte("post_on", gridEnd).order("post_on").order("position"),
     supabase.from("posts").select("*").eq("business_id", businessId).eq("status", "draft").gte("post_on", addDays(today, -7)).order("post_on").limit(14),
-    supabase.from("sales_daily").select("day, total").eq("business_id", businessId).gte("day", chartStart).lte("day", today),
-    supabase.from("item_daily").select("day, item, amount").eq("business_id", businessId).gte("day", chartStart).lte("day", today),
-    supabase.from("posts").select("post_on, items").eq("business_id", businessId).neq("status", "draft").gte("post_on", chartStart).lte("post_on", today),
+    salesByWeek(supabase, businessId, chartStart, 6, today),
   ]);
 
   const rows = [...(cal.data ?? []), ...(drafts.data ?? [])];
   const urls = await signed(supabase, [...new Set(rows.map((r) => r.media_path).filter(Boolean))]);
+
+  return {
+    month: ym,
+    gridStart,
+    gridEnd,
+    calendar: (cal.data ?? []).map((r) => mapPost(r, urls)),
+    drafts: (drafts.data ?? []).map((r) => mapPost(r, urls)),
+    weeks: chart.weeks,
+    hasSales: chart.hasSales,
+  };
+}
+
+export type HomeData = Awaited<ReturnType<typeof getHome>>;
+
+/** Weekly sales from Square, split into what the posted items sold and everything else. */
+export async function salesByWeek(supabase: Supa, businessId: string, firstWeek: string, count: number, today: string) {
+  const last = addDays(firstWeek, count * 7 - 1);
+  const until = last < today ? last : today;
+  const [sd, idl, posted] = await Promise.all([
+    supabase.from("sales_daily").select("day, total").eq("business_id", businessId).gte("day", firstWeek).lte("day", until),
+    supabase.from("item_daily").select("day, item, amount").eq("business_id", businessId).gte("day", firstWeek).lte("day", until),
+    supabase.from("posts").select("post_on, items").eq("business_id", businessId).neq("status", "draft").gte("post_on", firstWeek).lte("post_on", until),
+  ]);
 
   // Items each week's posts featured.
   const featured = new Map<string, string[]>();
@@ -237,8 +258,8 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
     featured.set(w, [...(featured.get(w) ?? []), ...((p.items as string[]) ?? [])]);
   }
   const weeks: ChartWeek[] = [];
-  for (let i = 0; i < 6; i++) {
-    const w = addDays(chartStart, i * 7);
+  for (let i = 0; i < count; i++) {
+    const w = addDays(firstWeek, i * 7);
     const end = addDays(w, 6);
     const total = (sd.data ?? []).filter((r) => r.day >= w && r.day <= end).reduce((s, r) => s + Number(r.total), 0);
     const names = featured.get(w) ?? [];
@@ -247,16 +268,5 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
       : 0;
     weeks.push({ weekOf: w, total, posted: Math.min(fromPosts, total) });
   }
-
-  return {
-    month: ym,
-    gridStart,
-    gridEnd,
-    calendar: (cal.data ?? []).map((r) => mapPost(r, urls)),
-    drafts: (drafts.data ?? []).map((r) => mapPost(r, urls)),
-    weeks,
-    hasSales: (sd.data ?? []).length > 0,
-  };
+  return { weeks, hasSales: (sd.data ?? []).length > 0 };
 }
-
-export type HomeData = Awaited<ReturnType<typeof getHome>>;

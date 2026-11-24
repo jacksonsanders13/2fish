@@ -95,7 +95,7 @@ export function Dashboard({
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-6">
         <div className="min-w-0 space-y-4">
           <div className={cn(tab === "sales" ? "block" : "hidden lg:block")}>
-            <SalesChart weeks={home.weeks} hasSales={home.hasSales} />
+            <SalesChart weeks={home.weeks} hasSales={home.hasSales} today={today} />
           </div>
           <div className={cn(tab === "posts" ? "block" : "hidden lg:block")}>
             <PostBoard home={home} today={today} />
