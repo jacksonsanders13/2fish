@@ -9,7 +9,23 @@ const CLOSED = ["/audit", "/results", "/signup"];
 // Runs on every matched request: refreshes the Supabase session cookie and
 // sends signed-out visitors away from the dashboard.
 export async function proxy(request: NextRequest) {
-  if (WAITLIST && CLOSED.includes(request.nextUrl.pathname)) {
+  // Private preview: /preview?key=... sets a cookie that lets the holder past the waitlist.
+  const key = process.env.PREVIEW_KEY;
+  if (request.nextUrl.pathname === "/preview") {
+    const url = request.nextUrl.clone();
+    url.search = "";
+    if (key && request.nextUrl.searchParams.get("key") === key) {
+      url.pathname = "/audit";
+      const res = NextResponse.redirect(url);
+      res.cookies.set("2fish_preview", key, { httpOnly: true, secure: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 30, path: "/" });
+      return res;
+    }
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+  const previewing = Boolean(key) && request.cookies.get("2fish_preview")?.value === key;
+
+  if (WAITLIST && !previewing && CLOSED.includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";
@@ -51,5 +67,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/audit", "/results", "/login", "/signup", "/auth/:path*"],
+  matcher: ["/preview", "/dashboard/:path*", "/audit", "/results", "/login", "/signup", "/auth/:path*"],
 };
