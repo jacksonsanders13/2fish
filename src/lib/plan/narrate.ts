@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Answers, Estimate } from "./estimate";
+import { claudeKey } from "@/lib/ai-key";
 
 export type Narration = {
   summary: string;
@@ -17,7 +18,7 @@ export async function narrate(est: Estimate, a: Answers, allowModel = true): Pro
     model: null,
   };
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = claudeKey();
   if (!key || !allowModel) return fallback;
 
   try {

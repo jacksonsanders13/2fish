@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Business } from "@/lib/app/types";
 import { buildSnapshot, describeSnapshot } from "./snapshot";
 import { runTool, toolDefinitions, type ToolCard } from "./tools";
+import { claudeKey } from "@/lib/ai-key";
 
 export const MODEL = "claude-sonnet-5-5";
 
@@ -58,7 +59,7 @@ export type AgentArgs = {
  */
 export async function runAgentTurn(args: AgentArgs): Promise<void> {
   const { supabase, ownerId, business, conversationId, history, userMessage, integrations, emit } = args;
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = claudeKey();
 
   await supabase.from("chat_messages").insert({ conversation_id: conversationId, owner_id: ownerId, role: "user", content: userMessage });
 

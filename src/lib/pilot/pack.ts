@@ -4,6 +4,7 @@ import { CAPTION_SKILL, EDITOR_SKILL } from "@/lib/skills/captions";
 import { findTells } from "@/lib/skills/tells";
 import { DAYS } from "./dates";
 import { POST_KINDS } from "./types";
+import { claudeKey } from "@/lib/ai-key";
 
 export type PackMedia = { path: string; name: string; url: string | null; isImage: boolean };
 export type PostDraft = {
@@ -48,7 +49,7 @@ export async function buildPack(input: {
     .slice(0, 30);
   const fallback = { posts: templatePack(input.store, items, input.media), model: null };
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = claudeKey();
   if (!key) return fallback;
 
   try {

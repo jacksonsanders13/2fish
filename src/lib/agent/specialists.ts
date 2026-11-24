@@ -10,6 +10,7 @@ import { SKILL_TEXT } from "@/lib/skills/library.generated";
 import { POSTER_KIT, posterSpec } from "@/lib/skills/poster";
 import { describeSnapshot } from "./snapshot";
 import type { ToolContext, ToolOutcome } from "./tools";
+import { claudeKey } from "@/lib/ai-key";
 
 // Fisher's specialists. Fisher (the chat) decides what the owner needs and
 // hands one job to one specialist. Each specialist is a single Claude call
@@ -90,7 +91,7 @@ function skillBlock(names: string[]) {
 export async function runSpecialist(kind: string, brief: string, ctx: ToolContext): Promise<ToolOutcome> {
   const spec = SPECIALISTS[kind];
   if (!spec) return { summary: `No specialist called ${kind}. Options: ${SPECIALIST_NAMES.join(", ")}.` };
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = claudeKey();
   if (!key) return { summary: "Specialists need the Claude key, which isn't set up yet." };
   if (!(await takeQuota(ctx.supabase, "skill"))) return { summary: "That's the daily limit for specialist jobs (20). It resets tomorrow." };
 

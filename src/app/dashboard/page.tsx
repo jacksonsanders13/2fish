@@ -6,6 +6,7 @@ import { ensureBusiness, getDashboard } from "@/lib/app/queries";
 import { smsConfigured } from "@/lib/integrations/sms";
 import { todayIn } from "@/lib/pilot/dates";
 import { getHome } from "@/lib/pilot/queries";
+import { claudeKey } from "@/lib/ai-key";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -21,7 +22,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     getHome(supabase, business.id, today, month),
   ]);
 
-  const agentReady = Boolean(process.env.ANTHROPIC_API_KEY);
+  const agentReady = Boolean(claudeKey());
   const intro = fallbackIntro(Boolean(data.plan), data.plan?.totalMonthly ?? 0, data.plan?.steps[0]?.title.toLowerCase());
 
   return (
