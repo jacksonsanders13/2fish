@@ -206,6 +206,7 @@ export async function getExamplesPage() {
   return { examples: await loadExamples(supabase, user.id, 300) };
 }
 export type ChartWeek = { weekOf: string; total: number; posted: number };
+export type ChartDay = { day: string; total: number; posted: number };
 
 /**
  * The dashboard home: a month of the post calendar, the posts waiting on an okay,
@@ -224,6 +225,8 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
     supabase.from("posts").select("*").eq("business_id", businessId).eq("status", "draft").gte("post_on", addDays(today, -7)).order("post_on").limit(14),
     salesByWeek(supabase, businessId, chartStart, 6, today),
   ]);
+  // Last full week (Monday to Sunday), one bar per day, for the dashboard strip.
+  const days = await salesByDay(supabase, businessId, addDays(mondayOf(today), -7));
 
   const rows = [...(cal.data ?? []), ...(drafts.data ?? [])];
   const urls = await signed(supabase, [...new Set(rows.map((r) => r.media_path).filter(Boolean))]);
@@ -235,6 +238,7 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
     calendar: (cal.data ?? []).map((r) => mapPost(r, urls)),
     drafts: (drafts.data ?? []).map((r) => mapPost(r, urls)),
     weeks: chart.weeks,
+    days,
     hasSales: chart.hasSales,
   };
 }
@@ -269,4 +273,23 @@ export async function salesByWeek(supabase: Supa, businessId: string, firstWeek:
     weeks.push({ weekOf: w, total, posted: Math.min(fromPosts, total) });
   }
   return { weeks, hasSales: (sd.data ?? []).length > 0 };
+}
+
+/** One week of sales, day by day, split the same way as salesByWeek. */
+export async function salesByDay(supabase: Supa, businessId: string, monday: string): Promise<ChartDay[]> {
+  const sunday = addDays(monday, 6);
+  const [sd, idl, posted] = await Promise.all([
+    supabase.from("sales_daily").select("day, total").eq("business_id", businessId).gte("day", monday).lte("day", sunday),
+    supabase.from("item_daily").select("day, item, amount").eq("business_id", businessId).gte("day", monday).lte("day", sunday),
+    supabase.from("posts").select("items").eq("business_id", businessId).neq("status", "draft").gte("post_on", monday).lte("post_on", sunday),
+  ]);
+  const names = (posted.data ?? []).flatMap((p) => (p.items as string[]) ?? []);
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = addDays(monday, i);
+    const total = (sd.data ?? []).filter((r) => r.day === day).reduce((sum, r) => sum + Number(r.total), 0);
+    const fromPosts = names.length
+      ? (idl.data ?? []).filter((r) => r.day === day && names.some((n) => matches(String(r.item), n))).reduce((sum, r) => sum + Number(r.amount), 0)
+      : 0;
+    return { day, total, posted: Math.min(fromPosts, total) };
+  });
 }

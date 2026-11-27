@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Money } from "@/components/ui/money";
 import { money } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { mondayOf, shortDate } from "@/lib/pilot/dates";
-import type { ChartWeek } from "@/lib/pilot/queries";
+import { DAYS, mondayOf, shortDate } from "@/lib/pilot/dates";
+import type { ChartDay, ChartWeek } from "@/lib/pilot/queries";
 
 // Six weeks of sales as stacked bars: the bottom part is what the posted items
 // sold, the rest is everything else in the store. Comparing the two is how we
@@ -15,12 +15,14 @@ export function SalesChart({
   label = "Last 6 weeks",
   wholeRange = false,
   compact = false,
+  days,
 }: {
   weeks: ChartWeek[];
   hasSales: boolean;
   today: string;
   label?: string;
   wholeRange?: boolean; // sum every week (a month report) instead of quoting last week
+  days?: ChartDay[]; // last week day by day, for the compact strip
   compact?: boolean; // shorter bars on the dashboard so everything fits on one screen
 }) {
   const max = Math.max(1, ...weeks.map((w) => w.total));
@@ -36,7 +38,7 @@ export function SalesChart({
   const share = (w?: ChartWeek) =>
     w && w.total ? Math.round((w.posted / w.total) * 100) : 0;
 
-  if (compact) return <CompactChart weeks={weeks} hasSales={hasSales} current={current} max={max} lastWeek={lastFull} share={share(lastFull)} />;
+  if (compact) return <CompactChart days={days ?? []} hasSales={hasSales} />;
 
   return (
     <section
@@ -149,32 +151,15 @@ export function SalesChart({
 
 // The dashboard version: one short strip. Last week's numbers on the left,
 // six small bars on the right, so the calendar and chat get the height.
-function CompactChart({
-  weeks: realWeeks,
-  hasSales,
-  current,
-  max: realMax,
-  lastWeek: realLast,
-  share: realShare,
-}: {
-  weeks: ChartWeek[];
-  hasSales: boolean;
-  current: string;
-  max: number;
-  lastWeek?: ChartWeek;
-  share: number;
-}) {
+function CompactChart({ days: realDays, hasSales }: { days: ChartDay[]; hasSales: boolean }) {
   // Before Square is connected, show made-up numbers so the owner sees what
   // this will look like. Always labeled "Sample" so nobody takes them as real.
   const sample = !hasSales;
-  const weeks = sample ? realWeeks.map((w, n) => ({ ...w, ...SAMPLE[n % SAMPLE.length] })) : realWeeks;
-  const max = sample ? Math.max(1, ...weeks.map((w) => w.total)) : realMax;
-  const lastWeek = sample ? weeks.filter((w) => w.weekOf < current).at(-1) : realLast;
-  const share = sample
-    ? lastWeek && lastWeek.total
-      ? Math.round((lastWeek.posted / lastWeek.total) * 100)
-      : 0
-    : realShare;
+  const days = sample ? realDays.map((d, n) => ({ ...d, ...SAMPLE[n % SAMPLE.length] })) : realDays;
+  const max = Math.max(1, ...days.map((d) => d.total));
+  const total = days.reduce((sum, d) => sum + d.total, 0);
+  const posted = days.reduce((sum, d) => sum + d.posted, 0);
+  const share = total ? Math.round((posted / total) * 100) : 0;
 
   return (
     <section aria-labelledby="sales-h" className="rounded-lg bg-white px-4 py-3">
@@ -202,33 +187,39 @@ function CompactChart({
             <div>
               <dt className="text-sm text-muted-foreground">Last week</dt>
               <dd className="text-xl font-semibold">
-                <Money amount={lastWeek?.total ?? 0} tone="ink" />
+                <Money amount={total} tone="ink" />
               </dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">From posted items</dt>
               <dd className="text-xl font-semibold">
-                <Money amount={lastWeek?.posted ?? 0} tone="ink" className="text-posted" />
+                <Money amount={posted} tone="ink" className="text-posted" />
                 <span className="num ml-1.5 text-sm font-normal text-muted-foreground">{share}%</span>
               </dd>
             </div>
           </dl>
           <div
-            className="flex h-14 min-w-0 flex-1 items-end gap-1.5"
+            className="grid min-w-0 flex-1 grid-cols-7 gap-1.5"
             role="img"
-            aria-label={weeks
-              .map((w) => `Week of ${shortDate(w.weekOf)}: ${money(w.total)} total, ${money(w.posted)} from posted items`)
+            aria-label={days
+              .map((d) => `${DAY_NAMES[dayIndex(d.day)]}: ${money(d.total)} total, ${money(d.posted)} from posted items`)
               .join(". ")}
           >
-            {weeks.map((w) => (
-              <div
-                key={w.weekOf}
-                title={w.weekOf === current ? "This week" : `Week of ${shortDate(w.weekOf)}`}
-                className="flex flex-1 flex-col justify-end overflow-hidden rounded-t-[2px]"
-                style={{ height: `${Math.max(4, (w.total / max) * 100)}%` }}
-              >
-                <div className="bg-line" style={{ flexGrow: Math.max(0, w.total - w.posted) }} />
-                <div className="bg-posted" style={{ flexGrow: w.posted, minHeight: w.posted ? 2 : 0 }} />
+            {days.map((d) => (
+              <div key={d.day} className="flex min-w-0 flex-col items-stretch">
+                <div className="flex h-12 flex-col justify-end">
+                  <div
+                    title={`${DAY_NAMES[dayIndex(d.day)]} ${shortDate(d.day)}`}
+                    className="flex flex-col justify-end overflow-hidden rounded-t-[2px]"
+                    style={{ height: `${Math.max(4, (d.total / max) * 100)}%` }}
+                  >
+                    <div className="bg-line" style={{ flexGrow: Math.max(0, d.total - d.posted) }} />
+                    <div className="bg-posted" style={{ flexGrow: d.posted, minHeight: d.posted ? 2 : 0 }} />
+                  </div>
+                </div>
+                <p aria-hidden="true" className="mt-1 text-center text-xs text-muted-foreground">
+                  {DAYS[dayIndex(d.day)]}
+                </p>
               </div>
             ))}
           </div>
@@ -238,13 +229,20 @@ function CompactChart({
   );
 }
 
-// Six made-up weeks for the sample: a small store doing about $4-5K a week,
-// with the posted items' share creeping up as the posts start working.
+// A made-up week for the sample: a small store doing about $5K, busiest on
+// Friday and Saturday, with posted items a bit under a fifth of it.
 const SAMPLE = [
-  { total: 4180, posted: 290 },
-  { total: 4620, posted: 410 },
-  { total: 4350, posted: 520 },
-  { total: 5010, posted: 760 },
-  { total: 5240, posted: 880 },
-  { total: 2130, posted: 390 }, // this week, still in progress
+  { total: 520, posted: 70 },
+  { total: 610, posted: 90 },
+  { total: 580, posted: 110 },
+  { total: 690, posted: 120 },
+  { total: 940, posted: 190 },
+  { total: 1260, posted: 240 },
+  { total: 640, posted: 60 },
 ];
+
+const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// 0 = Monday
+function dayIndex(ymd: string) {
+  return (new Date(`${ymd}T12:00:00Z`).getUTCDay() + 6) % 7;
+}
