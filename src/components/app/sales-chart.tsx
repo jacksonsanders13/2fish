@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Money } from "@/components/ui/money";
 import { money } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { mondayOf, shortDate } from "@/lib/pilot/dates";
 import type { ChartWeek } from "@/lib/pilot/queries";
 
@@ -13,12 +14,14 @@ export function SalesChart({
   today,
   label = "Last 6 weeks",
   wholeRange = false,
+  compact = false,
 }: {
   weeks: ChartWeek[];
   hasSales: boolean;
   today: string;
   label?: string;
   wholeRange?: boolean; // sum every week (a month report) instead of quoting last week
+  compact?: boolean; // shorter bars on the dashboard so everything fits on one screen
 }) {
   const max = Math.max(1, ...weeks.map((w) => w.total));
   const current = mondayOf(today);
@@ -79,7 +82,7 @@ export function SalesChart({
           </p>
 
           <div
-            className="mt-4 flex h-40 items-end gap-2 sm:gap-4"
+            className={cn("mt-3 flex items-end gap-2 sm:gap-4", compact ? "h-24" : "h-40")}
             role="img"
             aria-label={weeks
               .map(
