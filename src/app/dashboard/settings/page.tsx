@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import { SettingsView } from "@/components/app/settings";
 import { AppShell, PageBody } from "@/components/app/shell";
 import { getSettings } from "@/lib/app/queries";
+import { instagramReady } from "@/lib/integrations/instagram";
 import { squareReady } from "@/lib/integrations/square";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Settings" };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ square?: string }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ square?: string; instagram?: string }> }) {
   const { email, business } = await getSettings();
-  const { square } = await searchParams;
+  const { square, instagram } = await searchParams;
   const supabase = await createClient();
-  const { data } = await supabase.from("businesses").select("square_connected_at, square_synced_at, pack_day").eq("id", business.id).single();
+  const { data } = await supabase.from("businesses").select("square_connected_at, square_synced_at, pack_day, instagram_connected_at, instagram_username").eq("id", business.id).single();
   return (
     <AppShell active="settings" email={email}>
       <PageBody>
@@ -19,6 +20,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           email={email}
           business={business}
           packDay={(data?.pack_day as number | undefined) ?? 1}
+          instagram={{ ready: instagramReady(), connectedAt: data?.instagram_connected_at ?? null, username: data?.instagram_username ?? null, status: instagram ?? null }}
           square={{ ready: squareReady(), connectedAt: data?.square_connected_at ?? null, syncedAt: data?.square_synced_at ?? null, status: square ?? null }}
         />
       </PageBody>

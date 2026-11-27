@@ -85,10 +85,39 @@ export function learnings(scores: PostScore[]) {
   const forWriter =
     "Results so far for this store (extra dollars of the featured items, week posted vs. week before): " +
     kinds.map((k) => `${k.kind} ${k.avg >= 0 ? "+" : ""}$${k.avg} per post (${k.n} posts)`).join("; ") +
-    `. Make more of what sold (${best.kind}) and fewer of what didn't (${worst.kind}).`;
+    `. Make more of what sold (${best.kind}) and fewer of what didn't (${worst.kind}).` +
+    byItem(done);
   return { summary, forWriter, best: best.kind };
 }
 
 function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Which products moved after they were posted, and with which kind of post.
+// This is the memory the next pack leans on: feature what responds, try a new
+// angle on what didn't.
+function byItem(done: PostScore[]) {
+  const items = new Map<string, { extra: number; n: number; kinds: Map<string, number> }>();
+  for (const s of done) {
+    for (const it of s.items) {
+      const key = it.item.toLowerCase();
+      const row = items.get(key) ?? { extra: 0, n: 0, kinds: new Map() };
+      const extra = it.sold - it.before;
+      row.extra += extra;
+      row.n += 1;
+      row.kinds.set(s.kind, (row.kinds.get(s.kind) ?? 0) + extra);
+      items.set(key, row);
+    }
+  }
+  if (!items.size) return "";
+  const ranked = [...items]
+    .map(([item, r]) => ({ item, avg: Math.round(r.extra / r.n), n: r.n, bestKind: [...r.kinds].sort((a, b) => b[1] - a[1])[0]?.[0] }))
+    .sort((a, b) => b.avg - a.avg);
+  const up = ranked.filter((r) => r.avg > 0).slice(0, 5);
+  const flat = ranked.filter((r) => r.avg <= 0).slice(-3);
+  const parts: string[] = [];
+  if (up.length) parts.push("Products that sold more after being posted: " + up.map((r) => `${r.item} +$${r.avg} (best as ${r.bestKind})`).join("; ") + ". Feature these again, in the kind of post that worked.");
+  if (flat.length) parts.push("Products that didn't move: " + flat.map((r) => r.item).join(", ") + ". If they come up again, try a different kind of post or hook.");
+  return " " + parts.join(" ");
 }

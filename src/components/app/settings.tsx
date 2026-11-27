@@ -9,14 +9,16 @@ import { Input } from "@/components/ui/input";
 import { MinimalCard, MinimalCardContent } from "@/components/ui/minimal-card";
 import { changePassword, deleteAccount, updateBusiness } from "@/lib/app/actions";
 import { disconnectSquareNow, syncSquareNow } from "@/lib/integrations/square-actions";
+import { disconnectInstagramNow } from "@/lib/integrations/instagram-actions";
 import { setPackDay } from "@/lib/pilot/actions";
 import { WEEKDAYS } from "@/lib/pilot/dates";
 import { BUSINESS_KINDS, formatPhone, type Business } from "@/lib/app/types";
 import { Field, Notice, selectClass } from "./forms";
 
 type SquareState = { ready: boolean; connectedAt: string | null; syncedAt: string | null; status: string | null };
+type InstagramState = { ready: boolean; connectedAt: string | null; username: string | null; status: string | null };
 
-export function SettingsView({ email, business, square, packDay }: { email: string; business: Business; square: SquareState; packDay: number }) {
+export function SettingsView({ email, business, square, instagram, packDay }: { email: string; business: Business; square: SquareState; instagram: InstagramState; packDay: number }) {
   return (
     <>
       <Reveal immediate y={16}>
@@ -28,6 +30,12 @@ export function SettingsView({ email, business, square, packDay }: { email: stri
         <Reveal immediate delay={0.05}>
           <Card title="Square" sub="2fish reads your sales so it can tell which posts sold. It can't change anything in Square.">
             <SquareCard square={square} />
+          </Card>
+        </Reveal>
+
+        <Reveal immediate delay={0.06}>
+          <Card title="Instagram" sub="Connect once and every post you approve goes up by itself on its day, in the morning. Nothing posts without your okay.">
+            <InstagramCard instagram={instagram} />
           </Card>
         </Reveal>
 
@@ -168,6 +176,54 @@ function SquareCard({ square }: { square: SquareState }) {
             start(async () => {
               await disconnectSquareNow();
               setMsg("Disconnected.");
+              router.refresh();
+            })
+          }
+        >
+          Disconnect
+        </Button>
+      </div>
+      {msg ? <p className="mt-2 text-sm" role="status">{msg}</p> : null}
+    </>
+  );
+}
+
+function InstagramCard({ instagram }: { instagram: InstagramState }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(
+    instagram.status === "connected" ? "Connected. Approved posts will go up on their day." : instagram.status === "failed" ? "Instagram didn't connect. Make sure it's a business or creator account, then try again." : null,
+  );
+
+  if (!instagram.ready) {
+    return <p className="text-sm text-muted-foreground">Not switched on yet. Until Instagram approves 2fish, copy each post from the dashboard and post it yourself.</p>;
+  }
+
+  if (!instagram.connectedAt) {
+    return (
+      <>
+        <Button asChild variant="signal">
+          <a href="/api/instagram/connect">Connect Instagram</a>
+        </Button>
+        <p className="mt-2 text-sm text-muted-foreground">Needs an Instagram business or creator account. Switching is free in the Instagram app.</p>
+        {msg ? <p className="mt-2 text-sm" role="status">{msg}</p> : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="text-sm">
+        <span className="font-semibold">Connected{instagram.username ? ` as @${instagram.username}` : ""}.</span> Approved posts go up on their day.
+      </p>
+      <div className="mt-3">
+        <Button
+          variant="ghost"
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              await disconnectInstagramNow();
+              setMsg("Disconnected. Posts won't go up by themselves.");
               router.refresh();
             })
           }
