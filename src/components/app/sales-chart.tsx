@@ -36,6 +36,8 @@ export function SalesChart({
   const share = (w?: ChartWeek) =>
     w && w.total ? Math.round((w.posted / w.total) * 100) : 0;
 
+  if (compact) return <CompactChart weeks={weeks} hasSales={hasSales} current={current} max={max} lastWeek={lastFull} share={share(lastFull)} />;
+
   return (
     <section
       aria-labelledby="sales-h"
@@ -140,6 +142,85 @@ export function SalesChart({
             </li>
           </ul>
         </>
+      )}
+    </section>
+  );
+}
+
+// The dashboard version: one short strip. Last week's numbers on the left,
+// six small bars on the right, so the calendar and chat get the height.
+function CompactChart({
+  weeks,
+  hasSales,
+  current,
+  max,
+  lastWeek,
+  share,
+}: {
+  weeks: ChartWeek[];
+  hasSales: boolean;
+  current: string;
+  max: number;
+  lastWeek?: ChartWeek;
+  share: number;
+}) {
+  return (
+    <section aria-labelledby="sales-h" className="rounded-lg bg-white px-4 py-3">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 id="sales-h" className="text-sm font-semibold text-night">
+          Sales vs. posts
+        </h2>
+        {hasSales ? (
+          <Link href="/dashboard/report" className="text-sm text-muted-foreground underline-offset-2 hover:text-night hover:underline">
+            Monthly report
+          </Link>
+        ) : null}
+      </div>
+
+      {!hasSales ? (
+        <p className="mt-1 text-sm text-muted-foreground">
+          Connect Square and this fills in by itself: what the items in your posts sold, next to everything else.{" "}
+          <Link href="/dashboard/settings" className="font-semibold text-night underline underline-offset-2">
+            Connect Square
+          </Link>
+        </p>
+      ) : (
+        <div className="mt-2 flex items-end gap-6">
+          <dl className="flex shrink-0 gap-6">
+            <div>
+              <dt className="text-sm text-muted-foreground">Last week</dt>
+              <dd className="text-xl font-semibold">
+                <Money amount={lastWeek?.total ?? 0} tone="ink" />
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">From posted items</dt>
+              <dd className="text-xl font-semibold">
+                <Money amount={lastWeek?.posted ?? 0} />
+                <span className="num ml-1.5 text-sm font-normal text-muted-foreground">{share}%</span>
+              </dd>
+            </div>
+          </dl>
+          <div
+            className="flex h-14 min-w-0 flex-1 items-end gap-1.5"
+            role="img"
+            aria-label={weeks
+              .map((w) => `Week of ${shortDate(w.weekOf)}: ${money(w.total)} total, ${money(w.posted)} from posted items`)
+              .join(". ")}
+          >
+            {weeks.map((w) => (
+              <div
+                key={w.weekOf}
+                title={w.weekOf === current ? "This week" : `Week of ${shortDate(w.weekOf)}`}
+                className="flex flex-1 flex-col justify-end overflow-hidden rounded-t-[2px]"
+                style={{ height: `${Math.max(4, (w.total / max) * 100)}%` }}
+              >
+                <div className="bg-line" style={{ flexGrow: Math.max(0, w.total - w.posted) }} />
+                <div className="bg-night" style={{ flexGrow: w.posted, minHeight: w.posted ? 2 : 0 }} />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );

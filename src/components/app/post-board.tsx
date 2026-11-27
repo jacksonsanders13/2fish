@@ -17,10 +17,14 @@ export type BoardView = "approve" | "calendar";
 
 export function PostBoard({ home, today, view, setView }: { home: HomeData; today: string; view: BoardView; setView: (v: BoardView) => void }) {
   const [open, setOpen] = useState<Post | null>(null);
+  const prev = addDays(`${home.month}-01`, -1).slice(0, 7);
+  const next = addDays(`${home.month}-01`, 32).slice(0, 7);
 
   return (
-    <section aria-label="Your posts" className="rounded-lg bg-white p-4 sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    // On a laptop the panel fills whatever height is left and nothing inside
+    // makes the page scroll. The calendar rows shrink to fit.
+    <section aria-label="Your posts" className="flex flex-col rounded-lg bg-white p-4 lg:h-full lg:min-h-0">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div
           role="group"
           aria-label="Show"
@@ -41,7 +45,7 @@ export function PostBoard({ home, today, view, setView }: { home: HomeData; toda
               aria-pressed={view === key}
               onClick={() => setView(key)}
               className={cn(
-                "min-h-10 rounded-[6px] px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
+                "min-h-9 rounded-[6px] px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
                 view === key
                   ? "bg-white font-semibold text-night"
                   : "text-ink hover:bg-white",
@@ -51,7 +55,22 @@ export function PostBoard({ home, today, view, setView }: { home: HomeData; toda
             </button>
           ))}
         </div>
-        <Button asChild size="sm" variant="outline" className="h-10">
+        {view === "calendar" ? (
+          <div className="flex items-center gap-1">
+            <Button asChild size="sm" variant="ghost" className="size-9 p-0">
+              <Link href={`/dashboard?month=${prev}`} scroll={false} aria-label="Last month">
+                <ChevronLeft aria-hidden="true" />
+              </Link>
+            </Button>
+            <h3 className="min-w-32 text-center text-sm font-semibold">{monthName(home.month)}</h3>
+            <Button asChild size="sm" variant="ghost" className="size-9 p-0">
+              <Link href={`/dashboard?month=${next}`} scroll={false} aria-label="Next month">
+                <ChevronRight aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+        ) : null}
+        <Button asChild size="sm" variant="outline" className="h-9">
           <Link href="/dashboard/videos">
             <Camera aria-hidden="true" />
             Send photos
@@ -59,7 +78,7 @@ export function PostBoard({ home, today, view, setView }: { home: HomeData; toda
         </Button>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col">
         {view === "approve" ? (
           <ApproveList drafts={home.drafts} onOpen={setOpen} />
         ) : (
@@ -101,7 +120,8 @@ function ApproveList({
 
   return (
     <>
-      <ul className="space-y-2">
+      {/* A long week of drafts scrolls inside the panel, never the page. */}
+      <ul className="min-h-0 flex-1 space-y-2 lg:overflow-y-auto">
         {drafts.map((p) => (
           <li
             key={p.id}
@@ -166,7 +186,7 @@ function ApproveList({
           onClick={() =>
             start(async () => void (await approveWeek({ weekOf: weeks[0] })))
           }
-          className="mt-4 h-11"
+          className="mt-3 h-10 shrink-0 self-start"
         >
           Approve all {drafts.length}
         </Button>
@@ -190,40 +210,19 @@ function Calendar({
   const byDay = new Map<string, Post[]>();
   for (const p of home.calendar)
     byDay.set(p.postOn, [...(byDay.get(p.postOn) ?? []), p]);
-  const prev = addDays(`${home.month}-01`, -1).slice(0, 7);
-  const next = addDays(`${home.month}-01`, 32).slice(0, 7);
+  const rows = days.length / 7;
 
   return (
-    <div>
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold">{monthName(home.month)}</h3>
-        <div className="flex gap-1">
-          <Button asChild size="sm" variant="outline" className="size-10 p-0">
-            <Link
-              href={`/dashboard?month=${prev}`}
-              scroll={false}
-              aria-label="Last month"
-            >
-              <ChevronLeft aria-hidden="true" />
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="outline" className="size-10 p-0">
-            <Link
-              href={`/dashboard?month=${next}`}
-              scroll={false}
-              aria-label="Next month"
-            >
-              <ChevronRight aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      <div className="mt-3 grid grid-cols-7 gap-px overflow-hidden rounded-md border border-line bg-line">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div
+        className="grid min-h-0 flex-1 grid-cols-7 gap-px overflow-hidden rounded-md border border-line bg-line"
+        // Header row, then each week shares the height that's left.
+        style={{ gridTemplateRows: `auto repeat(${rows}, minmax(0, 1fr))` }}
+      >
         {DAYS.map((d) => (
           <p
             key={d}
-            className="bg-surface py-1.5 text-center text-sm font-semibold"
+            className="bg-surface py-1 text-center text-sm text-muted-foreground"
           >
             <span className="sm:hidden">{d[0]}</span>
             <span className="hidden sm:inline">{d}</span>
@@ -236,7 +235,7 @@ function Calendar({
             <div
               key={d}
               className={cn(
-                "min-h-20 min-w-0 p-1 sm:min-h-24 sm:p-1.5",
+                "min-h-20 min-w-0 overflow-hidden p-1 lg:min-h-0",
                 inMonth ? "bg-white" : "bg-surface",
               )}
             >
@@ -244,7 +243,7 @@ function Calendar({
                 className={cn(
                   "num text-sm",
                   d === today
-                    ? "inline-flex size-6 items-center justify-center rounded-full bg-night font-semibold text-white"
+                    ? "inline-flex size-5 items-center justify-center rounded-full bg-night font-semibold text-white"
                     : inMonth
                       ? ""
                       : "text-muted-foreground",
@@ -252,14 +251,14 @@ function Calendar({
               >
                 {Number(d.slice(8))}
               </p>
-              <ul className="mt-1 space-y-1">
-                {posts.map((p) => (
+              <ul className="mt-0.5 space-y-0.5">
+                {posts.slice(0, posts.length > 2 ? 1 : 2).map((p) => (
                   <li key={p.id}>
                     <button
                       type="button"
                       onClick={() => onOpen(p)}
                       className={cn(
-                        "block w-full truncate rounded-[3px] px-1 py-0.5 text-left text-xs leading-snug focus-visible:outline-2 focus-visible:outline-signal sm:px-1.5 sm:text-sm",
+                        "block w-full truncate rounded-[3px] px-1 py-0.5 text-left text-xs leading-snug focus-visible:outline-2 focus-visible:outline-signal sm:px-1.5",
                         p.status === "posted"
                           ? "bg-night text-white"
                           : p.status === "approved"
@@ -282,13 +281,24 @@ function Calendar({
                     </button>
                   </li>
                 ))}
+                {posts.length > 2 ? (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => onOpen(posts[1])}
+                      className="num rounded-[3px] px-1 text-xs text-muted-foreground hover:text-night focus-visible:outline-2 focus-visible:outline-signal"
+                    >
+                      +{posts.length - 1} more
+                    </button>
+                  </li>
+                ) : null}
               </ul>
             </div>
           );
         })}
       </div>
 
-      <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+      <ul className="mt-2 flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <li className="flex items-center gap-1.5">
           <span
             className="h-3 w-4 rounded-[2px] border border-dashed border-night"
