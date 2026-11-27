@@ -208,7 +208,7 @@ function CompactChart({
             <div>
               <dt className="text-sm text-muted-foreground">From posted items</dt>
               <dd className="text-xl font-semibold">
-                <Money amount={lastWeek?.posted ?? 0} />
+                <Money amount={lastWeek?.posted ?? 0} tone="ink" className="text-posted" />
                 <span className="num ml-1.5 text-sm font-normal text-muted-foreground">{share}%</span>
               </dd>
             </div>
@@ -228,7 +228,7 @@ function CompactChart({
                 style={{ height: `${Math.max(4, (w.total / max) * 100)}%` }}
               >
                 <div className="bg-line" style={{ flexGrow: Math.max(0, w.total - w.posted) }} />
-                <div className="bg-night" style={{ flexGrow: w.posted, minHeight: w.posted ? 2 : 0 }} />
+                <div className="bg-posted" style={{ flexGrow: w.posted, minHeight: w.posted ? 2 : 0 }} />
               </div>
             ))}
           </div>
