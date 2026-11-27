@@ -19,7 +19,7 @@
   --signal: #c8402f;
   --signal-tint: #a8321f;
   --signal-soft: #fcece8; /* light coral: highlights that aren't buttons */
-  --posted: #c2570c; /* orange: sales from posted items in the sales strip */
+  --posted: var(--signal); /* sales from posted items in the sales strip */
   --cash: #047857;
   --cash-bright: #6ee7b7;
   --on-night-muted: #d3e8e7;
