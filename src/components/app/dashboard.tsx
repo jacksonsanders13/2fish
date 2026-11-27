@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowRight, CircleHelp } from "lucide-react";
+import { DashboardTour, tourSeen, type TourTab } from "./dashboard-tour";
 import { shortDate } from "@/lib/pilot/dates";
 import type { Task } from "@/lib/agent/snapshot";
 import type { ChatMessage, ChatSummary } from "@/lib/agent/store";
@@ -45,6 +46,16 @@ export function Dashboard({
 }) {
   const [tab, setTab] = useState<Tab>("posts");
   const [board, setBoard] = useState<BoardView>(home.drafts.length ? "approve" : "calendar");
+  // The walk-through opens by itself on the first visit in this browser.
+  const [touring, setTouring] = useState(false);
+  useEffect(() => {
+    // Wait a frame so the page has its final layout before we measure it.
+    const id = requestAnimationFrame(() => {
+      if (!tourSeen()) setTouring(true);
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+  const onTourTab = useCallback((t: TourTab) => setTab(t), []);
   const { business, plan } = data;
   const who = business.name || "Your store";
 
@@ -72,6 +83,7 @@ export function Dashboard({
           // Until setup is done, one line says what to do next. The dots show
           // how far along they are without three big cards.
           <Link
+            data-tour="start"
             href={nextStep.href}
             className="group flex min-w-0 items-center gap-3 rounded-md text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
@@ -91,6 +103,14 @@ export function Dashboard({
             Next post goes up <span className="num font-semibold text-ink">{nextPost.postOn === today ? "today" : shortDate(nextPost.postOn)}</span>
           </p>
         ) : null}
+        <button
+          type="button"
+          onClick={() => setTouring(true)}
+          className="flex items-center gap-1.5 rounded-md text-sm text-muted-foreground hover:text-night focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal lg:ml-auto"
+        >
+          <CircleHelp size={16} aria-hidden="true" />
+          How it works
+        </button>
         <div role="group" aria-label="Show" className="ml-auto flex rounded-md bg-white p-1 lg:hidden">
           {(
             [
@@ -118,10 +138,10 @@ export function Dashboard({
       <div className="mt-3 grid min-h-0 flex-1 gap-4 lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)]">
         {/* Sales strip on top, posts panel takes the rest. Nothing here scrolls the page. */}
         <div className="flex min-w-0 flex-col gap-3 lg:min-h-0">
-          <div className={cn("shrink-0", tab === "sales" ? "block" : "hidden lg:block")}>
+          <div data-tour="sales" className={cn("shrink-0", tab === "sales" ? "block" : "hidden lg:block")}>
             <SalesChart weeks={home.weeks} hasSales={home.hasSales} today={today} compact />
           </div>
-          <div className={cn("lg:min-h-0 lg:flex-1", tab === "posts" ? "block" : "hidden lg:block")}>
+          <div data-tour="posts" className={cn("lg:min-h-0 lg:flex-1", tab === "posts" ? "block" : "hidden lg:block")}>
             <PostBoard home={home} today={today} view={board} setView={setBoard} />
           </div>
         </div>
@@ -143,6 +163,7 @@ export function Dashboard({
           className={cn("h-[calc(100dvh-13rem)] min-h-[24rem] lg:h-full lg:min-h-0", tab === "chat" ? "flex" : "hidden lg:flex")}
         />
       </div>
+      <DashboardTour open={touring} onClose={() => setTouring(false)} onTab={onTourTab} nextStep={nextStep?.label} />
     </div>
   );
 }

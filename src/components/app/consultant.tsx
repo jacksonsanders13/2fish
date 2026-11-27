@@ -135,7 +135,7 @@ export function Consultant({
   const working = tasks.filter((t) => t.status === "queued" || t.status === "running");
 
   return (
-    <div className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border-t-4 border-night bg-white", className)}>
+    <div data-tour="chat" className={cn("flex min-h-0 flex-col overflow-hidden rounded-lg border-t-4 border-night bg-white", className)}>
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
           <FisherAvatar size={36} />
