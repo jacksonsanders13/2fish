@@ -3,7 +3,7 @@ import { normalizePhone } from "@/lib/app/types";
 import { sendSms, withinHours } from "./sms";
 
 export function siteUrl() {
-  return (process.env.SITE_URL ?? "https://join2fish.vercel.app").replace(/\/$/, "");
+  return (process.env.SITE_URL ?? "https://join2fish.com").replace(/\/$/, "");
 }
 
 // Texts the store owner at the mobile number in Settings. Only between 8am and
