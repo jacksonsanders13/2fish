@@ -110,6 +110,8 @@ function samplePosts(today: string): Post[] {
         mediaPath: null,
         mediaUrl: null,
         isImage: true,
+        slides: [],
+        shots: [],
         status: status === "approved" && postOn < today ? "posted" : status,
         postOn,
         campaign: "",

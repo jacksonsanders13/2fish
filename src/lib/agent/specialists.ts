@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { takeQuota } from "@/lib/app/limits";
@@ -172,8 +173,10 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
     try {
       const src = photo ? ((await supabase.storage.from("clips").createSignedUrl(photo, 300)).data?.signedUrl ?? null) : null;
       const png = await (await renderPoster({ spec: { ...finalSpec, layout: src ? p.layout : "type" }, photo: src, store: business.name || "" })).arrayBuffer();
-      const path = `${ownerId}/posters/${posterId}.png`;
-      const up = await supabase.storage.from("clips").upload(path, new Uint8Array(png), { contentType: "image/png", upsert: true });
+      const path = `${ownerId}/posters/${posterId}.jpg`;
+      // Instagram only takes JPEG, so the poster is saved as one.
+      const jpg = await sharp(Buffer.from(png)).flatten({ background: "#ffffff" }).jpeg({ quality: 90 }).toBuffer();
+      const up = await supabase.storage.from("clips").upload(path, new Uint8Array(jpg), { contentType: "image/jpeg", upsert: true });
       if (up.error) throw up.error;
       const idx = (new Date(`${postOn}T12:00:00Z`).getUTCDay() + 6) % 7;
       const ins = await supabase.from("posts").insert({
@@ -189,6 +192,7 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
         caption: p.caption,
         items: [],
         media_path: path,
+        slides: [path],
       });
       if (ins.error) throw ins.error;
     } catch (e) {
@@ -224,6 +228,7 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
         hook: p.hook,
         caption: p.caption,
         items: p.items,
+        shots: p.shots,
         campaign: plan.campaign,
       };
     });
@@ -242,8 +247,9 @@ const CAMPAIGN_FORMAT = `
 Reply with JSON only:
 {"campaign": short name like "Holiday gift week",
  "summary": the plan for the owner in under 150 words (the offer, the dates, what to set up in the store, what to say at the counter),
- "posts": [{"date":"YYYY-MM-DD","kind":one of ${POST_KINDS.join(", ")},"title":string,"hook":string,"caption":string,"items":string[]}]}
+ "posts": [{"date":"YYYY-MM-DD","kind":one of ${POST_KINDS.join(", ")},"title":string,"hook":string,"caption":string,"items":string[],"shots":string[]}]}
 3 to 8 posts, all on or after today, spaced over the campaign (a teaser before, the main days, a last-chance post). Every post follows the caption rules.
+No video or Reels: each post is one photo or a slideshow of 2 to 10. "shots" lists the photos the owner should take for that post, in slide order, each a short specific instruction ("The sale rack, wide, from the door"). 1 to 6 shots.
 `.trim();
 
 const campaignSchema = z.object({
@@ -258,6 +264,7 @@ const campaignSchema = z.object({
         hook: z.string().trim().default("").transform((v) => v.slice(0, 140)),
         caption: z.string().trim().default("").transform((v) => v.slice(0, 900)),
         items: z.array(z.string().transform((v) => v.slice(0, 120))).default([]).transform((v) => v.slice(0, 6)),
+        shots: z.array(z.string().transform((v) => v.slice(0, 160))).default([]).transform((v) => v.slice(0, 6)),
       }),
     )
     .transform((v) => v.slice(0, 12)),

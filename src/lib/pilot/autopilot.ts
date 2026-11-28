@@ -52,7 +52,7 @@ export async function weeklyAutopilot() {
       const [examples, scores] = await Promise.all([loadExamples(admin, c.owner_id), scorePosts(admin, c.business_id, addDays(week, -56), today)]);
       const { posts } = await buildPack({ store: (biz?.name as string) || "the store", city: (biz?.city as string) || "", notes: top.join("\n"), media, examples, results: learnings(scores).forWriter });
       const { error } = await admin.from("posts").insert(
-        posts.map((p) => ({ business_id: c.business_id, owner_id: c.owner_id, week_of: week, position: p.position, day: p.day, kind: p.kind, title: p.title, hook: p.hook, caption: p.caption, items: p.items, media_path: p.mediaPath, post_on: addDays(week, p.position - 1), campaign: p.campaign })),
+        posts.map((p) => ({ business_id: c.business_id, owner_id: c.owner_id, week_of: week, position: p.position, day: p.day, kind: p.kind, title: p.title, hook: p.hook, caption: p.caption, items: p.items, media_path: p.mediaPath, slides: p.slides, shots: p.shots, post_on: addDays(week, p.position - 1), campaign: p.campaign })),
       );
       if (error) throw error;
       await textOwner(

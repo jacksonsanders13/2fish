@@ -25,6 +25,8 @@ export type Post = {
   mediaPath: string | null;
   mediaUrl: string | null;
   isImage: boolean;
+  slides: { path: string; url: string | null }[]; // one photo, or a slideshow of up to 10
+  shots: string[]; // photos Fisher still needs for this post, in plain words
   status: "draft" | "approved" | "posted";
   postOn: string; // the date it goes up
   campaign: string; // empty when it isn't part of one

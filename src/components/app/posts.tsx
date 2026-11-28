@@ -11,6 +11,8 @@ import { shortDate, weekdayOf, WEEKDAYS } from "@/lib/pilot/dates";
 import type { Post, Upload as UploadFile } from "@/lib/pilot/types";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { checkPhotos } from "@/lib/uploads/check";
+import { uploadPhotos } from "@/lib/uploads/prepare";
 
 const MAX_FILES = 20;
 
@@ -44,27 +46,13 @@ export function PostsView({
     const files = Array.from(e.target.files ?? []).slice(0, Math.max(0, MAX_FILES - uploads.length));
     e.target.value = "";
     if (!files.length) return;
-    // Photos up to 25 MB, clips up to 200 MB. Anything bigger is skipped with a note.
-    const tooBig = files.filter((f) => f.size > (f.type.startsWith("video/") ? 200 : 25) * 1024 * 1024);
-    if (tooBig.length) {
-      setMsg(`Skipped ${tooBig.map((f) => f.name).join(", ")}: too big. Photos up to 25 MB, clips up to 200 MB.`);
-      files.splice(0, files.length, ...files.filter((f) => !tooBig.includes(f)));
-      if (!files.length) return;
-    }
+    // Photos only: shrunk, turned to JPEG, phone data stripped, then checked.
     const supabase = createClient();
-    for (const [i, f] of files.entries()) {
-      setUploading(`Uploading ${i + 1} of ${files.length}…`);
-      const path = `${userId}/pack/${weekOf}/${Date.now()}-${f.name.replace(/[^\w.-]+/g, "_")}`;
-      const { error } = await supabase.storage.from("clips").upload(path, f, { upsert: false });
-      if (error) {
-        setUploading(null);
-        setMsg(`Upload failed: ${error.message}`);
-        router.refresh();
-        return;
-      }
-    }
+    const up = await uploadPhotos(supabase, `${userId}/pack/${weekOf}`, files, (done, total) => setUploading(done < total ? `Getting photo ${done + 1} of ${total} ready…` : "Checking the photos…"));
+    const check = up.paths.length ? await checkPhotos(up.paths) : { kept: [], rejected: [] };
+    const notes = [...up.problems, ...check.rejected.map((r) => `One photo was removed: ${r.why}`)];
     setUploading(null);
-    setMsg(null);
+    setMsg(notes.length ? notes.join(" ") : null);
     router.refresh();
   }
 
@@ -82,7 +70,7 @@ export function PostsView({
       <header className="max-w-2xl">
         <h1 className="text-display font-semibold">Posts for the week of {shortDate(weekOf)}</h1>
         <p className="mt-3">
-          Send this week&apos;s product photos and try-on clips, list what&apos;s new, and Fisher, your marketing helper, writes the week&apos;s posts.
+          Send this week&apos;s product photos, list what&apos;s new, and Fisher, your marketing helper, writes the week&apos;s posts.
           Approve them and they land on your{" "}
           <Link href="/dashboard" className="font-semibold text-night underline underline-offset-2">
             calendar
@@ -101,12 +89,12 @@ export function PostsView({
           <div className="rounded-lg bg-white p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-semibold">
-                Photos and clips <span className="num font-normal text-muted-foreground">({uploads.length})</span>
+                Photos <span className="num font-normal text-muted-foreground">({uploads.length})</span>
               </h2>
-              <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={onFiles} />
+              <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onFiles} />
               <Button size="sm" variant="outline" disabled={Boolean(uploading) || uploads.length >= MAX_FILES} onClick={() => fileRef.current?.click()}>
                 <Upload aria-hidden="true" />
-                Choose photos or clips
+                Choose photos
               </Button>
             </div>
             {uploading ? (
@@ -124,7 +112,7 @@ export function PostsView({
                 ))}
               </ul>
             ) : (
-              <p className="mt-3 text-sm text-muted-foreground">About 10 photos or a few short clips make a good week. Straight from your camera roll is fine.</p>
+              <p className="mt-3 text-sm text-muted-foreground">About 10 photos make a good week: products, close-ups, the shop, someone wearing it. Straight from your camera roll is fine.</p>
             )}
           </div>
 

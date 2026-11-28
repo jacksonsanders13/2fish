@@ -10,6 +10,11 @@ export function uploadFolder(ownerId: string, weekOf: string) {
   return `${ownerId}/pack/${weekOf}`;
 }
 
+/** Every photo path a post row points at: the cover and the slides. */
+function postPaths(rows: Record<string, unknown>[]) {
+  return [...new Set(rows.flatMap((r) => [r.media_path as string | null, ...(((r.slides as string[]) ?? []))]).filter((x): x is string => Boolean(x)))];
+}
+
 async function signed(supabase: Supa, paths: string[]) {
   const map = new Map<string, string>();
   if (!paths.length) return map;
@@ -33,6 +38,8 @@ function mapPost(r: Record<string, unknown>, urls: Map<string, string>): Post {
     mediaPath: path,
     mediaUrl: path ? urls.get(path) ?? null : null,
     isImage: path ? looksLikeImage(path) : false,
+    slides: (((r.slides as string[]) ?? []).length ? (r.slides as string[]) : path ? [path] : []).map((p) => ({ path: p, url: urls.get(p) ?? null })),
+    shots: (r.shots as string[]) ?? [],
     status: r.status as Post["status"],
     postOn: r.post_on ? String(r.post_on) : addDays(String(r.week_of), Number(r.position) - 1),
     campaign: String(r.campaign ?? ""),
@@ -62,7 +69,7 @@ export async function getPostsPage(week?: string) {
     listUploads(supabase, user.id, weekOf),
   ]);
   const rows = postsRes.data ?? [];
-  const urls = await signed(supabase, rows.map((r) => r.media_path).filter(Boolean));
+  const urls = await signed(supabase, postPaths(rows));
   return { userId: user.id, business, weekOf, today, uploads, posts: rows.map((r) => mapPost(r, urls)) };
 }
 
@@ -229,7 +236,7 @@ export async function getHome(supabase: Supa, businessId: string, today: string,
   const days = await salesByDay(supabase, businessId, addDays(mondayOf(today), -7));
 
   const rows = [...(cal.data ?? []), ...(drafts.data ?? [])];
-  const urls = await signed(supabase, [...new Set(rows.map((r) => r.media_path).filter(Boolean))]);
+  const urls = await signed(supabase, postPaths(rows));
 
   return {
     month: ym,

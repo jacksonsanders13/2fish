@@ -17,7 +17,9 @@ import { PostDialog } from "./post-dialog";
 export type BoardView = "approve" | "calendar";
 
 export function PostBoard({ home, today, view, setView }: { home: HomeData; today: string; view: BoardView; setView: (v: BoardView) => void }) {
-  const [open, setOpen] = useState<Post | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = openId ? [...home.drafts, ...home.calendar].find((p) => p.id === openId) ?? null : null;
+  const setOpen = (p: Post | null) => setOpenId(p?.id ?? null);
   const prev = addDays(`${home.month}-01`, -1).slice(0, 7);
   const next = addDays(`${home.month}-01`, 32).slice(0, 7);
 
@@ -143,7 +145,7 @@ function ApproveList({
                 />
               ) : (
                 <span className="flex size-14 shrink-0 items-center justify-center rounded-[4px] bg-white text-sm text-muted-foreground">
-                  {p.mediaUrl ? "Video" : "No photo"}
+                  {p.mediaUrl ? "Video" : p.shots.length ? "Photo needed" : "No photo"}
                 </span>
               )}
               <span className="min-w-0">
@@ -155,9 +157,15 @@ function ApproveList({
                   }{" "}
                   · {p.kind}
                   {p.campaign ? ` · ${p.campaign}` : ""}
+                  {p.slides.length > 1 ? ` · ${p.slides.length} photos` : ""}
                 </span>
                 <span className="block font-semibold">{p.title}</span>
                 <span className="line-clamp-1 block text-sm">{p.hook}</span>
+                {p.shots.length ? (
+                  <span className="block text-sm font-semibold text-signal-tint">
+                    Needs {p.shots.length} {p.shots.length === 1 ? "photo" : "photos"}
+                  </span>
+                ) : null}
               </span>
             </button>
             <Button

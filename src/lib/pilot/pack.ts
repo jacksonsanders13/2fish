@@ -15,7 +15,9 @@ export type PostDraft = {
   hook: string;
   caption: string;
   items: string[];
-  mediaPath: string | null;
+  mediaPath: string | null; // the cover, same as slides[0]
+  slides: string[];
+  shots: string[];
   campaign: string;
 };
 
@@ -26,6 +28,8 @@ const draftSchema = z.object({
   caption: z.string().max(900),
   items: z.array(z.string().max(120)).max(6),
   media: z.number().int().nullable().optional(),
+  slides: z.array(z.number().int()).default([]),
+  shots: z.array(z.string().transform((v) => v.slice(0, 160))).default([]),
   campaign: z.string().max(80).nullable().optional(),
 });
 
@@ -83,7 +87,7 @@ export async function buildPack(input: {
 
     const res = await client.messages.create({
       model,
-      max_tokens: 3500,
+      max_tokens: 5000,
       system: [
         "You are Fisher, and you write a week of Instagram and TikTok posts for a small independent store. The owner approves every post before it goes up.",
         CAPTION_SKILL,
@@ -93,9 +97,11 @@ export async function buildPack(input: {
         "Each post features 1 to 3 specific items from the owner's list or clearly visible in a photo. Name items the way a shopper would ask for them at the counter (\"green wrap dress\").",
         "hook and caption follow HOW TO WRITE A STORE POST above. No promo codes or discounts unless the owner wrote one.",
         "If example posts are given, borrow what made them work (hook style, format, structure, pacing) and apply it to this store's items. Never copy their words, names or claims.",
-        "media: the index of the file that fits the post best, or null. Spread the files across the week.",
+        "FORMAT: no video and no Reels. Each post is a single photo, or a slideshow (carousel) of 2 to 10 photos. Pick what fits: one strong photo for a quick new-arrival or a sale; a slideshow when there's a sequence (an outfit built piece by piece, the same item three ways, 5 gift ideas, before and after, a close-up then the full look). The first slide is the hook, so it has to stop the scroll on its own.",
+        "slides: the file indexes for the post, in order (first one is the cover). Only photos, never a video clip. Spread the photos across the week, and reuse one only if you must.",
+        "shots: if the post needs photos the owner hasn't sent, list each missing one as a short, specific instruction they can shoot in a minute on their phone, in slide order (\"The cable knit folded on the counter, shot from above\", \"Close-up of the knit texture\", \"Someone wearing it in the fitting room mirror\"). Empty if the uploaded photos are enough. Never more than 6 shots for one post.",
         "If the owner mentions a sale, holiday or event, the posts that push it share one short campaign name (\"Holiday gift week\"). Every other post gets an empty campaign.",
-        'Reply with JSON only: {"posts":[{"kind":string,"title":string,"hook":string,"caption":string,"items":string[],"media":number|null,"campaign":string}]}',
+        'Reply with JSON only: {"posts":[{"kind":string,"title":string,"hook":string,"caption":string,"items":string[],"slides":number[],"shots":string[],"campaign":string}]}',
       ].join("\n"),
       messages: [{ role: "user", content }],
     });
@@ -114,7 +120,7 @@ export async function buildPack(input: {
         hook: p.hook.trim(),
         caption: p.caption.trim(),
         items: p.items.map((x) => x.trim()).filter(Boolean),
-        mediaPath: typeof p.media === "number" ? input.media[p.media]?.path ?? null : null,
+        ...slidesFor(p, input.media),
         campaign: (p.campaign ?? "").trim(),
       })),
     };
@@ -183,8 +189,21 @@ function templatePack(store: string, items: string[], media: PackMedia[]): PostD
       hook: p.hook(item),
       caption: p.caption(item, store),
       items: items.length ? [item] : [],
-      mediaPath: media.length ? media[i % media.length].path : null,
+      ...(() => {
+        const photos = media.filter((m) => m.isImage);
+        const path = photos.length ? photos[i % photos.length].path : null;
+        return { mediaPath: path, slides: path ? [path] : [], shots: path ? [] : ["A clear photo of the item on the rack or counter, in good light"] };
+      })(),
       campaign: "",
     };
   });
+}
+
+// Turn the writer's file indexes into storage paths. Photos only, no repeats
+// within a post, 10 at most (Instagram's carousel limit, counting shots still to come).
+function slidesFor(p: { slides?: number[]; media?: number | null; shots?: string[] }, media: PackMedia[]) {
+  const picks = p.slides?.length ? p.slides : typeof p.media === "number" ? [p.media] : [];
+  const slides = [...new Set(picks)].map((i) => media[i]).filter((m) => m && m.isImage).map((m) => m!.path).slice(0, 10);
+  const shots = (p.shots ?? []).map((x) => x.trim()).filter(Boolean).slice(0, Math.min(6, 10 - slides.length));
+  return { mediaPath: slides[0] ?? null, slides, shots };
 }

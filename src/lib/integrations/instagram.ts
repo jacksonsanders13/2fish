@@ -106,22 +106,38 @@ async function post(path: string, params: Record<string, string>) {
   return igJson(await fetch(`${GRAPH}/${path}`, { method: "POST", body: new URLSearchParams(params), signal: AbortSignal.timeout(30_000) }));
 }
 
-/** Put one post on Instagram. Videos go up as Reels and need a moment to process. */
-async function publishOne(conn: Conn, token: string, mediaUrl: string, isImage: boolean, caption: string) {
-  const container = await post(`${conn.ig_user_id}/media`, isImage
-    ? { image_url: mediaUrl, caption, access_token: token }
-    : { media_type: "REELS", video_url: mediaUrl, caption, access_token: token });
-
-  if (!isImage) {
-    // Wait up to about a minute for Instagram to finish the video.
-    for (let i = 0; i < 12; i++) {
-      const s = await igJson(await fetch(`${GRAPH}/${container.id}?${new URLSearchParams({ fields: "status_code", access_token: token })}`));
-      if (s.status_code === "FINISHED") break;
-      if (s.status_code === "ERROR") throw new Error("Instagram couldn't process the video.");
-      await new Promise((r) => setTimeout(r, 5000));
-    }
+/** Wait for Instagram to finish loading a container before it can be published. */
+async function ready(id: string, token: string) {
+  for (let i = 0; i < 12; i++) {
+    const s = await igJson(await fetch(`${GRAPH}/${id}?${new URLSearchParams({ fields: "status_code", access_token: token })}`));
+    if (s.status_code === "FINISHED" || s.status_code == null) return;
+    if (s.status_code === "ERROR") throw new Error("Instagram couldn't load one of the photos.");
+    await new Promise((r) => setTimeout(r, 3000));
   }
-  const done = await post(`${conn.ig_user_id}/media_publish`, { creation_id: container.id, access_token: token });
+}
+
+/**
+ * Put one post on Instagram: a single photo, or a slideshow (carousel) of 2 to
+ * 10 photos. Photos only for now, no Reels. For a slideshow, each photo is
+ * loaded on its own first, then grouped into one post.
+ */
+async function publishOne(conn: Conn, token: string, urls: string[], caption: string) {
+  let creation: string;
+  if (urls.length === 1) {
+    const c = await post(`${conn.ig_user_id}/media`, { image_url: urls[0], caption, access_token: token });
+    creation = c.id;
+  } else {
+    const children: string[] = [];
+    for (const url of urls) {
+      const c = await post(`${conn.ig_user_id}/media`, { image_url: url, is_carousel_item: "true", access_token: token });
+      children.push(c.id);
+    }
+    for (const id of children) await ready(id, token);
+    const c = await post(`${conn.ig_user_id}/media`, { media_type: "CAROUSEL", children: children.join(","), caption, access_token: token });
+    creation = c.id;
+  }
+  await ready(creation, token);
+  const done = await post(`${conn.ig_user_id}/media_publish`, { creation_id: creation, access_token: token });
   return String(done.id);
 }
 
@@ -140,7 +156,7 @@ export async function publishDuePosts() {
     const today = todayIn((biz?.timezone as string) || "America/New_York");
     const { data: due } = await admin
       .from("posts")
-      .select("id, caption, media_path, post_on")
+      .select("id, caption, media_path, slides, shots, post_on")
       .eq("business_id", conn.business_id)
       .eq("status", "approved")
       .is("published_at", null)
@@ -158,12 +174,16 @@ export async function publishDuePosts() {
 
     for (const p of due ?? []) {
       try {
-        if (!p.media_path) throw new Error("This post has no photo or video yet.");
-        const isImage = looksLikeImage(p.media_path);
-        if (isImage && !/\.(jpe?g)$/i.test(p.media_path)) throw new Error("Instagram only takes JPEG photos. Send this one as a .jpg.");
-        const { data: signed } = await admin.storage.from("clips").createSignedUrl(p.media_path, 3600);
-        if (!signed?.signedUrl) throw new Error("Couldn't open the photo.");
-        const id = await publishOne(conn, token, signed.signedUrl, isImage, p.caption ?? "");
+        const shots = (p.shots as string[]) ?? [];
+        if (shots.length) throw new Error(`Still needs ${shots.length} ${shots.length === 1 ? "photo" : "photos"} before it can go up.`);
+        const paths = (((p.slides as string[]) ?? []).length ? (p.slides as string[]) : p.media_path ? [p.media_path as string] : []).slice(0, 10);
+        if (!paths.length) throw new Error("This post has no photo yet.");
+        if (paths.some((x) => !looksLikeImage(x))) throw new Error("Videos can't be posted yet. Swap it for a photo.");
+        if (paths.some((x) => !/\.(jpe?g)$/i.test(x))) throw new Error("Instagram only takes JPEG photos. Upload this one again and it'll be converted.");
+        const { data: signed } = await admin.storage.from("clips").createSignedUrls(paths, 3600);
+        const urls = paths.map((_, i) => signed?.[i]?.signedUrl).filter((u): u is string => Boolean(u));
+        if (urls.length !== paths.length) throw new Error("Couldn't open one of the photos.");
+        const id = await publishOne(conn, token, urls, p.caption ?? "");
         await admin.from("posts").update({ status: "posted", published_at: new Date().toISOString(), ig_media_id: id, publish_error: null }).eq("id", p.id);
         out.push({ post: p.id, ok: true });
       } catch (e) {

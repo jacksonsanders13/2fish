@@ -74,12 +74,18 @@ export const toolDefinitions: Anthropic.Tool[] = [
   },
   {
     name: "request_clips",
-    description: "Ask the owner to upload product photos and short phone clips (new arrivals, try-ons, the shop floor). Shows an upload card in the chat. Use before starting a week of posts when there's nothing uploaded.",
+    description:
+      "Ask the owner for photos (photos only: no video, no Reels for now). Shows an upload card in the chat. Use before a week of posts when nothing is uploaded, or when a post you're planning needs specific pictures. Ask for exact shots they can take in a minute on their phone, in the order they'd appear in a slideshow.",
     input_schema: {
       type: "object",
       properties: {
-        count: { type: "integer", description: "How many photos or clips you'd like, usually 5 to 10." },
+        count: { type: "integer", description: "How many photos you'd like, usually 5 to 10." },
         why: { type: "string", description: "One sentence on what you'll make from them." },
+        shots: {
+          type: "array",
+          items: { type: "string" },
+          description: 'Optional. The exact photos you want, each a short instruction ("The cable knit folded on the counter, from above", "Close-up of the knit", "Someone wearing it in the fitting room mirror"). Up to 10.',
+        },
       },
       required: ["count", "why"],
     },
@@ -209,7 +215,8 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
     }
 
     case "request_clips": {
-      const count = Math.min(Math.max(Number(input.count) || 5, 1), 12);
+      const shots = (Array.isArray(input.shots) ? input.shots : []).map((x) => String(x).trim().slice(0, 160)).filter(Boolean).slice(0, 10);
+      const count = Math.min(Math.max(Number(input.count) || shots.length || 5, 1), 12);
       const { data, error } = await supabase
         .from("agent_tasks")
         .insert({
@@ -217,13 +224,13 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
           owner_id: ownerId,
           kind: "clips_request",
           status: "waiting_on_owner",
-          title: `Upload ${count} phone clips`,
-          payload: { count, why: String(input.why ?? "") },
+          title: `Send ${count} ${count === 1 ? "photo" : "photos"}`,
+          payload: { count, why: String(input.why ?? "").slice(0, 300), shots },
         })
         .select("id")
         .single();
       if (error) return { summary: `Could not create the upload request: ${error.message}` };
-      return { summary: `An upload card for ${count} clips is now in the chat. Wait for the owner to upload before starting a batch.`, data: { task_id: data.id } };
+      return { summary: `An upload card for ${count} photos${shots.length ? " with your shot list" : ""} is now in the chat. Wait for the owner to upload before writing the posts.`, data: { task_id: data.id } };
     }
 
     case "start_video_batch": {

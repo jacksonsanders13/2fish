@@ -55,6 +55,8 @@ export async function makePack(input: { weekOf: string; notes: string }): Promis
         caption: p.caption,
         items: p.items,
         media_path: p.mediaPath,
+        slides: p.slides,
+        shots: p.shots,
         post_on: addDays(weekOf, p.position - 1),
         campaign: p.campaign,
       })),
@@ -120,6 +122,52 @@ export async function approveWeek(input: { weekOf: string }): Promise<Result> {
     const weekOf = week.parse(input.weekOf);
     const { supabase, business } = await ensureBusiness();
     const { error } = await supabase.from("posts").update({ status: "approved", updated_at: new Date().toISOString() }).eq("business_id", business.id).eq("week_of", weekOf).eq("status", "draft");
+    if (error) throw error;
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+/**
+ * Photos the owner just uploaded for one post: they go on the end of the
+ * slideshow (10 at most), and each one ticks off the next shot Fisher asked for.
+ */
+export async function addPostPhotos(input: { id: string; paths: string[] }): Promise<Result> {
+  try {
+    const id = z.string().uuid().parse(input.id);
+    const { supabase, user } = await ensureBusiness();
+    const paths = z.array(z.string().min(1).max(300)).min(1).max(10).parse(input.paths).filter((p) => p.startsWith(`${user.id}/`) && /\.jpe?g$/i.test(p));
+    if (!paths.length) return { ok: false, message: "Nothing was uploaded." };
+    const { data: post } = await supabase.from("posts").select("slides, shots, media_path, status").eq("id", id).maybeSingle();
+    if (!post) return { ok: false, message: "That post is gone." };
+    if (post.status === "posted") return { ok: false, message: "That post is already up. Photos can't change now." };
+    const current = ((post.slides as string[]) ?? []).length ? (post.slides as string[]) : post.media_path ? [post.media_path as string] : [];
+    const room = 10 - current.length;
+    if (room <= 0) return { ok: false, message: "A post can have 10 photos at most. Remove one first." };
+    const slides = [...current, ...paths.slice(0, room)];
+    const shots = ((post.shots as string[]) ?? []).slice(Math.min(paths.length, room));
+    const { error } = await supabase.from("posts").update({ slides, shots, media_path: slides[0], updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) throw error;
+    refresh();
+    return { ok: true, message: shots.length ? `Added. ${shots.length} more ${shots.length === 1 ? "photo" : "photos"} to go.` : "Added. This post has all its photos." };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+/** Takes one photo out of a post's slideshow. The file stays in the owner's uploads. */
+export async function removePostPhoto(input: { id: string; path: string }): Promise<Result> {
+  try {
+    const id = z.string().uuid().parse(input.id);
+    const { supabase } = await ensureBusiness();
+    const { data: post } = await supabase.from("posts").select("slides, media_path, status").eq("id", id).maybeSingle();
+    if (!post) return { ok: false, message: "That post is gone." };
+    if (post.status === "posted") return { ok: false, message: "That post is already up." };
+    const current = ((post.slides as string[]) ?? []).length ? (post.slides as string[]) : post.media_path ? [post.media_path as string] : [];
+    const slides = current.filter((p) => p !== input.path);
+    const { error } = await supabase.from("posts").update({ slides, media_path: slides[0] ?? null, updated_at: new Date().toISOString() }).eq("id", id);
     if (error) throw error;
     refresh();
     return { ok: true };

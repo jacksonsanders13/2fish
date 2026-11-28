@@ -8,6 +8,7 @@ import { movePost, setPostStatus } from "@/lib/pilot/actions";
 import { todayIn } from "@/lib/pilot/dates";
 import type { Post } from "@/lib/pilot/types";
 import { useDemo } from "./demo";
+import { PostPhotos } from "./post-photos";
 
 const STATUS = { draft: "Waiting on your okay", approved: "Approved, goes up on its day", posted: "Posted" } as const;
 
@@ -81,16 +82,7 @@ export function PostDialog({ post, onClose }: { post: Post | null; onClose: () =
           </div>
 
           <div className="p-4 sm:p-5">
-            {post.mediaUrl ? (
-              post.isImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={post.mediaUrl} alt={`Photo for ${post.title}`} className="max-h-80 w-full rounded-md bg-surface object-contain" />
-              ) : (
-                <video src={post.mediaUrl} controls playsInline className="max-h-80 w-full rounded-md bg-ink" />
-              )
-            ) : (
-              <p className="rounded-md bg-surface p-4 text-sm text-muted-foreground">No photo picked for this post yet.</p>
-            )}
+            <PostPhotos post={post} />
 
             <dl className="mt-4 space-y-3 text-sm">
               <div>

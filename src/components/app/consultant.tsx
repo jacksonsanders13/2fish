@@ -15,6 +15,9 @@ import { formatPhone } from "@/lib/app/types";
 import { createClient } from "@/lib/supabase/client";
 import { FisherAvatar } from "@/components/brand/fisher-avatar";
 import { cn } from "@/lib/utils";
+import { packWeek, todayIn } from "@/lib/pilot/dates";
+import { checkPhotos } from "@/lib/uploads/check";
+import { uploadPhotos } from "@/lib/uploads/prepare";
 import { useDemo } from "./demo";
 
 type Local = { id: string; role: "user" | "assistant" | "tool"; content: string; meta?: Record<string, unknown>; pending?: boolean };
@@ -364,27 +367,25 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
   }
 
   if (task.kind === "clips_request") {
-    const p = task.payload as { count: number; why?: string };
+    const p = task.payload as { count: number; why?: string; shots?: string[] };
     async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
       const files = Array.from(e.target.files ?? []).slice(0, 12);
+      e.target.value = "";
       if (!files.length) return;
-      setMsg(`Uploading ${files.length} ${files.length === 1 ? "file" : "files"}…`);
       const supabase = createClient();
-      const paths: string[] = [];
-      for (const f of files) {
-        const path = `${userId}/${task.id}/${Date.now()}-${f.name.replace(/[^\w.-]+/g, "_")}`;
-        const { error } = await supabase.storage.from("clips").upload(path, f, { upsert: false });
-        if (error) {
-          setMsg(`Upload failed: ${error.message}`);
-          return;
-        }
-        paths.push(path);
+      const week = packWeek(todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone));
+      const up = await uploadPhotos(supabase, `${userId}/pack/${week}`, files, (done, total) => setMsg(done < total ? `Getting photo ${done + 1} of ${total} ready…` : "Checking the photos…"));
+      const check = up.paths.length ? await checkPhotos(up.paths) : { kept: [], rejected: [] };
+      const notes = [...up.problems, ...check.rejected.map((r) => `One photo was removed: ${r.why}`)];
+      if (!check.kept.length) {
+        setMsg(notes.join(" ") || "Nothing was uploaded.");
+        return;
       }
       start(async () => {
-        const r = await clipsUploaded(task.id, paths);
-        setMsg(r.message ?? null);
+        const r = await clipsUploaded(task.id, check.kept);
+        setMsg([r.message, ...notes].filter(Boolean).join(" "));
         router.refresh();
-        if (r.ok) onDone(`I uploaded ${paths.length} photos and clips.`);
+        if (r.ok) onDone(`I uploaded ${check.kept.length} ${check.kept.length === 1 ? "photo" : "photos"}.${check.rejected.length ? ` ${check.rejected.length} didn't pass the photo check.` : ""}`);
       });
     }
     return (
@@ -394,12 +395,22 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
           {task.title}
         </p>
         {p.why ? <p className="mt-1 text-sm text-muted-foreground">{p.why}</p> : null}
-        <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={onFiles} />
+        {p.shots?.length ? (
+          <ol className="mt-2 space-y-1 text-sm">
+            {p.shots.map((s, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="num w-4 shrink-0 text-muted-foreground">{i + 1}</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onFiles} />
         {msg ? <p className="mt-2 text-sm text-muted-foreground">{msg}</p> : null}
         <div className="mt-2 flex gap-2">
           <Button size="sm" variant="signal" disabled={pending} onClick={() => fileRef.current?.click()}>
             <Upload aria-hidden="true" />
-            Choose photos or clips
+            Choose photos
           </Button>
           <Button size="sm" variant="ghost" disabled={pending} onClick={dismiss}>
             Not now
