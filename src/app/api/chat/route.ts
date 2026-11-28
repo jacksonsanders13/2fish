@@ -13,7 +13,7 @@ export const maxDuration = 300;
 // One chat turn. Streams newline-delimited JSON events back to the browser.
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  const parsed = z.object({ message: z.string().trim().min(1).max(4000), conversationId: z.string().uuid().nullish() }).safeParse(body);
+  const parsed = z.object({ message: z.string().trim().min(1).max(4000), conversationId: z.string().uuid().nullish(), photos: z.array(z.string().max(300)).max(10).optional() }).safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Say something first." }, { status: 400 });
 
   let ctx;
@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
           conversationId,
           history,
           userMessage: parsed.data.message,
+          photos: (parsed.data.photos ?? []).filter((p) => p.startsWith(`${user.id}/`) && /\.jpe?g$/i.test(p)),
           integrations: { sms: smsConfigured(), video: videoConfigured() },
           emit,
         });

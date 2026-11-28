@@ -1,54 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { Camera, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { addPostPhotos, removePostPhoto } from "@/lib/pilot/actions";
+import { useState } from "react";
+import { X } from "lucide-react";
+import { removePostPhoto } from "@/lib/pilot/actions";
 import type { Post } from "@/lib/pilot/types";
-import { checkPhotos } from "@/lib/uploads/check";
-import { uploadPhotos } from "@/lib/uploads/prepare";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useDemo } from "./demo";
 
-// The photos in one post: the slideshow so far, the shots Fisher still needs,
-// and the button to add them. One photo is a single post; two or more go up
-// as a slideshow.
+// The photos in one post: the slideshow so far and the shots Fisher still
+// needs. New photos come in through Fisher's chat. One photo is a single post;
+// two or more go up as a slideshow.
 export function PostPhotos({ post }: { post: Post }) {
   const router = useRouter();
   const demo = useDemo();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [notes, setNotes] = useState<string[]>([]);
   const locked = post.status === "posted";
-  const room = 10 - post.slides.length;
-
-  async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []).slice(0, Math.max(0, room));
-    e.target.value = "";
-    if (!files.length) return;
-    setNotes([]);
-    const supabase = createClient();
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) return setNotes(["Sign in again to add photos."]);
-
-    const up = await uploadPhotos(supabase, `${data.user.id}/posts/${post.id}`, files, (done, total) => setBusy(done < total ? `Getting photo ${done + 1} of ${total} ready…` : "Checking the photos…"));
-    const problems = [...up.problems];
-    let kept = up.paths;
-    if (kept.length) {
-      const check = await checkPhotos(kept);
-      kept = check.kept;
-      problems.push(...check.rejected.map((r) => `One photo was removed: ${r.why}`));
-    }
-    if (kept.length) {
-      const r = await addPostPhotos({ id: post.id, paths: kept });
-      if (r.message) problems.unshift(r.message);
-    }
-    setBusy(null);
-    setNotes(problems);
-    router.refresh();
-  }
 
   async function remove(path: string) {
     setBusy("Removing…");
@@ -110,19 +78,8 @@ export function PostPhotos({ post }: { post: Post }) {
         </div>
       ) : null}
 
-      {!locked && room > 0 ? (
-        demo ? (
-          <p className="mt-3 text-sm text-muted-foreground">In the real app you add photos to the post right here.</p>
-        ) : (
-          <div className="mt-3">
-            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onFiles} />
-            <Button size="sm" variant={post.shots.length ? "signal" : "outline"} disabled={Boolean(busy)} onClick={() => fileRef.current?.click()} className="h-10">
-              <Camera aria-hidden="true" />
-              {busy ?? (post.shots.length ? "Add these photos" : "Add photos")}
-            </Button>
-            <p className="mt-1.5 text-xs text-muted-foreground">Photos only. Up to {room} more for this post. Add them in the order above.</p>
-          </div>
-        )
+      {!locked && post.shots.length ? (
+        <p className="mt-2 text-sm text-muted-foreground">Take these on your phone and send them to Fisher with the Photos button in the chat. Fisher puts them on this post.</p>
       ) : null}
 
       {notes.length ? (

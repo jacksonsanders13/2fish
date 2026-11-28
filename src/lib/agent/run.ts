@@ -33,7 +33,7 @@ Your specialists (the ask_specialist tool). Each one has proven marketing skills
 - referral: a word-of-mouth idea they can run at the counter
 After a specialist finishes, its draft is already on the owner's screen. Posters and campaign posts become draft posts: always tell the owner they're in Posts to approve, waiting for their okay. Say in one or two sentences what it made and what to do next (approve, copy, fill in a [NEED]). Don't paste the draft again. If the owner's request is missing a key fact (the dates of a sale, the discount), ask for it first, one question.
 
-What you do: explain their score and fixes in their words, say what you will do and what it is worth, and when they agree, do it with your tools. Tools change the plan, ask for photos and clips (request_clips), queue a week of posts (start_video_batch), log a sale at checkout (log_job, with how the shopper heard about the store), and add customers. If they tell you something new (for example "my try-ons do better"), adjust the plan with update_plan_step and tell them what changed, then ask for what you need (photos, their okay).
+What you do: explain their score and fixes in their words, say what you will do and what it is worth, and when they agree, do it with your tools. Photos: posts are one photo or a slideshow of 2 to 10, never video. Before you make a post or a week of posts, ask which products the owner wants pushed and ask for photos of them with request_clips, listing the exact shots. The owner can also send photos any time with the Photos button in the chat; you see them in their message with a path for each. When photos arrive, look at them and put each one on the post it fits with add_photos_to_post (the snapshot lists posts not up yet, their ids and the shots they still need), then say which post got which photo. If no post fits, say you'll use them in the next week of posts. Tools change the plan, ask for photos (request_clips), put photos on posts (add_photos_to_post), queue a week of posts (start_video_batch), log a sale at checkout (log_job, with how the shopper heard about the store), and add customers. If they tell you something new (for example "my try-ons do better"), adjust the plan with update_plan_step and tell them what changed, then ask for what you need (photos, their okay).
 
 Rules:
 - Every dollar figure comes from the snapshot or from math you show. Never invent sales.
@@ -51,6 +51,7 @@ export type AgentArgs = {
   conversationId: string;
   history: { role: "user" | "assistant"; content: string }[];
   userMessage: string;
+  photos?: string[];
   integrations: { sms: boolean; video: boolean };
   emit: (e: StreamEvent) => void;
 };
@@ -64,7 +65,8 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
   const { supabase, ownerId, business, conversationId, history, userMessage, integrations, emit } = args;
   const key = claudeKey();
 
-  await supabase.from("chat_messages").insert({ conversation_id: conversationId, owner_id: ownerId, role: "user", content: userMessage });
+  const photos = (args.photos ?? []).slice(0, 10);
+  await supabase.from("chat_messages").insert({ conversation_id: conversationId, owner_id: ownerId, role: "user", content: userMessage, meta: photos.length ? { photos } : {} });
 
   if (!key) {
     const text =
@@ -79,7 +81,7 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
   let snapshot = await buildSnapshot(supabase, business, integrations);
   const messages: Anthropic.MessageParam[] = [
     ...history.slice(-20).map((m) => ({ role: m.role, content: m.content })),
-    { role: "user", content: userMessage },
+    { role: "user", content: await withPhotos(supabase, userMessage, photos) },
   ];
 
   let finalText = "";
@@ -137,6 +139,24 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
   emit({ type: "done", messageId: saved.data?.id ?? null });
 }
 
+/** The owner's message plus any photos they sent, so Fisher can see them and knows each path. */
+async function withPhotos(supabase: SupabaseClient, text: string, photos: string[]): Promise<Anthropic.MessageParam["content"]> {
+  if (!photos.length) return text;
+  const { data } = await supabase.storage.from("clips").createSignedUrls(photos, 3600);
+  const blocks: Anthropic.ContentBlockParam[] = [{ type: "text", text: `${text}\n\n${photoList(photos)}` }];
+  photos.forEach((p, i) => {
+    const url = data?.[i]?.signedUrl;
+    if (!url) return;
+    blocks.push({ type: "text", text: `Photo ${i + 1}:` });
+    blocks.push({ type: "image", source: { type: "url", url } });
+  });
+  return blocks;
+}
+
+export function photoList(photos: string[]) {
+  return `Photos the owner sent (path for add_photos_to_post, in the order sent):\n${photos.map((p, i) => `${i + 1}. ${p}`).join("\n")}`;
+}
+
 // Plain words for what each tool is doing, shown in the chat while it runs.
 // "slow" ones get a heads-up that they take about a minute.
 const SPECIALIST_STATUS: Record<string, string> = {
@@ -154,6 +174,7 @@ const TOOL_STATUS: Record<string, string> = {
   add_plan_step: "Adding to your plan",
   set_textback: "Changing your text-back settings",
   request_clips: "Asking for photos",
+  add_photos_to_post: "Putting the photos on the post",
   start_video_batch: "Starting your videos",
   propose_text: "Drafting a text for you to check",
   log_job: "Logging the sale",

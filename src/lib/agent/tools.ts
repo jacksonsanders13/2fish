@@ -91,6 +91,19 @@ export const toolDefinitions: Anthropic.Tool[] = [
     },
   },
   {
+    name: "add_photos_to_post",
+    description:
+      "Put photos the owner sent in the chat onto one post that isn't up yet, in slide order. Use the post id from the snapshot and the photo paths from the owner's message, exactly as written. One photo is a single post; 2 to 10 make a slideshow. Each photo added ticks off the next shot the post still needs, so add them in the order of its shot list.",
+    input_schema: {
+      type: "object",
+      properties: {
+        post_id: { type: "string", description: "The post's id from the snapshot." },
+        photos: { type: "array", items: { type: "string" }, description: "Photo paths from the owner's message, in slide order." },
+      },
+      required: ["post_id", "photos"],
+    },
+  },
+  {
     name: "start_video_batch",
     description: "Queue a week of posts (short vertical videos and photo posts, each tagged with the items it shows) from what the owner uploaded. Runs through the video renderer when connected; otherwise it is queued.",
     input_schema: {
@@ -231,6 +244,28 @@ export async function runTool(name: string, input: Record<string, unknown>, ctx:
         .single();
       if (error) return { summary: `Could not create the upload request: ${error.message}` };
       return { summary: `An upload card for ${count} photos${shots.length ? " with your shot list" : ""} is now in the chat. Wait for the owner to upload before writing the posts.`, data: { task_id: data.id } };
+    }
+
+    case "add_photos_to_post": {
+      const id = String(input.post_id ?? "").trim();
+      if (!/^[0-9a-f-]{36}$/i.test(id)) return { summary: "That isn't a post id. Use one from the snapshot." };
+      const paths = (Array.isArray(input.photos) ? input.photos : []).map((x) => String(x).trim()).filter((x) => x.startsWith(`${ownerId}/`) && /\.jpe?g$/i.test(x));
+      if (!paths.length) return { summary: "No usable photos. Copy the paths from the owner's message exactly." };
+      const { data: post } = await supabase.from("posts").select("id, title, slides, shots, media_path, status").eq("id", id).eq("business_id", business.id).maybeSingle();
+      if (!post) return { summary: "No post with that id. Check the snapshot." };
+      if (post.status === "posted") return { summary: "That post is already up, so its photos can't change." };
+      const current = ((post.slides as string[] | null) ?? []).length ? (post.slides as string[]) : post.media_path ? [post.media_path as string] : [];
+      const fresh = [...new Set(paths)].filter((x) => !current.includes(x)).slice(0, Math.max(0, 10 - current.length));
+      if (!fresh.length) return { summary: current.length >= 10 ? "That post already has 10 photos, the most Instagram allows." : "Those photos are already on that post." };
+      const slides = [...current, ...fresh];
+      const shots = ((post.shots as string[] | null) ?? []).slice(fresh.length);
+      const { error } = await supabase.from("posts").update({ slides, shots, media_path: slides[0], updated_at: new Date().toISOString() }).eq("id", id);
+      if (error) return { summary: `Couldn't add them: ${error.message}` };
+      await event("video", `${fresh.length} ${fresh.length === 1 ? "photo" : "photos"} added to "${post.title}" by Fisher.`);
+      return {
+        summary: `Added ${fresh.length} ${fresh.length === 1 ? "photo" : "photos"} to "${post.title}". It has ${slides.length} now${slides.length > 1 ? " (a slideshow)" : ""}. ${shots.length ? `Still needs: ${shots.join(" / ")}.` : "It has every photo it needs."}`,
+        madePosts: 1,
+      };
     }
 
     case "start_video_batch": {

@@ -28,7 +28,13 @@ export async function loadConversation(supabase: SupabaseClient, businessId: str
     .order("created_at")
     .limit(200);
   const messages: ChatMessage[] = (rows ?? []).map((r) => ({ id: r.id, role: r.role, content: r.content, meta: (r.meta as Record<string, unknown>) ?? {}, createdAt: r.created_at }));
-  const history = messages.filter((m) => m.role !== "tool" && m.content).map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+  const history = messages
+    .filter((m) => m.role !== "tool" && m.content)
+    .map((m) => {
+      const photos = Array.isArray(m.meta.photos) ? (m.meta.photos as string[]) : [];
+      const list = photos.length ? `\n\nPhotos the owner sent (path for add_photos_to_post):\n${photos.map((p, i) => `${i + 1}. ${p}`).join("\n")}` : "";
+      return { role: m.role as "user" | "assistant", content: m.content + list };
+    });
   return { conversationId: convo.id as string, messages, history };
 }
 

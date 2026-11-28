@@ -32,6 +32,8 @@ export type Snapshot = {
   integrations: { sms: boolean; video: boolean };
   // From Square, when connected: the last 4 weeks of sales and the top sellers of the last 2 weeks.
   square: { weeks: { weekOf: string; total: number }[]; top: { item: string; qty: number }[] } | null;
+  // Posts not up yet, so Fisher can put the owner's photos on the right one.
+  posts: { id: string; on: string | null; title: string; status: string; photos: number; shots: string[] }[];
 };
 
 export async function buildSnapshot(
@@ -88,6 +90,21 @@ export async function buildSnapshot(
     supabase.from("sales_daily").select("day, total").eq("business_id", business.id).gte("day", since),
     supabase.from("item_daily").select("item, qty").eq("business_id", business.id).gte("day", recent),
   ]);
+  const postRows = await supabase
+    .from("posts")
+    .select("id, post_on, title, status, slides, media_path, shots")
+    .eq("business_id", business.id)
+    .neq("status", "posted")
+    .order("post_on", { ascending: true, nullsFirst: false })
+    .limit(14);
+  const posts: Snapshot["posts"] = (postRows.data ?? []).map((p) => ({
+    id: p.id as string,
+    on: (p.post_on as string | null) ?? null,
+    title: (p.title as string) ?? "",
+    status: p.status as string,
+    photos: ((p.slides as string[] | null) ?? []).length || (p.media_path ? 1 : 0),
+    shots: (p.shots as string[] | null) ?? [],
+  }));
   let square: Snapshot["square"] = null;
   if ((sd.data ?? []).length) {
     const weeks = new Map<string, number>();
@@ -107,6 +124,7 @@ export async function buildSnapshot(
 
   return {
     business,
+    posts,
     plan: plan.data
       ? {
           id: plan.data.id,
@@ -165,6 +183,10 @@ export function describeSnapshot(s: Snapshot) {
       : "Text-back: not set up yet.",
   );
   lines.push(`Integrations: texting ${s.integrations.sms ? "connected" : "NOT connected (texts are queued, not sent)"}; video renderer ${s.integrations.video ? "connected" : "NOT connected (video batches are queued)"}.`);
+  if (s.posts.length)
+    lines.push(
+      `Posts not up yet: ${s.posts.map((p) => `[id ${p.id}] ${p.on ?? "no date"} "${p.title}" (${p.status}, ${p.photos} ${p.photos === 1 ? "photo" : "photos"}${p.shots.length ? `, still needs: ${p.shots.join(" / ")}` : ""})`).join("; ")}.`,
+    );
   if (s.tasks.length) lines.push(`Open tasks: ${s.tasks.map((t) => `${t.kind} (${t.status}): ${t.title}`).join("; ")}.`);
   if (s.recentEvents.length) lines.push(`Recent activity: ${s.recentEvents.slice(0, 5).join(" | ")}`);
   return lines.join("\n");

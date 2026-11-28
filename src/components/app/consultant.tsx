@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowUp, Check, Clock, Copy, Download, Film, History, SquarePen, Trash2, Upload, X } from "lucide-react";
+import { ArrowUp, Camera, Check, Clock, Copy, Download, Film, History, SquarePen, Trash2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { approveText, clipsUploaded, deleteConversation, dismissTask } from "@/lib/agent/actions";
@@ -64,6 +64,10 @@ export function Consultant({
   const [status, setStatus] = useState<{ label: string; slow: boolean; since: number } | null>(null);
   const [now, setNow] = useState(0);
   const lastAsk = useRef<string | null>(null);
+  const lastPhotos = useRef<string[]>([]);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [photoNote, setPhotoNote] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
   const demo = useDemo();
@@ -89,10 +93,32 @@ export function Consultant({
     return () => window.clearInterval(id);
   }, [busy]);
 
-  async function send(text: string, opts: { silentUser?: boolean } = {}) {
+  // Photos from the chat: shrunk, turned to JPEG, checked, saved with this
+  // week's uploads, then sent to Fisher so it can put them on posts.
+  async function onPhotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, 10);
+    e.target.value = "";
+    if (!files.length || busy || uploading) return;
+    if (demo) return setPhotoNote("In the real app your photos go straight to Fisher from here.");
+    setUploading(true);
+    const supabase = createClient();
+    const week = packWeek(todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone));
+    const up = await uploadPhotos(supabase, `${userId}/pack/${week}`, files, (done, total) => setPhotoNote(done < total ? `Getting photo ${done + 1} of ${total} ready…` : "Checking the photos…"));
+    const check = up.paths.length ? await checkPhotos(up.paths) : { kept: [], rejected: [] };
+    const notes = [...up.problems, ...check.rejected.map((r) => `One photo was removed: ${r.why}`)];
+    setUploading(false);
+    setPhotoNote(notes.length ? notes.join(" ") : check.kept.length ? null : "Nothing was uploaded.");
+    if (!check.kept.length) return;
+    const n = check.kept.length;
+    void send(draft.trim() || (n === 1 ? "Here's a photo." : `Here are ${n} photos.`), { photos: check.kept });
+  }
+
+  async function send(text: string, opts: { silentUser?: boolean; photos?: string[] } = {}) {
     const clean = text.trim();
     if (!clean || busy) return;
+    const photos = opts.photos ?? [];
     lastAsk.current = opts.silentUser ? null : clean;
+    lastPhotos.current = photos;
     setStatus({ label: "Reading your store", slow: false, since: Date.now() });
     setNow(Date.now());
     setError(null);
@@ -103,7 +129,7 @@ export function Consultant({
     const assistantId = `a-${Date.now()}`;
     setMessages((m) => [
       ...(opts.silentUser ? m.filter((x) => x.id !== "intro") : m),
-      ...(opts.silentUser ? [] : [{ id: userId, role: "user" as const, content: clean }]),
+      ...(opts.silentUser ? [] : [{ id: userId, role: "user" as const, content: photos.length ? `${clean}\n\n(${photos.length} ${photos.length === 1 ? "photo" : "photos"} sent)` : clean }]),
       { id: assistantId, role: "assistant" as const, content: "", pending: true },
     ]);
 
@@ -127,7 +153,7 @@ export function Consultant({
     let finished = false;
 
     try {
-      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current }), signal: abort.signal });
+      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current, photos }), signal: abort.signal });
       if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({ error: "Could not reach Fisher." }))).error);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -255,7 +281,7 @@ export function Consultant({
             <p className="font-semibold text-destructive">That didn&apos;t finish.</p>
             <p className="mt-1">{error}</p>
             {lastAsk.current ? (
-              <Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={() => void send(lastAsk.current!)}>
+              <Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={() => void send(lastAsk.current!, { photos: lastPhotos.current })}>
                 Try again
               </Button>
             ) : null}
@@ -268,7 +294,7 @@ export function Consultant({
         <div className="space-y-2 border-t border-line bg-surface px-4 py-3">
           <p className="text-sm font-semibold text-signal">Needs you</p>
           {open.map((t) => (
-            <TaskCard key={t.id} task={t} userId={userId} onDone={(note) => send(note)} />
+            <TaskCard key={t.id} task={t} userId={userId} onDone={(note, photos) => send(note, { photos })} />
           ))}
         </div>
       ) : null}
@@ -295,6 +321,11 @@ export function Consultant({
           }}
           className="flex items-end gap-2"
         >
+          <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={onPhotos} />
+          <Button type="button" variant="outline" disabled={busy || uploading || !agentReady} onClick={() => photoRef.current?.click()} className="h-11 shrink-0 px-3">
+            <Camera aria-hidden="true" />
+            {uploading ? "Wait…" : "Photos"}
+          </Button>
           <Textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -314,12 +345,17 @@ export function Consultant({
             <ArrowUp aria-hidden="true" />
           </Button>
         </form>
+        {photoNote ? (
+          <p role="status" className="mt-2 text-sm text-muted-foreground">
+            {photoNote}
+          </p>
+        ) : null}
       </div>
     </div>
   );
 }
 
-function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone: (note: string) => void }) {
+function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone: (note: string, photos?: string[]) => void }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
@@ -385,7 +421,7 @@ function TaskCard({ task, userId, onDone }: { task: Task; userId: string; onDone
         const r = await clipsUploaded(task.id, check.kept);
         setMsg([r.message, ...notes].filter(Boolean).join(" "));
         router.refresh();
-        if (r.ok) onDone(`I uploaded ${check.kept.length} ${check.kept.length === 1 ? "photo" : "photos"}.${check.rejected.length ? ` ${check.rejected.length} didn't pass the photo check.` : ""}`);
+        if (r.ok) onDone(`I uploaded ${check.kept.length} ${check.kept.length === 1 ? "photo" : "photos"}.${check.rejected.length ? ` ${check.rejected.length} didn't pass the photo check.` : ""}`, check.kept);
       });
     }
     return (
