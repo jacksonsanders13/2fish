@@ -38,7 +38,7 @@ export function AuthScreen({ mode, next, error }: { mode: Mode; next: string; er
   const [sent, setSent] = useState(false);
   const [pending, start] = useTransition();
 
-  const title = signup ? "Save your plan" : "Welcome back";
+  const title = signup ? "Save your plan" : "Sign in to your store";
   const passwordOk = password.length >= 8 && /\d/.test(password);
 
   function submit(e: React.FormEvent) {

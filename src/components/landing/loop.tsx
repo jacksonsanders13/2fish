@@ -1,4 +1,4 @@
-import { Check, Play } from "lucide-react";
+import { Check, GalleryHorizontal } from "lucide-react";
 import { AnimatedMoney } from "@/components/motion/animated-money";
 import { GrowBar } from "@/components/motion/grow-bar";
 import { Money } from "@/components/ui/money";
@@ -24,7 +24,7 @@ export const loop = [
     n: 3,
     name: "Post",
     title: "A week of posts from your own photos, on the day you pick",
-    body: "Send new-arrival photos and try-on clips. 2fish writes the captions and turns them into a week of posts. You approve the week in one tap.",
+    body: "Send new-arrival and try-on photos. 2fish writes the captions and turns them into a week of photo posts and slideshows. You approve the week in one tap.",
   },
   {
     n: 4,
@@ -96,13 +96,13 @@ export function StepSnippet({ n, className }: { n: 1 | 2 | 3 | 4; className?: st
           <span className="shrink-0 rounded-md bg-night px-2.5 py-1 font-medium text-white">Approve all</span>
         </div>
         <ul className="mt-3 grid grid-cols-3 gap-2">
-          {videos.slice(0, 3).map((v) => (
+          {videos.slice(0, 3).map((v, i) => (
             <li
               key={v.id}
               className={cn("relative flex aspect-[4/5] items-center justify-center rounded-md", tones[v.tone])}
             >
-              <Play size={18} />
-              <span className="num absolute right-1.5 bottom-1.5">{v.length}</span>
+              <GalleryHorizontal size={18} />
+              <span className="num absolute right-1.5 bottom-1.5">{[1, 4, 6][i]} {i ? "photos" : "photo"}</span>
             </li>
           ))}
         </ul>
