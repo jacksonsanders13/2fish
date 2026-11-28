@@ -31,6 +31,7 @@ export function Dashboard({
   agentReady,
   intro,
   userId,
+  sampleSales = false,
 }: {
   data: DashboardData;
   home: HomeData;
@@ -43,6 +44,7 @@ export function Dashboard({
   agentReady: boolean;
   intro: string;
   userId: string;
+  sampleSales?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("posts");
   const [board, setBoard] = useState<BoardView>(home.drafts.length ? "approve" : "calendar");
@@ -139,7 +141,7 @@ export function Dashboard({
         {/* Sales strip on top, posts panel takes the rest. Nothing here scrolls the page. */}
         <div className="flex min-w-0 flex-col gap-3 lg:min-h-0">
           <div data-tour="sales" className={cn("shrink-0", tab === "sales" ? "block" : "hidden lg:block")}>
-            <SalesChart weeks={home.weeks} days={home.days} hasSales={home.hasSales} today={today} compact />
+            <SalesChart weeks={home.weeks} days={home.days} hasSales={home.hasSales} today={today} compact sample={sampleSales} />
           </div>
           <div data-tour="posts" className={cn("lg:min-h-0 lg:flex-1", tab === "posts" ? "block" : "hidden lg:block")}>
             <PostBoard home={home} today={today} view={board} setView={setBoard} />

@@ -15,6 +15,7 @@ export function SalesChart({
   label = "Last 6 weeks",
   wholeRange = false,
   compact = false,
+  sample = false,
   days,
 }: {
   weeks: ChartWeek[];
@@ -24,6 +25,7 @@ export function SalesChart({
   wholeRange?: boolean; // sum every week (a month report) instead of quoting last week
   days?: ChartDay[]; // last week day by day, for the compact strip
   compact?: boolean; // shorter bars on the dashboard so everything fits on one screen
+  sample?: boolean; // the /demo test drive: made-up numbers, labeled
 }) {
   const max = Math.max(1, ...weeks.map((w) => w.total));
   const current = mondayOf(today);
@@ -38,7 +40,7 @@ export function SalesChart({
   const share = (w?: ChartWeek) =>
     w && w.total ? Math.round((w.posted / w.total) * 100) : 0;
 
-  if (compact) return <CompactChart days={days ?? []} hasSales={hasSales} />;
+  if (compact) return <CompactChart days={days ?? []} hasSales={hasSales} sample={sample} />;
 
   return (
     <section
@@ -151,10 +153,10 @@ export function SalesChart({
 
 // The dashboard version: one short strip. Last week's numbers on the left,
 // six small bars on the right, so the calendar and chat get the height.
-function CompactChart({ days: realDays, hasSales }: { days: ChartDay[]; hasSales: boolean }) {
-  // Before Square is connected, show made-up numbers so the owner sees what
-  // this will look like. Always labeled "Sample" so nobody takes them as real.
-  const sample = !hasSales;
+function CompactChart({ days: realDays, hasSales, sample: demo }: { days: ChartDay[]; hasSales: boolean; sample: boolean }) {
+  // Only the /demo test drive shows made-up numbers, labeled "Sample". A real
+  // store with no sales yet sees empty bars and a link to connect Square.
+  const sample = demo && !hasSales;
   const days = sample ? realDays.map((d, n) => ({ ...d, ...SAMPLE[n % SAMPLE.length] })) : realDays;
   const max = Math.max(1, ...days.map((d) => d.total));
   const total = days.reduce((sum, d) => sum + d.total, 0);
@@ -174,6 +176,10 @@ function CompactChart({ days: realDays, hasSales }: { days: ChartDay[]; hasSales
               Connect Square for yours
             </Link>
           </p>
+        ) : !hasSales ? (
+          <Link href="/dashboard/settings" className="text-sm font-semibold text-night underline underline-offset-2">
+            Connect Square to see your sales
+          </Link>
         ) : (
           <Link href="/dashboard/report" className="text-sm text-muted-foreground underline-offset-2 hover:text-night hover:underline">
             Monthly report
@@ -182,7 +188,7 @@ function CompactChart({ days: realDays, hasSales }: { days: ChartDay[]; hasSales
       </div>
 
       {
-        <div className={cn("mt-2 flex items-end gap-6", sample && "opacity-70")}>
+        <div className={cn("mt-2 flex items-end gap-6", (sample || !hasSales) && "opacity-70")}>
           <dl className="flex shrink-0 gap-6">
             <div>
               <dt className="text-sm text-muted-foreground">Last week</dt>

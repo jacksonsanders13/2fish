@@ -56,6 +56,7 @@ export function DemoDashboard({ data, frame, today, soon }: { data: DashboardDat
         agentReady
         intro={`Hi, I'm Fisher, your marketing helper. I wrote next week's 7 posts for ${data.business.name} from your photos. Tap one to read it, then approve the ones you like. Nothing goes up without your okay.`}
         userId="demo"
+        sampleSales
       />
       {note ? (
         <div role="status" className="fixed inset-x-4 bottom-24 z-40 mx-auto flex max-w-md items-start gap-3 rounded-lg bg-night p-4 text-sm text-white md:bottom-6">
