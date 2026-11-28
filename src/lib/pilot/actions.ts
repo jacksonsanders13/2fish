@@ -9,6 +9,7 @@ import { learnings, scorePosts } from "./scores";
 import { buildPack } from "./pack";
 import { listUploads, loadExamples } from "./queries";
 import { SOURCES } from "./types";
+import { shopTypeOf } from "@/lib/app/types";
 
 type Result = { ok: true; message?: string } | { ok: false; message: string };
 
@@ -39,7 +40,7 @@ export async function makePack(input: { weekOf: string; notes: string }): Promis
     if (!(await takeQuota(supabase, "pack"))) return { ok: false, message: limitMessage.pack };
 
     const today = todayIn(business.timezone);
-    const [examples, scores] = await Promise.all([loadExamples(supabase, user.id), scorePosts(supabase, business.id, addDays(mondayOf(today), -56), today)]);
+    const [examples, scores] = await Promise.all([loadExamples(supabase, user.id, 20, shopTypeOf(business.kind)), scorePosts(supabase, business.id, addDays(mondayOf(today), -56), today)]);
     const { posts, model } = await buildPack({ store: business.name || "the store", city: business.city, notes, media, examples, results: learnings(scores).forWriter });
     await supabase.from("posts").delete().eq("business_id", business.id).eq("week_of", weekOf).eq("status", "draft");
     const { error } = await supabase.from("posts").insert(

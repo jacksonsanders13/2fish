@@ -226,6 +226,13 @@ export const auditQuestions: AuditQuestion[] = [
     placeholder: "Linden Row Boutique",
   },
   {
+    id: "shop",
+    prompt: "What kind of shop is it?",
+    help: "Fisher learns from posts that worked for shops like yours.",
+    type: "choice",
+    options: ["Clothing boutique", "Gift or home shop", "Plant or flower shop", "Jewelry or accessories", "Bookstore", "Other shop"],
+  },
+  {
     id: "instagram",
     prompt: "What's the store's Instagram handle?",
     help: "Type \"none\" if the store doesn't have one yet.",
@@ -266,6 +273,7 @@ export const auditQuestions: AuditQuestion[] = [
 
 export const sampleAnswers: Record<string, string> = {
   store: "Linden Row Boutique",
+  shop: "Clothing boutique",
   instagram: "lindenrow",
   posts: "A few times a month",
   sale: "68",

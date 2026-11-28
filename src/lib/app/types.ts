@@ -72,7 +72,28 @@ export const STEP_SOURCES = [
   { key: "other", label: "Something else" },
 ] as const;
 
-export const BUSINESS_KINDS = ["Power washing", "Landscaping", "Cleaning", "Boutique", "Something else"];
+// The kinds of shop 2fish is for: independent shops that sell products in person.
+// The label is what the owner picks; the id tags post examples so Fisher learns
+// from shops like theirs.
+export const SHOP_TYPES = [
+  { id: "boutique", label: "Clothing boutique" },
+  { id: "gift", label: "Gift or home shop" },
+  { id: "plants", label: "Plant or flower shop" },
+  { id: "jewelry", label: "Jewelry or accessories" },
+  { id: "books", label: "Bookstore" },
+  { id: "any", label: "Other shop" },
+] as const;
+export type ShopTypeId = (typeof SHOP_TYPES)[number]["id"];
+export const BUSINESS_KINDS: string[] = SHOP_TYPES.map((t) => t.label);
+
+/** Which example set a store's type maps to. Older rows said "Boutique" or "Store". */
+export function shopTypeOf(kind: string | null | undefined): ShopTypeId {
+  const k = (kind ?? "").toLowerCase();
+  const hit = SHOP_TYPES.find((t) => t.label.toLowerCase() === k);
+  if (hit) return hit.id;
+  if (k.includes("boutique") || k.includes("clothing")) return "boutique";
+  return "any";
+}
 
 /** Digits only, with a US country code when it looks like a 10-digit number. */
 export function normalizePhone(input: string) {

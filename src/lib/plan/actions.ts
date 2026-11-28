@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { answersSchema, emailSchema, passwordSchema } from "./schema";
+import { BUSINESS_KINDS } from "@/lib/app/types";
 import { createClient } from "@/lib/supabase/server";
 import { estimate, type Answers } from "./estimate";
 import { narrate } from "./narrate";
@@ -144,7 +145,7 @@ export async function savePlan(input: Answers) {
   if (!business) {
     const created = await supabase
       .from("businesses")
-      .insert({ owner_id: user.id, kind: "Store", name: answers.store })
+      .insert({ owner_id: user.id, kind: shopKind(answers.shop), name: answers.store })
       .select("id")
       .single();
     if (created.data) business = created.data;
@@ -155,7 +156,8 @@ export async function savePlan(input: Answers) {
     }
   } else {
     // A business made before the grader has no name or type yet. Fill them in.
-    await supabase.from("businesses").update({ kind: "Store" }).eq("id", business.id).eq("kind", "Something else");
+    if (answers.shop) await supabase.from("businesses").update({ kind: shopKind(answers.shop) }).eq("id", business.id);
+    else await supabase.from("businesses").update({ kind: "Other shop" }).eq("id", business.id).eq("kind", "Something else");
     await supabase.from("businesses").update({ name: answers.store }).eq("id", business.id).or("name.is.null,name.eq.");
   }
 
@@ -203,4 +205,9 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+/** The grader's shop answer, kept to the known list. */
+function shopKind(answer?: string) {
+  return answer && BUSINESS_KINDS.includes(answer) ? answer : "Other shop";
 }

@@ -186,11 +186,12 @@ export async function postSalesThisMonth(supabase: Supa, businessId: string, tz:
 }
 
 /** The examples the agent studies: this owner's plus the shared ones, best performers first. */
-export async function loadExamples(db: SupabaseClient, ownerId: string, limit = 20): Promise<Example[]> {
-  const { data } = await db
-    .from("post_examples")
-    .select("*")
-    .or(`is_global.eq.true,owner_id.eq.${ownerId}`)
+export async function loadExamples(db: SupabaseClient, ownerId: string, limit = 20, shop?: string): Promise<Example[]> {
+  const type = shop && /^[a-z]+$/.test(shop) ? shop : null;
+  let q = db.from("post_examples").select("*").or(`is_global.eq.true,owner_id.eq.${ownerId}`);
+  // A shop sees its own kind's examples, the ones for every shop, and its own.
+  if (type && type !== "any") q = q.or(`store_type.in.(${type},any),owner_id.eq.${ownerId}`);
+  const { data } = await q
     .order("views", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(limit);

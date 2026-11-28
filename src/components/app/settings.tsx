@@ -250,7 +250,7 @@ function Card({ title, sub, children }: { title: string; sub: string; children: 
 
 function BusinessForm({ business }: { business: Business }) {
   const router = useRouter();
-  const [form, setForm] = useState({ name: business.name, kind: business.kind || "Something else", phone: business.phone ? formatPhone(business.phone) : "", city: business.city });
+  const [form, setForm] = useState({ name: business.name, kind: BUSINESS_KINDS.includes(business.kind) ? business.kind : business.kind?.toLowerCase().includes("boutique") ? "Clothing boutique" : "Other shop", phone: business.phone ? formatPhone(business.phone) : "", city: business.city });
   const [msg, setMsg] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [pending, start] = useTransition();
 

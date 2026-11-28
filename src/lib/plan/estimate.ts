@@ -7,6 +7,7 @@ import { roundTen } from "@/lib/format";
 
 export type Answers = {
   store: string;
+  shop?: string;
   instagram: string;
   posts: string;
   sale: string;

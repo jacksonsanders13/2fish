@@ -1,3 +1,4 @@
+import { shopTypeOf } from "@/lib/app/types";
 import { siteUrl, textOwner } from "@/lib/integrations/notify";
 import { adminClient } from "@/lib/supabase/admin";
 import { addDays, packWeek, todayIn, weekdayOf } from "./dates";
@@ -18,7 +19,7 @@ export async function weeklyAutopilot() {
 
   for (const c of conns ?? []) {
     try {
-      const { data: biz } = await admin.from("businesses").select("name, city, timezone, pack_day").eq("id", c.business_id).single();
+      const { data: biz } = await admin.from("businesses").select("name, city, kind, timezone, pack_day").eq("id", c.business_id).single();
       const today = todayIn((biz?.timezone as string) || "America/New_York");
       if (weekdayOf(today) !== ((biz?.pack_day as number | null) ?? 1)) {
         out.push({ business: c.business_id, made: false, why: "not their day" });
@@ -49,7 +50,7 @@ export async function weeklyAutopilot() {
         continue;
       }
 
-      const [examples, scores] = await Promise.all([loadExamples(admin, c.owner_id), scorePosts(admin, c.business_id, addDays(week, -56), today)]);
+      const [examples, scores] = await Promise.all([loadExamples(admin, c.owner_id, 20, shopTypeOf(biz?.kind as string)), scorePosts(admin, c.business_id, addDays(week, -56), today)]);
       const { posts } = await buildPack({ store: (biz?.name as string) || "the store", city: (biz?.city as string) || "", notes: top.join("\n"), media, examples, results: learnings(scores).forWriter });
       const { error } = await admin.from("posts").insert(
         posts.map((p) => ({ business_id: c.business_id, owner_id: c.owner_id, week_of: week, position: p.position, day: p.day, kind: p.kind, title: p.title, hook: p.hook, caption: p.caption, items: p.items, media_path: p.mediaPath, slides: p.slides, shots: p.shots, post_on: addDays(week, p.position - 1), campaign: p.campaign })),
