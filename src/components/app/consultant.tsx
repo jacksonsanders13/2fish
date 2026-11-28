@@ -56,6 +56,11 @@ export function Consultant({
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // What Fisher is doing right now, and since when, so the owner can tell
+  // "working on it" apart from "stuck".
+  const [status, setStatus] = useState<{ label: string; slow: boolean; since: number } | null>(null);
+  const [now, setNow] = useState(0);
+  const lastAsk = useRef<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
   const demo = useDemo();
@@ -74,9 +79,19 @@ export function Consultant({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Tick once a second while Fisher works, for the "12s" counter.
+  useEffect(() => {
+    if (!busy) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [busy]);
+
   async function send(text: string, opts: { silentUser?: boolean } = {}) {
     const clean = text.trim();
     if (!clean || busy) return;
+    lastAsk.current = opts.silentUser ? null : clean;
+    setStatus({ label: "Reading your store", slow: false, since: Date.now() });
+    setNow(Date.now());
     setError(null);
     setShowChats(false);
     setBusy(true);
@@ -98,14 +113,30 @@ export function Consultant({
       return;
     }
 
+    // If nothing at all arrives for 45 seconds, the connection is gone. The
+    // server pings every 8 seconds during long jobs, so silence means broken.
+    const abort = new AbortController();
+    let watchdog = window.setTimeout(() => abort.abort(), 45_000);
+    const alive = () => {
+      window.clearTimeout(watchdog);
+      watchdog = window.setTimeout(() => abort.abort(), 45_000);
+    };
+    let finished = false;
+
     try {
-      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current }) });
+      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current }), signal: abort.signal });
       if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({ error: "Could not reach Fisher." }))).error);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
       const handle = (ev: StreamEvent) => {
-        if (ev.type === "text") {
+        alive();
+        if (ev.type === "status") {
+          setStatus({ label: ev.label, slow: ev.slow, since: Date.now() });
+        } else if (ev.type === "ping") {
+          // nothing to show, just proof of life
+        } else if (ev.type === "text") {
+          if (ev.delta) setStatus(null);
           setMessages((m) => m.map((x) => (x.id === assistantId ? { ...x, content: x.content + ev.delta } : x)));
         } else if (ev.type === "tool") {
           if (ev.madePosts) onMadePosts?.();
@@ -121,6 +152,7 @@ export function Consultant({
         } else if (ev.type === "error") {
           setError(ev.message);
         } else if (ev.type === "done") {
+          finished = true;
           setMessages((m) => m.map((x) => (x.id === assistantId ? { ...x, pending: false } : x)));
         }
       };
@@ -133,10 +165,20 @@ export function Consultant({
         for (const line of lines) if (line.trim()) handle(JSON.parse(line) as StreamEvent);
       }
       if (buffer.trim()) handle(JSON.parse(buffer) as StreamEvent);
+      if (!finished) throw new Error("Fisher got cut off before finishing.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
+      const cut = abort.signal.aborted;
+      setError(
+        cut
+          ? "Fisher stopped answering. Your connection may have dropped. Anything already listed above with a check mark is done."
+          : e instanceof Error
+            ? e.message
+            : "Something went wrong.",
+      );
       setMessages((m) => m.filter((x) => !(x.id === assistantId && !x.content)));
     } finally {
+      window.clearTimeout(watchdog);
+      setStatus(null);
       setBusy(false);
       router.refresh();
     }
@@ -195,15 +237,26 @@ export function Consultant({
                   m.role === "user" ? "bg-night text-white" : "bg-surface text-ink",
                 )}
               >
-                {m.content || (m.pending ? <span className="inline-block motion-safe:animate-pulse">Thinking…</span> : "")}
+                {m.content}
+                {m.pending && (status || !m.content) ? (
+                  <span className={cn("block", m.content && "mt-2 border-t border-line pt-2")}>
+                    <Working status={status} now={now} />
+                  </span>
+                ) : null}
               </div>
             </div>
           ),
         )}
         {error ? (
-          <p role="alert" className="text-sm font-semibold text-destructive">
-            {error}
-          </p>
+          <div role="alert" className="rounded-lg border border-destructive/30 bg-white p-3 text-sm">
+            <p className="font-semibold text-destructive">That didn&apos;t finish.</p>
+            <p className="mt-1">{error}</p>
+            {lastAsk.current ? (
+              <Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={() => void send(lastAsk.current!)}>
+                Try again
+              </Button>
+            ) : null}
+          </div>
         ) : null}
         <div ref={bottomRef} />
       </div>
@@ -468,5 +521,23 @@ function ChatList({ chats, current, onPick }: { chats: ChatSummary[]; current: s
         <p className="px-2 py-2 text-sm text-muted-foreground">No saved chats yet. Each chat is saved after your first message.</p>
       )}
     </div>
+  );
+}
+
+// The "Fisher is working" line in the pending bubble: what it's doing, how
+// long it's been, and a heads-up when a job is the slow kind.
+function Working({ status, now }: { status: { label: string; slow: boolean; since: number } | null; now: number }) {
+  const label = status?.label ?? "Thinking";
+  const secs = status ? Math.max(0, Math.floor((now - status.since) / 1000)) : 0;
+  return (
+    <span role="status" className="block">
+      <span className="flex items-center gap-2">
+        <span className="size-2 shrink-0 rounded-full bg-signal motion-safe:animate-pulse" aria-hidden="true" />
+        <span>{label}…</span>
+        {secs >= 3 ? <span className="num text-muted-foreground">{secs}s</span> : null}
+      </span>
+      {status?.slow && secs < 20 ? <span className="mt-1 block text-xs text-muted-foreground">This kind of job takes about a minute.</span> : null}
+      {secs >= 20 ? <span className="mt-1 block text-xs text-muted-foreground">Still working. You can leave this open and keep using the page.</span> : null}
+    </span>
   );
 }

@@ -10,6 +10,8 @@ export const MODEL = "claude-sonnet-5-5";
 export type StreamEvent =
   | { type: "text"; delta: string }
   | { type: "tool"; name: string; summary: string; card?: ToolCard; madePosts?: number }
+  | { type: "status"; label: string; slow: boolean } // what Fisher is doing right now
+  | { type: "ping" } // keep-alive during long jobs, so the browser knows we're still here
   | { type: "conversation"; id: string }
   | { type: "done"; messageId: string | null }
   | { type: "error"; message: string };
@@ -101,7 +103,12 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
       messages.push({ role: "assistant", content: final.content });
       const results: Anthropic.ToolResultBlockParam[] = [];
       for (const use of toolUses) {
-        const outcome = await runTool(use.name, (use.input ?? {}) as Record<string, unknown>, { supabase, ownerId, business, snapshot });
+        const input = (use.input ?? {}) as Record<string, unknown>;
+        emit({ type: "status", ...statusFor(use.name, input) });
+        // Specialists can take a minute. Ping every 8 seconds so the browser
+        // can tell "still working" apart from "the connection died".
+        const ping = setInterval(() => emit({ type: "ping" }), 8000);
+        const outcome = await runTool(use.name, input, { supabase, ownerId, business, snapshot }).finally(() => clearInterval(ping));
         // Cards show the owner the draft itself; the chat line stays short.
         const line = outcome.card ? `${outcome.card.title} ready` : outcome.summary;
         toolSummaries.push({ name: use.name, summary: line, card: outcome.card });
@@ -109,6 +116,7 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
         results.push({ type: "tool_result", tool_use_id: use.id, content: outcome.summary });
       }
       messages.push({ role: "user", content: results });
+      emit({ type: "status", label: "Writing back to you", slow: false });
       snapshot = await buildSnapshot(supabase, business, integrations);
       if (round < 5) emit({ type: "text", delta: finalText && roundText ? "\n\n" : "" });
     }
@@ -127,4 +135,31 @@ export async function runAgentTurn(args: AgentArgs): Promise<void> {
     .select("id")
     .single();
   emit({ type: "done", messageId: saved.data?.id ?? null });
+}
+
+// Plain words for what each tool is doing, shown in the chat while it runs.
+// "slow" ones get a heads-up that they take about a minute.
+const SPECIALIST_STATUS: Record<string, string> = {
+  poster: "Designing your poster",
+  campaign: "Planning the sale and putting posts on your calendar",
+  local_seo: "Checking how you show up on Google",
+  google_post: "Writing your Google post",
+  review_reply: "Writing your review replies",
+  email: "Writing the email",
+  text_message: "Writing the texts",
+  referral: "Working out a referral idea",
+};
+const TOOL_STATUS: Record<string, string> = {
+  update_plan_step: "Updating your plan",
+  add_plan_step: "Adding to your plan",
+  set_textback: "Changing your text-back settings",
+  request_clips: "Asking for photos",
+  start_video_batch: "Starting your videos",
+  propose_text: "Drafting a text for you to check",
+  log_job: "Logging the sale",
+  add_customer: "Adding the customer",
+};
+function statusFor(name: string, input: Record<string, unknown>) {
+  if (name === "ask_specialist") return { label: SPECIALIST_STATUS[String(input.specialist)] ?? "Working on it", slow: true };
+  return { label: TOOL_STATUS[name] ?? "Working on it", slow: false };
 }
