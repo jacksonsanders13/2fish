@@ -7,7 +7,8 @@ import { runAgentTurn, type StreamEvent } from "@/lib/agent/run";
 import { smsConfigured } from "@/lib/integrations/sms";
 import { videoConfigured } from "@/lib/integrations/video";
 
-export const maxDuration = 60;
+// Big jobs (a sale plan with a week of posts) take Fisher over a minute.
+export const maxDuration = 300;
 
 // One chat turn. Streams newline-delimited JSON events back to the browser.
 export async function POST(request: NextRequest) {
