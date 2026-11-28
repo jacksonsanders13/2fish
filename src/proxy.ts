@@ -24,8 +24,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
   const previewing = Boolean(key) && request.cookies.get("2fish_preview")?.value === key;
+  // The /demo test drive may use the grader and results, never sign-up.
+  const demo = request.cookies.get("2fish_demo")?.value === "1";
+  const demoOk = demo && ["/audit", "/results"].includes(request.nextUrl.pathname);
 
-  if (WAITLIST && !previewing && CLOSED.includes(request.nextUrl.pathname)) {
+  if (WAITLIST && !previewing && !demoOk && CLOSED.includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";
@@ -55,6 +58,16 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Test drive: signed-out visitors with the demo cookie get the sample
+  // dashboard. Pages under it show a note instead of a login wall.
+  if (!user && demo && request.nextUrl.pathname.startsWith("/dashboard")) {
+    const url = request.nextUrl.clone();
+    const sub = request.nextUrl.pathname.split("/")[2];
+    url.pathname = "/demo/dashboard";
+    if (sub) url.searchParams.set("soon", sub);
+    return NextResponse.rewrite(url);
+  }
 
   if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone();

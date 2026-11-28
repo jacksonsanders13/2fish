@@ -15,6 +15,7 @@ import { formatPhone } from "@/lib/app/types";
 import { createClient } from "@/lib/supabase/client";
 import { FisherAvatar } from "@/components/brand/fisher-avatar";
 import { cn } from "@/lib/utils";
+import { useDemo } from "./demo";
 
 type Local = { id: string; role: "user" | "assistant" | "tool"; content: string; meta?: Record<string, unknown>; pending?: boolean };
 
@@ -57,6 +58,7 @@ export function Consultant({
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
+  const demo = useDemo();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
@@ -86,6 +88,15 @@ export function Consultant({
       ...(opts.silentUser ? [] : [{ id: userId, role: "user" as const, content: clean }]),
       { id: assistantId, role: "assistant" as const, content: "", pending: true },
     ]);
+
+    if (demo) {
+      // Test drive: a written answer after a short pause, nothing sent anywhere.
+      const answer = demo.reply(clean);
+      await new Promise((r) => setTimeout(r, 900));
+      setMessages((m) => m.map((x) => (x.id === assistantId ? { ...x, content: answer, pending: false } : x)));
+      setBusy(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: clean, conversationId: convRef.current }) });

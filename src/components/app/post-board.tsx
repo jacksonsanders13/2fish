@@ -9,6 +9,7 @@ import { addDays, DAYS, monthName } from "@/lib/pilot/dates";
 import type { HomeData } from "@/lib/pilot/queries";
 import type { Post } from "@/lib/pilot/types";
 import { cn } from "@/lib/utils";
+import { useDemo } from "./demo";
 import { PostDialog } from "./post-dialog";
 
 // The bottom-left panel: a switch between the posts waiting on an okay and a
@@ -98,6 +99,7 @@ function ApproveList({
   drafts: Post[];
   onOpen: (p: Post) => void;
 }) {
+  const demo = useDemo();
   const [pending, start] = useTransition();
   const weeks = [...new Set(drafts.map((d) => d.weekOf))];
 
@@ -163,13 +165,15 @@ function ApproveList({
               variant="outline"
               disabled={pending}
               onClick={() =>
-                start(
-                  async () =>
-                    void (await setPostStatus({
-                      id: p.id,
-                      status: "approved",
-                    })),
-                )
+                demo
+                  ? demo.setStatus(p.id, "approved")
+                  : start(
+                      async () =>
+                        void (await setPostStatus({
+                          id: p.id,
+                          status: "approved",
+                        })),
+                    )
               }
               className="h-10 shrink-0"
             >
@@ -184,7 +188,7 @@ function ApproveList({
           variant="signal"
           disabled={pending}
           onClick={() =>
-            start(async () => void (await approveWeek({ weekOf: weeks[0] })))
+            demo ? demo.approveAll() : start(async () => void (await approveWeek({ weekOf: weeks[0] })))
           }
           className="mt-3 h-10 shrink-0 self-start"
         >

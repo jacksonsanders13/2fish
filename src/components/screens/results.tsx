@@ -16,6 +16,7 @@ import { savePlan } from "@/lib/plan/actions";
 import { estimate, type Answers } from "@/lib/plan/estimate";
 import { clearAnswers, readAnswers } from "@/lib/plan/storage";
 import { createClient } from "@/lib/supabase/client";
+import { inDemo } from "@/components/app/demo";
 
 // The results screen runs the estimate right here in the browser from the
 // answers saved during the audit. Nothing is stored until the owner asks to
@@ -25,11 +26,13 @@ export function ResultsScreen() {
   const [answers, setAnswers] = useState<Answers | null>(null);
   const [sample, setSample] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [demo, setDemo] = useState(false);
 
   // Browser storage is only readable after mount, so the setState here is on purpose.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const saved = readAnswers();
+    setDemo(inDemo());
     if (saved) setAnswers(saved);
     else {
       setAnswers(sampleAnswers as Answers);
@@ -50,6 +53,10 @@ export function ResultsScreen() {
     );
 
   const biggest = est.leaks[0].perMonth;
+  // Test drive: skip sign-up and go straight to the sample dashboard.
+  const toDemo = () => {
+    document.cookie = `2fish_demo_store=${encodeURIComponent(est.facts.store)}; path=/; samesite=lax`;
+  };
   const saved = () => {
     clearAnswers();
     router.push("/dashboard");
@@ -93,7 +100,7 @@ export function ResultsScreen() {
                 ) : null}
               </Reveal>
               <Reveal immediate delay={0.35} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} />
+                <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} demo={demo} onDemo={toDemo} />
                 <Button asChild size="lg" variant="outline" className="h-12 bg-white px-5 text-base">
                   <Link href="/audit">{sample ? "Grade my store" : "Change my answers"}</Link>
                 </Button>
@@ -176,7 +183,7 @@ export function ResultsScreen() {
                       ))}
                     </ol>
                     <div className="mt-5">
-                      <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} full />
+                      <SavePlan answers={answers} signedIn={signedIn} onSaved={saved} demo={demo} onDemo={toDemo} full />
                     </div>
                 </div>
               </Reveal>
@@ -194,15 +201,30 @@ function SavePlan({
   answers,
   signedIn,
   onSaved,
+  demo = false,
+  onDemo,
   full = false,
 }: {
   answers: Answers;
   signedIn: boolean;
   onSaved: () => void;
+  demo?: boolean;
+  onDemo?: () => void;
   full?: boolean;
 }) {
   const [pending, start] = useTransition();
   const size = full ? "h-12 w-full text-base" : "h-12 px-5 text-base";
+
+  if (demo && !signedIn) {
+    return (
+      <Button asChild size="lg" variant="signal" className={size}>
+        <Link href="/dashboard" prefetch={false} onClick={onDemo}>
+          Put this plan on my dashboard
+          <ArrowRight aria-hidden="true" />
+        </Link>
+      </Button>
+    );
+  }
 
   if (signedIn) {
     return (

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { movePost, setPostStatus } from "@/lib/pilot/actions";
 import { todayIn } from "@/lib/pilot/dates";
 import type { Post } from "@/lib/pilot/types";
+import { useDemo } from "./demo";
 
 const STATUS = { draft: "Waiting on your okay", approved: "Approved, goes up on its day", posted: "Posted" } as const;
 
@@ -18,6 +19,7 @@ function longDate(ymd: string) {
 // to, and the buttons to okay it or move it to another day.
 export function PostDialog({ post, onClose }: { post: Post | null; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const demo = useDemo();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -31,7 +33,12 @@ export function PostDialog({ post, onClose }: { post: Post | null; onClose: () =
     setCopied(false);
   }, [post]);
 
-  function run(fn: () => Promise<{ ok: boolean; message?: string }>, close = false) {
+  function run(fn: () => Promise<{ ok: boolean; message?: string }>, close = false, local?: (d: NonNullable<typeof demo>) => void) {
+    if (demo && local) {
+      local(demo);
+      if (close) onClose();
+      return;
+    }
     start(async () => {
       const r = await fn();
       if (!r.ok) setError(r.message ?? "That didn't save. Try again.");
@@ -121,7 +128,7 @@ export function PostDialog({ post, onClose }: { post: Post | null; onClose: () =
                   defaultValue={post.postOn}
                   min={todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone)}
                   disabled={pending}
-                  onChange={(e) => e.target.value && run(() => movePost({ id: post.id, postOn: e.target.value }))}
+                  onChange={(e) => e.target.value && run(() => movePost({ id: post.id, postOn: e.target.value }), false, (d) => d.move(post.id, e.target.value))}
                   className="num mt-1 block h-11 rounded-md border border-input bg-white px-3 text-sm"
                 />
               </div>
@@ -135,13 +142,13 @@ export function PostDialog({ post, onClose }: { post: Post | null; onClose: () =
 
             <div className="mt-5 flex flex-wrap gap-2">
               {post.status === "draft" ? (
-                <Button variant="signal" disabled={pending} onClick={() => run(() => setPostStatus({ id: post.id, status: "approved" }), true)} className="h-11">
+                <Button variant="signal" disabled={pending} onClick={() => run(() => setPostStatus({ id: post.id, status: "approved" }), true, (d) => d.setStatus(post.id, "approved"))} className="h-11">
                   <Check aria-hidden="true" />
                   Approve
                 </Button>
               ) : null}
               {post.status === "approved" ? (
-                <Button variant="outline" disabled={pending} onClick={() => run(() => setPostStatus({ id: post.id, status: "posted" }), true)} className="h-11">
+                <Button variant="outline" disabled={pending} onClick={() => run(() => setPostStatus({ id: post.id, status: "posted" }), true, (d) => d.setStatus(post.id, "posted"))} className="h-11">
                   Mark as posted
                 </Button>
               ) : null}
