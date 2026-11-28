@@ -98,7 +98,8 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
 
   const { supabase, business, ownerId, snapshot } = ctx;
   const today = todayIn(business.timezone || "America/New_York");
-  const client = new Anthropic({ apiKey: key, timeout: 80_000, maxRetries: 1 });
+  // A full week plan can take close to two minutes to write.
+  const client = new Anthropic({ apiKey: key, timeout: 120_000, maxRetries: 0 });
 
   const extra = spec.output === "poster" ? POSTER_KIT : spec.output === "campaign" ? CAMPAIGN_FORMAT : "";
   const writing = spec.output === "text" ? "" : CAPTION_SKILL;
@@ -126,10 +127,22 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
     });
   }
 
+  // A week of posts with captions is long, so the planner gets more room. If a
+  // reply comes back cut off or not as JSON, ask once more before giving up.
+  const ask = async () => {
+    const res = await client.messages.create({ model: MODEL, max_tokens: spec.output === "campaign" ? 8000 : 2500, system, messages: [{ role: "user", content }] });
+    const out = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
+    if (res.stop_reason === "max_tokens") console.error("specialist reply cut off", kind, out.length);
+    return { out, cut: res.stop_reason === "max_tokens" };
+  };
   let text = "";
   try {
-    const res = await client.messages.create({ model: MODEL, max_tokens: spec.output === "campaign" ? 3500 : 2000, system, messages: [{ role: "user", content }] });
-    text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
+    let r = await ask();
+    if (spec.output !== "text" && (r.cut || parseJson(r.out) == null)) {
+      console.error("specialist retry", kind, r.cut ? "cut off" : "not JSON", r.out.slice(0, 200));
+      r = await ask();
+    }
+    text = r.out;
   } catch (e) {
     console.error("specialist failed", kind, e);
     return { summary: `The ${spec.label.toLowerCase()} couldn't finish just now. Try again in a minute.` };
@@ -191,6 +204,7 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
 
   // Campaign: a plan plus draft posts on the calendar.
   const parsed = campaignSchema.safeParse(json);
+  if (!parsed.success) console.error("campaign unusable", json == null ? "not JSON" : parsed.error.issues.slice(0, 3));
   if (!parsed.success) return { summary: "The campaign planner sent back something unusable. Try again with the dates and the offer." };
   const plan = parsed.data;
   const posts = plan.posts.filter((p) => isYmd(p.date) && p.date >= today && p.date <= addDays(today, 90)).slice(0, 10);
@@ -233,20 +247,20 @@ Reply with JSON only:
 `.trim();
 
 const campaignSchema = z.object({
-  campaign: z.string().trim().min(1).max(80),
-  summary: z.string().trim().min(1).max(2000),
+  campaign: z.string().trim().min(1).transform((v) => v.slice(0, 80)),
+  summary: z.string().trim().min(1).transform((v) => v.slice(0, 2000)),
   posts: z
     .array(
       z.object({
         date: z.string(),
-        kind: z.string().max(40),
-        title: z.string().trim().min(1).max(80),
-        hook: z.string().trim().max(140),
-        caption: z.string().trim().max(900),
-        items: z.array(z.string().max(120)).max(6).default([]),
+        kind: z.string().transform((v) => v.slice(0, 40)),
+        title: z.string().trim().min(1).transform((v) => v.slice(0, 80)),
+        hook: z.string().trim().default("").transform((v) => v.slice(0, 140)),
+        caption: z.string().trim().default("").transform((v) => v.slice(0, 900)),
+        items: z.array(z.string().transform((v) => v.slice(0, 120))).default([]).transform((v) => v.slice(0, 6)),
       }),
     )
-    .max(12),
+    .transform((v) => v.slice(0, 12)),
 });
 
 function parseJson(text: string): unknown {
