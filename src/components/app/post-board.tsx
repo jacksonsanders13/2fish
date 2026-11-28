@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -258,7 +258,7 @@ function Calendar({
                       type="button"
                       onClick={() => onOpen(p)}
                       className={cn(
-                        "block w-full truncate rounded-[3px] px-1 py-0.5 text-left text-xs leading-snug focus-visible:outline-2 focus-visible:outline-signal sm:px-1.5",
+                        "block w-full truncate rounded-[4px] px-1 py-0.5 text-left text-xs leading-snug focus-visible:outline-2 focus-visible:outline-signal sm:px-1.5",
                         p.status === "posted"
                           ? "bg-night text-white"
                           : p.status === "approved"
@@ -286,7 +286,7 @@ function Calendar({
                     <button
                       type="button"
                       onClick={() => onOpen(posts[1])}
-                      className="num rounded-[3px] px-1 text-xs text-muted-foreground hover:text-night focus-visible:outline-2 focus-visible:outline-signal"
+                      className="num rounded-[4px] px-1 text-xs text-muted-foreground hover:text-night focus-visible:outline-2 focus-visible:outline-signal"
                     >
                       +{posts.length - 1} more
                     </button>

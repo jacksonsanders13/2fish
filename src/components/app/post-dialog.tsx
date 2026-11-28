@@ -95,7 +95,7 @@ export function PostDialog({ post, onClose }: { post: Post | null; onClose: () =
               </div>
               <div>
                 <dt className="font-semibold">Campaign</dt>
-                <dd className="mt-0.5">{post.campaign ? <span className="rounded-[4px] bg-signal-soft px-1.5 py-0.5 font-semibold text-signal-tint">{post.campaign}</span> : "Not part of a campaign"}</dd>
+                <dd className="mt-0.5">{post.campaign ? <span className="rounded-[4px] bg-surface px-1.5 py-0.5 font-semibold text-night">{post.campaign}</span> : "Not part of a campaign"}</dd>
               </div>
               {post.items.length ? (
                 <div>

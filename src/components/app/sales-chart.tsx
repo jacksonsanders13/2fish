@@ -103,7 +103,7 @@ export function SalesChart({
                 className="flex h-full min-w-0 flex-1 flex-col justify-end"
               >
                 <div
-                  className="flex flex-col justify-end overflow-hidden rounded-t-[3px]"
+                  className="flex flex-col justify-end overflow-hidden rounded-t-[2px]"
                   style={{ height: `${Math.max(2, (w.total / max) * 100)}%` }}
                 >
                   <div
