@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { Camera, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { approveWeek, setPostStatus } from "@/lib/pilot/actions";
 import { addDays, DAYS, monthName } from "@/lib/pilot/dates";
@@ -73,12 +73,6 @@ export function PostBoard({ home, today, view, setView }: { home: HomeData; toda
             </Button>
           </div>
         ) : null}
-        <Button asChild size="sm" variant="outline" className="h-9">
-          <Link href="/dashboard/videos">
-            <Camera aria-hidden="true" />
-            Send photos
-          </Link>
-        </Button>
       </div>
 
       <div className="mt-3 flex min-h-0 flex-1 flex-col">
@@ -109,15 +103,9 @@ function ApproveList({
     return (
       <div className="text-sm">
         <p>
-          Nothing waiting on you. Send photos and Fisher writes the
-          next week of posts.
+          Nothing waiting on you. Send Fisher photos with the Photos button
+          in the chat and Fisher writes the next week of posts.
         </p>
-        <Link
-          href="/dashboard/videos"
-          className="mt-2 inline-block font-semibold text-night underline underline-offset-2"
-        >
-          Send photos
-        </Link>
       </div>
     );
   }
@@ -155,9 +143,9 @@ function ApproveList({
                       (new Date(`${p.postOn}T12:00:00Z`).getUTCDay() + 6) % 7
                     ]
                   }{" "}
-                  · {p.kind}
-                  {p.campaign ? ` · ${p.campaign}` : ""}
-                  {p.slides.length > 1 ? ` · ${p.slides.length} photos` : ""}
+                  Â· {p.kind}
+                  {p.campaign ? ` Â· ${p.campaign}` : ""}
+                  {p.slides.length > 1 ? ` Â· ${p.slides.length} photos` : ""}
                 </span>
                 <span className="block font-semibold">{p.title}</span>
                 <span className="line-clamp-1 block text-sm">{p.hook}</span>
