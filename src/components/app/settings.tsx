@@ -338,7 +338,7 @@ function DeleteForm() {
   return (
     <form onSubmit={submit} className="space-y-3">
       <h3 className="font-semibold">Delete my account</h3>
-      <p className="text-sm text-muted-foreground">Removes your account, plan, customers, jobs and messages for good. Type DELETE to confirm.</p>
+      <p className="text-sm text-muted-foreground">Removes your store, uploads, posts, sales numbers, chats, and your Square and Instagram connections for good. Type DELETE to confirm.</p>
       <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="DELETE" aria-label="Type DELETE to confirm" className="max-w-xs" />
       {error ? <Notice tone="error">{error}</Notice> : null}
       {/* Outlined, so a solid coral button always means "go" and never gets mistaken for this one. */}

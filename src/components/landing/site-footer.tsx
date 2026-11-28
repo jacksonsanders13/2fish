@@ -29,6 +29,11 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
+            <Link href="/data-deletion" className="hover:underline">
+              Delete your data
+            </Link>
+          </li>
+          <li>
             <Link href="/privacy" className="hover:underline">
               Privacy
             </Link>
