@@ -131,9 +131,12 @@ export async function runSpecialist(kind: string, brief: string, ctx: ToolContex
   // A week of posts with captions is long, so the planner gets more room. If a
   // reply comes back cut off or not as JSON, ask once more before giving up.
   const ask = async () => {
-    const res = await client.messages.create({ model: MODEL, max_tokens: spec.output === "campaign" ? 8000 : 2500, system, messages: [{ role: "user", content }] });
+    // Room counts the model's thinking too, not just the answer, so the planner
+    // needs a lot of it.
+    const res = await client.messages.create({ model: MODEL, max_tokens: spec.output === "campaign" ? 16000 : 4000, system, messages: [{ role: "user", content }] });
     const out = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
-    if (res.stop_reason === "max_tokens") console.error("specialist reply cut off", kind, out.length);
+    if (res.stop_reason === "max_tokens")
+      console.error("specialist reply cut off", kind, out.length, "chars", res.usage.output_tokens, "tokens", res.content.map((b) => b.type).join(","));
     return { out, cut: res.stop_reason === "max_tokens" };
   };
   let text = "";
